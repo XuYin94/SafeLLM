@@ -1,0 +1,65 @@
+# Training
+
+defaults:
+  - config
+
+hydra:
+  run:
+    dir: /mnt/lynx1/users/zhang/Workfolder/exp
+
+dataset:
+  type: 'multi' # 'single' or 'multi'
+  images: True
+  cache: False # load episodes to memory instead of reading from disk
+  augment:
+    theta_sigma: 60 # rotation sigma in degrees; N(mu = 0, sigma = theta_sigma).
+
+train:
+  # folders
+  exp_folder: /mnt/lynx1/users/zhang/Workfolder/exp
+  exp_note: note
+#  train_dir: ${root_dir}/${train.exp_folder}/${train.task}-${train.agent}-n${train.n_demos}-train
+#  data_dir: ${root_dir}/data  # asdf: /${train.task}
+  train_dir: /mnt/lynx1/users/zhang/Workfolder/exp
+  data_dir: /mnt/lynx1/users/zhang/Workfolder/data/primitive
+
+  # task configs
+  task: multi_primitive
+  agent: two_stream_full_clip_lingunet_lat_transporter
+  n_demos: 10000
+  n_steps: 2010000 # use 601000 for multi-task models
+
+  # hyper params
+  n_rotations: 36
+  n_rotations_pick: 1  # FIXME: this should be integrated into the code (where n_rotations is hard-coded as 1)
+  batchnorm: True # important: False because batch_size=1
+  lr: 5e-4  # should scale with effective batch_size?
+  gpu: [0] # -1 for all
+  accum_grad: 1
+  batch_size: 8
+
+  attn_stream_fusion_type: 'add'
+  trans_stream_fusion_type: 'conv'
+  lang_fusion_type: 'mult'
+
+  # script configs
+  log: True # log metrics and stats to wandb
+  n_val: 300
+  val_repeats: 1
+  save_steps: 6250
+  load_from_last_ckpt: False
+
+  # seed
+  seed: 42
+
+wandb:
+  run_name: 'cliport0'
+  logger:
+    entity: cliport
+    project: cliport
+    tags: []
+    group: train
+    offline: False
+  saver:
+    upload: False
+    monitor: 'val_loss'

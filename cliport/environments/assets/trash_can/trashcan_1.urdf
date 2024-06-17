@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<robot name="trashcan.urdf">
+  <link name="baseLink">
+      <contact>
+      <lateral_friction value="1.0"/>
+      <inertia_scaling value="3.0"/>
+    </contact>
+    <inertial>
+      <origin rpy="0 0 0" xyz="-0.01 0 0.02"/>
+       <mass value="1.0"/>
+       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1"/>
+    </inertial>
+    <visual>
+       <origin rpy="0 0 0" xyz="0 0 0.1"/>
+      <geometry>
+        <mesh filename="trashcan_1.obj" scale="0.07 0.07 0.06"/>
+      </geometry>
+      <material name="light steel blue">
+       <color rgba="0.690196078 0.7686274509 0.8705882352 1"/>
+     </material>
+    </visual>
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+	 	    <mesh filename="trashcan_1.obj" scale="0.07 0.07 0.06"/>
+      </geometry>
+    </collision>
+  </link>
+</robot>

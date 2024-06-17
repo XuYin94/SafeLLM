@@ -1,0 +1,81 @@
+# Evaluation
+
+defaults:
+  - config
+
+hydra:
+  run:
+    dir: ./
+
+mode: test # 'val' or 'test'
+
+# eval settings
+agent: cliport
+n_demos: 100 # number of val instances
+train_demos: 200 # training demos used to train model
+n_repeats: 1 # number of repeats
+gpu: [0]
+save_results: True # write results to json
+update_results: False # overwrite existing json results?
+checkpoint_type: 'steps=50001'
+anomaly_type: container ##[None, miss, pick, container, place]
+use_vlm: False ## True: use openflamigo. False: use the GT 
+prompt_type: 'cot'
+
+actor:
+  # task configs
+  task: lohoravens-pick-and-place-primitive
+  agent: two_stream_full_clip_lingunet_lat_transporter
+  # hyper params
+  n_rotations: 36
+  n_rotations_pick: 1  # FIXME: this should be integrated into the code (where n_rotations is hard-coded as 1)
+  val_repeats: 1
+  load_from_last_ckpt: False
+  batchnorm: True # important: False because batch_size=1
+  gpu: [0] # -1 for all
+  accum_grad: 1
+  batch_size: 1
+  attn_stream_fusion_type: 'add'
+  trans_stream_fusion_type: 'conv'
+  lang_fusion_type: 'mult'
+
+reporter:
+  name: openflamingo3B
+  vision_encoder:
+  language_encoder:
+  ckt_path:
+
+planner:
+  name: Llama-3-8B-instruct
+
+
+
+
+disp: False
+shared_memory: False
+eval_task: put-block-in-matching-bowl
+model_task: ${eval_task} # task the model was trained on (e.g. multi-language-conditioned or packing-boxes-pairs-seen-colors)
+type: single # 'single' or 'multi'
+
+# paths
+model_dir: /mnt/lynx1/users/zhang/Workfolder/exp/
+exp_folder: eval_llm
+data_dir: /mnt/lynx1/users/zhang/Workfolder/data/episodes
+assets_root: ./cliport/environments/assets/
+
+model_path: /mnt/lynx1/users/zhang/Workfolder/exp/checkpoints_data5000/ # path to pre-trained models
+train_config: ./cliport/cfg/train.yaml # path to train config
+save_path: ${model_dir}/${exp_folder}/${eval_task}-n${train_demos}-${mode}/checkpoints/ # path to save results
+results_path: ${model_dir}/${exp_folder}/${eval_task}-n${train_demos}-${mode}/checkpoints/ # path to existing results
+
+
+# record videos (super slow)
+record:
+  save_video: True
+  save_video_path: ${model_dir}/${exp_folder}/${eval_task}-n${train_demos}-test/videos/
+  vlm_path: ${model_dir}/${exp_folder}/${eval_task}-n${train_demos}-${mode}/vlm/
+  txt_path: ${model_dir}/${exp_folder}/${eval_task}-n${train_demos}-${mode}/txt/
+  add_text: True
+  fps: 20
+  video_height: 640
+  video_width: 720
