@@ -199,24 +199,21 @@ class PutBlockInMatchingBowl(Task):
         super().__init__()
         self.max_steps = 10
         self.pos_eps = 0.05
-        self.final_goal="put all the blocks in the bowls with matching colors."
-        self.task_name="put all the blocks in the bowls with matching colors."
-        self.lang_template = "pick up the {pick_color} block and place it into the {place_color} bowl."
+        self.final_goal="put blocks in matching bowls"
+        self.task_name="put blocks in matching bowls "
+        self.lang_template = "put the {pick_color} block in the {place_color} bowl."
         self.task_completed_desc = "done PutBlockInMatchingBowl."
-        self.question_template = "Did the robot successfully execute the action 'place the {pick_color} block into the {place_color} bowl', and did any anomaly happen?"
-        self.answer_template = "The action is executed successfully."
+        self.question_template = "Did the robot successfully execute the action 'put the {pick_color} block in the {place_color} bowl', and did any anomaly happen?"
+        self.answer_template = "The action is executed successfully, and "
         self.seed = 0
 
     def reset(self, env):
         super().reset(env)
         
-        trashcan_pose = ((0.35, random.choice([-0.4, 0.4]), 0.05), (0.0, 0.0, 0.12, 0.99))
-        container_template = 'trash_can/trashcan_1.urdf'
+        trashcan_pose = ((0.35, random.choice([-0.38, 0.38]), 0.05), (0.0, 0.0, 0.12, 0.1))
+        container_template = 'trash_can/trashcan.urdf'
         env.add_object(container_template, trashcan_pose, 'fixed')
 
-        
-        
-        
         n_bowls = np.random.randint(3, 5)
         n_blocks = np.random.randint(3, n_bowls + 1)
 
@@ -225,31 +222,61 @@ class PutBlockInMatchingBowl(Task):
 
         colors = [utils.COLORS[cn] for cn in selected_color_names]
 
+        self.place_obj_names, self.pick_obj_names = [], []
+        pick_obj_names, place_obj_names = [], []
         bowl_colors, block_colors = [], []
         self.unfinished_goal_poses={}
         self.obj_colors={}
+        self.remain_container_poses=[]
+        self.remain_pick_obj_poses=[]
+        self.remain_obj_info = {}
+
+
+
         # Add bowls.
         bowl_size = (0.12, 0.12, 0)
         bowl_urdf = 'bowl/bowl.urdf'
         bowl_poses = []
+        initial_objects={}
         for i in range(n_bowls):
             bowl_pose = self.get_random_pose(env, bowl_size)
             bowl_id = env.add_object(bowl_urdf, bowl_pose, 'fixed')
             p.changeVisualShape(bowl_id, -1, rgbaColor=colors[i] + [1])
             bowl_poses.append(bowl_pose)
+            self.remain_container_poses.append((bowl_pose,selected_color_names[i]))
+            place_obj_names.append(f"{selected_color_names[i]}")
             bowl_colors.append(f"{selected_color_names[i]}")
+            if selected_color_names[i]+" block" in initial_objects.keys():
+                initial_objects[selected_color_names[i]+" blowl"]+=1
+            else:
+                initial_objects[selected_color_names[i] + " blowl"]=1
+            #self.remain_obj_info[bowl_id]=selected_color_names[i]+" blowl"
+        self.place_obj_names=place_obj_names
         # Add blocks.
         blocks = []
         block_size = (0.04, 0.04, 0.04)
         block_urdf = 'stacking/block.urdf'
+        distractor_block = []
+        distractor_bowl = []
         for i in range(n_blocks):
             block_pose = self.get_random_pose(env, block_size)
             block_id = env.add_object(block_urdf, block_pose)
             p.changeVisualShape(block_id, -1, rgbaColor=colors[i] + [1])
             blocks.append((block_id, (0, None)))
-            self.unfinished_goal_poses[block_id] = [block_pose,bowl_poses[i],f"{selected_color_names[i]} bowl"]
+            if i <n_bowls:
+                self.unfinished_goal_poses[block_id] = [block_pose,bowl_poses[i],f"{selected_color_names[i]} bowl"]
             self.obj_colors[block_id]=selected_color_names[i]
+            pick_obj_names.append(f"{selected_color_names[i]} block")
+            if selected_color_names[i]+" block" in initial_objects.keys():
+                initial_objects[selected_color_names[i]+" block"]+=1
+            else:
+                initial_objects[selected_color_names[i] + " block"]=1
+            self.remain_pick_obj_poses.append((block_pose,selected_color_names[i]))
+            self.remain_obj_info[block_id] = selected_color_names[i] + " block"
             block_colors.append(f"{selected_color_names[i]}")
+            if i>=n_bowls:
+                distractor_block.append(f"{selected_color_names[i]}")
+        self.pick_obj_names.append(pick_obj_names)
         # Goal: put each block in a different bowl.
         self.goals.append((blocks, np.eye(len(blocks)), bowl_poses, False, True, 'pose', None, 1))
         self.lang_goals.append(self.lang_template)
@@ -266,15 +293,14 @@ class PutBlockInMatchingBowl(Task):
         # Add distractors.
         n_distractors = 0
         max_distractors = 6
-        distractor_block = []
-        distractor_bowl = []
+
         while n_distractors < max_distractors and distractor_colors:
             is_block = np.random.rand() > 0.5
             urdf = block_urdf if is_block else bowl_urdf
             size = block_size if is_block else bowl_size
             colors = distractor_colors
             pose = self.get_random_pose(env, size)
-            if not pose:
+            if None in pose:
                 continue
             obj_id = env.add_object(urdf, pose)
             color_name = distractor_color_names[n_distractors % len(colors)]
@@ -282,8 +308,19 @@ class PutBlockInMatchingBowl(Task):
             if is_block:
                 distractor_block.append(color_name)
                 block_colors.append(color_name)
+                if color_name + " block" in initial_objects.keys():
+                    initial_objects[color_name + " block"] += 1
+                else:
+                    initial_objects[color_name + " block"] = 1
+                self.remain_pick_obj_poses.append((pose,color_name))
+                self.remain_obj_info[obj_id] = color_name + " block"
             else:
                 distractor_bowl.append(color_name)
+                if color_name + " bowl" in initial_objects.keys():
+                    initial_objects[color_name+ " bowl"] += 1
+                else:
+                    initial_objects[color_name + " bowl"] = 1
+                self.remain_container_poses.append((pose,color_name))
                 bowl_colors.append(color_name)
             distractor_colors.remove(color)
             distractor_color_names.remove(color_name)
@@ -295,22 +332,27 @@ class PutBlockInMatchingBowl(Task):
         np.random.shuffle(block_list)
         bowl_list = selected_color_names[:n_bowls] + distractor_bowl
         np.random.shuffle(bowl_list)
-        
+        self.scene_description = f"On the table, there are {n_blocks + len(distractor_block)} blocks. " \
+                                 f"Their colors are {', '.join(block_list)}. " \
+                                 f"There are {n_bowls + len(distractor_bowl)} bowls. " \
+                                 f"Their colors are {', '.join(bowl_list)}."
         self.lang_goals.append(self.lang_template)
         self.question_list.append(self.question_template)
         self.answer_list.append(self.answer_template)
         self.build_initial_scene_description(block_colors,bowl_colors)
-
+        self.target_colors=bowl_colors[:n_bowls]
+        self.distractor_block = distractor_block
+        self.distractor_bowl = distractor_bowl
         return True
 
     def build_initial_scene_description(self, block_colors,bowl_colors):
-        info="In the initial state, there are blocks with "
+        info="In the initial state, there are "
         for i in range(len(block_colors)-1):
             info+=block_colors[i]+', '
-        info+="and "+block_colors[-1]+" colors, bowls with "
+        info+="and "+block_colors[-1]+" blocks; there are "
         for i in range(len(bowl_colors)-1):
             info+=bowl_colors[i]+', '
-        info+="and "+bowl_colors[-1]+" colors, and a trash can."
+        info+="and "+bowl_colors[-1]+" bowls; and a trash can."
         
         self.initial_state=info
 

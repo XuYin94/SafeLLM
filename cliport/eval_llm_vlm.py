@@ -237,7 +237,7 @@ def main(vcfg):
             print(f'THE FINAL GOAL: {final_goal}')
             print("Initial State:", initial_state)
             if anomaly_type !='None':
-                anomaly_time = np.random.choice(np.arange(1, len(episode)-2), size=1, replace=False)  ## the step when the anomaly occurr
+                anomaly_time = np.random.choice(np.arange(1, len(episode)-1), size=1, replace=False)  ## the step when the anomaly occurr
                 print("{type} anomaly will occur in step {time}".format(type=anomaly_type,time=anomaly_time))
             else:
                 anomaly_time=-1

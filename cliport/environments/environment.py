@@ -307,6 +307,17 @@ class Environment(gym.Env):
 
         return color, depth, segm
 
+    def multi_view_render(self):
+        color_list,depth_list=[],[]
+        for j,config in enumerate(self.agent_cams):
+            color, depth, _ = self.render_camera(config)
+            # img_rgb = cv2.cvtColor(np.uint8(color) , cv2.COLOR_BGR2RGB)
+            # cv2.imwrite(os.path.join('./', str(j) + ".png"), img_rgb)
+            color_list.append(color)
+            depth_list.append(color)
+        return color_list,depth_list
+
+
     @property
     def info(self):
         """Environment info variable with object poses, dimensions, and colors."""

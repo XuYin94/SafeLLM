@@ -310,7 +310,7 @@ class Task:
                     pts[1, :] > -can_size[1] / 2, pts[1, :] < can_size[1] / 2,
                     pts[2, :] < self.zone_bounds[2, 1]])
                 #print(np.sum(valid_pts))
-                if 120>np.sum(valid_pts)>5:
+                if 120>np.sum(valid_pts)>=6:
                     step_reward=1
                 else:
                     step_reward=0
@@ -318,16 +318,6 @@ class Task:
         reward = self.progress + step_reward - self._rewards
         self._rewards = self.progress + step_reward
 
-        # Move to next goal step if current goal step is complete.
-        # if np.abs(max_reward - step_reward) < 0.01:
-        #     self.progress += max_reward  # Update task progress.
-        #     self.goals.pop(0)
-        #     if len(self.lang_goals) > 0:
-        #         self.lang_goals.pop(0)
-        #     if len(self.pick_obj_names) > 0:
-        #         assert len(self.place_obj_names) > 0
-        #         self.pick_obj_names.pop(0)
-        #         self.place_obj_names.pop(0)
 
         return reward, info
 

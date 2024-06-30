@@ -18,7 +18,7 @@ class PackingBoxes(Task):
         self.final_goal="put all current-seen blocks in the brown box"
         self.lang_template = "pick up the {pick_color} block and place it in the brown box."
         self.question_template = "Did the robot successfully execute the action 'pick up the {pick_color} block and place it in the brown box', and did any anomaly happen?"
-        self.answer_template = "The action is executed successfully."
+        self.answer_template = "The action is executed successfully, and "
         self.task_name="Packing boxes"
         self.zone_bounds = np.array([[0.25, 0.75], [-0.5, 0.5], [0, 0.08]])
 

@@ -5,14 +5,13 @@
 
 # python setup.py develop
 #wandb login 64b0361e494a7e48cf9aab82f6ecd77888550de4
+#pack-box-primitive-relative-pick-position
+for TASK_NAME in pick-and-place-primitive pick-and-place-primitive-relative-pick-position pack-box-primitive 
+do
 
- for TASK_NAME in  pack-box-primitive-relative-pick-position
+    python cliport/primitive_generator.py  task=$TASK_NAME  n=2000 mode=train data_dir=/mnt/lynx1/users/zhang/Workfolder/data/new/primitive
 
- do
-
-    python cliport/primitive_generator.py  task=$TASK_NAME  n=10000 mode=train data_dir=/mnt/lynx1/users/zhang/Workfolder/data/primitive
-
-    #python cliport/primitive_generator.py  task=$TASK_NAME  n=300 mode=val data_dir=/mnt/lynx1/users/zhang/Workfolder/data/primitive
+    python cliport/primitive_generator.py  task=$TASK_NAME  n=200 mode=val data_dir=/mnt/lynx1/users/zhang/Workfolder/data/new/primitive
 
  done
 

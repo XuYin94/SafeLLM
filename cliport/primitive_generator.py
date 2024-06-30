@@ -11,31 +11,26 @@ from cliport.dataset import RavensDataset
 from cliport.utils.utils import add_anomaly_object
 from cliport.environments.environment import Environment
 
-def recording(env,font_img_list,topdown_img_list,topdown_config,event):
-    time.sleep(0.15)
+def recording(env,rgb_list,depth_list,event):
     while not event.is_set():
-        time.sleep(0.025)
-        img = env.render()
-        img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        font_img_list.append(img_rgb)
-        topdown_img_list.append(cv2.cvtColor(env.render_camera(topdown_config)[0], cv2.COLOR_BGR2RGB))
-
+        time.sleep(0.005)
+        rgb, depth = env.multi_view_render()
+        rgb_list.append(rgb)
+        depth_list.append(depth)
 
 def one_episode_execution(info,obs,agent,env,task,episode,output_queue,event,add_anomaly=False):
-    reward = 0
     for _ in range(task.max_steps):
         lang_goal = info['lang_goal']
         question = info['question']
         answer = info['answer']
         act = agent.act(obs, info)
-        episode.append((obs, act, reward, info))
         if add_anomaly:
             if 'trash can' in lang_goal:
                 continue
             if act is not None:
                 anomaly = add_anomaly_object(env, task, in_pick_position=True,oracle_pose=act)
         else:
-            anomaly=" no anomaly happened."
+            anomaly="no anomaly happened."
         obs, reward, __,__ = env.step(act)
 
         info['answer'] += anomaly
@@ -48,7 +43,7 @@ def one_episode_execution(info,obs,agent,env,task,episode,output_queue,event,add
                 f'| Goal: {lang_goal} | Question: {question} | Answer: {answer}')
 
             break
-    episode.append((obs, None, reward, info))
+    episode.append((obs, act, reward, info))
     output_queue.put(reward)
     event.set()
 
@@ -87,8 +82,6 @@ def main(cfg):
             seed = -1 + 10000
         else:
             raise Exception("Invalid mode. Valid options: train, val, test")
-    topdown_config=task.oracle_cams[0]
-    # Collect training data from oracle demonstrations.
 
 
 
@@ -114,32 +107,32 @@ def main(cfg):
             # Start video recording (NOTE: super slow)
             if record:
                 env.start_rec(f'{dataset.n_episodes+1:06d}')
+            rgb_list=[]
+            depth_list=[]
+            rgb,depth= env.multi_view_render()
+            rgb_list.append(rgb)
+            depth_list.append(depth)
 
-            font_img_list=[]
-            topdown_img_list=[]
-            img = env.render()
-            img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            font_img_list.append(img_rgb)
-            topdown_img_list.append(cv2.cvtColor(env.render_camera(topdown_config)[0], cv2.COLOR_BGR2RGB))
             import threading,queue
             event = threading.Event()
             output_queue = queue.Queue()
             execution=threading.Thread(target=one_episode_execution,args=(info,obs,agent,env,task,episode,output_queue,event))
-            record_rgb=threading.Thread(target=recording,args=(env,font_img_list,topdown_img_list,topdown_config,event))
+            record_rgb=threading.Thread(target=recording,args=(env,rgb_list, depth_list,event))
             execution.start()
             record_rgb.start()
             execution.join()
             event.set()
             record_rgb.join()
 
-            img=env.render()
-            img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            font_img_list.append(img_rgb)
-            topdown_img_list.append(cv2.cvtColor(env.render_camera(topdown_config)[0], cv2.COLOR_BGR2RGB))
+            rgb,depth= env.multi_view_render()
+            rgb_list.append(rgb)
+            depth_list.append(depth)
+
             while not output_queue.empty():
                 reward=output_queue.get()
             if save_data and reward > 0: ## for the primitive actions, only a single 
-                dataset.add(seed, episode,font_img_list,topdown_img_list)
+                dataset.add(seed, episode)
+                dataset.save_vlm_episodes(seed,rgb_list,depth_list,path=data_path)
 
 
 

@@ -81,7 +81,7 @@ class RavensDataset(Dataset):
             episodes = np.random.choice(range(self.n_episodes), self.n_demos, False)
             self.set(episodes)
 
-    def add(self, seed, episode,font_img_list=None,topdown_img_list=None):
+    def add(self, seed, episode):
         """Add an episode to the dataset.
 
         Args:
@@ -98,35 +98,45 @@ class RavensDataset(Dataset):
 
         color = np.uint8(color)
         depth = np.float32(depth)
-        #hist_img=np.stack(img_list,0)
         def dump(data, field):
-            field_path = os.path.join(self._path, field)
+            field_path = os.path.join(self._path,field)
             if not os.path.exists(field_path):
                 os.makedirs(field_path)
             fname=f'{self.n_episodes:06d}-{seed}'
-            if "img" in field:
-                root_path=field_path+"/"+fname
-                os.makedirs(root_path)
-                for i, img in enumerate(data):
-                    cv2.imwrite(os.path.join(root_path,str(i)+".png"),img)
-
-            else:
-                file_name = fname+'.pkl'  # -{len(episode):06d}
-                with open(os.path.join(field_path, file_name), 'wb') as f:
-                    pickle.dump(data, f)
+            file_name = fname+'.pkl'  # -{len(episode):06d}
+            with open(os.path.join(field_path, file_name), 'wb') as f:
+                pickle.dump(data, f)
 
         dump(color, 'color')
         dump(depth, 'depth')
         dump(action, 'action')
         dump(reward, 'reward')
         dump(info, 'info')
-        if font_img_list is not None:
-            dump(font_img_list,'font_img')
-        if topdown_img_list is not None:
-            dump(topdown_img_list,'topdown_img')
         self.n_episodes += 1
         self.max_seed = max(self.max_seed, seed)
 
+
+    def save_vlm_episodes(self,seed,rgb_list,depth_list,info=None,path=None):
+        assert len(rgb_list)==len(depth_list)
+        fname = f'{self.n_episodes:06d}-{seed}'
+        for i in range(len(rgb_list)):
+            rgb=rgb_list[i]
+            depth=depth_list[i]
+            for j in range(4):
+                obs=np.stack([rgb[j],depth[j]],axis=0) ## rgbd observation
+                field_path=os.path.join(path,"view_"+str(j)+"",fname)
+                if not os.path.exists(field_path):
+                    os.makedirs(field_path)
+                file_name = str(i)+'.pkl'  # -{len(episode):06d}
+                with open(os.path.join(field_path, file_name), 'wb') as f:
+                    pickle.dump(obs, f)
+            if info is not None:
+                file_name = fname + '.pkl'  # -{len(episode):06d}
+                info_path=os.path.join(path, "info")
+                if not os.path.exists(info_path):
+                    os.makedirs(info_path)
+                with open(os.path.join(info_path, file_name), 'wb') as f:
+                    pickle.dump(info, f)
 
     def set(self, episodes):
         """Limit random samples to specific fixed set."""

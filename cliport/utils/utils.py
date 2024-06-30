@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import meshcat
 import meshcat.geometry as g
 import meshcat.transformations as mtf
-
+from time import sleep
 import PIL
 import yaml
 import numpy as np
@@ -670,8 +670,9 @@ TRAIN_COLORS = ['blue', 'red', 'green', 'yellow', 'brown', 'gray', 'cyan']
 EVAL_COLORS = ['blue', 'red', 'green', 'orange', 'purple', 'pink', 'white']
 
 
-def anomaly_generator_for_primitive(env,task=None,type="miss"): # to generate the anomaly data for VLM training
-    assert type in ["pick","place","container","miss"]
+
+def anomaly_generator_for_primitive(env,output_queue,task=None,type="miss",progress_list=None): # to generate the anomaly data for VLM training
+    #assert type in ["pick","place","container","miss"]
     color_names = list(COLORS.keys())
     if type in ["pick","place"]:
         if 'box' in task.task_name:
@@ -696,7 +697,7 @@ def anomaly_generator_for_primitive(env,task=None,type="miss"): # to generate th
                 color = random.choice(color_names)
                 color_value = COLORS[color]
                 p.changeVisualShape(block_id, -1, rgbaColor=color_value + [1])
-                anomaly="a never-seen {color} block occurs at the {position}.".format(color=color,position=position)
+                anomaly="a never-seen {color} block appears at the {position}.".format(color=color,position=position)
             else:
                 return None
         elif type=="place":
@@ -706,7 +707,7 @@ def anomaly_generator_for_primitive(env,task=None,type="miss"): # to generate th
                 color_value = COLORS[color]
                 obj_info = color + " block"
                 if "block" in task.task_name:
-                    place_pose,color=random.choice(task.remain_container_poses)
+                    place_pose,color=task.remain_container_poses[-1]
                     pose1, pose2 = place_pose
                     pose1 = list(pose1)
                     pose1[2] = 0.04
@@ -728,20 +729,9 @@ def anomaly_generator_for_primitive(env,task=None,type="miss"): # to generate th
             anomaly="a never-seen {obj_info} is placed in the {position}.".format(obj_info=obj_info,position=place_obj)
 
     elif type=="container":
-        if "box" in task.task_name:  ## need to add a brown box
-            container_size = task.get_random_size(0.05, 0.15, 0.05, 0.15, 0.05, 0.05)
-            container_template = 'container/container-template.urdf'
-            half = np.float32(container_size) / 2
-            replace = {'DIM': container_size, 'HALF': half}
-            container_urdf = task.fill_template(container_template, replace)
-            color_value = COLORS["brown"]
-            container_info = "brown box"
-        else: ##add a bowl or block
-            container_size = (0.12, 0.12, 0)
-            container_urdf = 'bowl/bowl.urdf'
-            color = random.choice(color_names)
-            color_value = COLORS[color]
-            container_info = color + " bowl"
+        container_size = (0.12, 0.12, 0)
+        container_urdf = 'bowl/bowl.urdf'
+        container_info = color + " bowl"
         i=0
         while i<20:
             position = random.choice(rel_pos)
@@ -752,107 +742,162 @@ def anomaly_generator_for_primitive(env,task=None,type="miss"): # to generate th
             i+=1
         if obj_id is not None:
             p.changeVisualShape(obj_id, -1, rgbaColor=color_value + [1])
-            anomaly = "a never-seen {container_info} occurs at the {position}.".format(container_info=container_info,
+            anomaly = "a never-seen {container_info} appears at the {position}.".format(container_info=container_info,
                                                                            position=position)
         else:
             return None
-    else: ## for cases where certain goal objects dispappear.
+    elif type=="miss": ## for cases where certain goal objects dispappear.
         if not "box" in task.task_name:
 
-            goal_obj_info = random.choice(task.remain_pick_obj_poses)
-            goal_id,color_info=goal_obj_info
+            goal_id = list(task.remain_obj_info.keys())[-1]
+            obj_info=task.remain_obj_info[goal_id]
         else:
-            if len(task.remain_pick_obj_info)<1:
+
+            if len(task.remain_obj_info)<1:
                 return None
-            goal_obj_info=random.choice(task.remain_pick_obj_info)
-            goal_id, color_info = goal_obj_info
+
+            goal_obj_info=random.choice(task.remain_obj_info)
+
+            goal_id, obj_info = goal_obj_info
         env.remove_object(goal_id)
-        anomaly = "A {color_info} block in the work zone disappeared.".format(color_info=color_info)
+        anomaly = "the {obj_info} on the table disappeared.".format(obj_info=obj_info)
+    else: ## simulate the condition where the achieved progress is destoryed.
+        affected_progress=random.randint(1,len(progress_list))
+        obj_ids=random.sample(list(progress_list),affected_progress)
+        if "box" not in task.task_name:
+            color_lists=[task.remain_obj_info[x][:-6] for x in obj_ids]
+            if affected_progress>1:
+                con="in their corresponding bowls are"
+            else:
+                con="in its corresponding bowl is"
+            affected_obj = "the "
+            for i,obj in enumerate(obj_ids):
+                __, __, size = env.info[obj]
+                color_value = COLORS[color_lists[i].split(' ')[0]]
+                pose = task.get_random_pose(env, size)
+                p.resetBasePositionAndOrientation(obj, pose[0],pose[1])
 
-    return anomaly
-
-
-
-def anomaly_generator(env,task=None,type="pick",ora_act=None,sample=True): # to generate the anomaly data for VLM training
-    assert type in ["pick","place","container","miss"]
-
-    color_names = list(COLORS.keys())
-    future_goal_pick_poses=task.unfinished_goal_poses.copy()
-    if type in ["pick","place"]:
-        if sample:
-            goal_obj = random.choice(list(future_goal_pick_poses.keys()))
+                if i ==affected_progress-1 and affected_progress>1:
+                    affected_obj += "and "
+                affected_obj+=color_lists[i]+" "
+            affected_obj+= con
         else:
-            goal_obj=list(future_goal_pick_poses.keys())[-1]
-        #print(future_goal_pick_poses[goal_obj])
-        pick_pose,place_pose,place_obj = future_goal_pick_poses[goal_obj]  ## target place in the box
-        goal_region=determine_region(pick_pose)
-        if 'box' in task.task_name:
-            object_template = 'box/box-template.urdf'
+            color_lists=[task.inside_box_blocks[obj] for obj in obj_ids ]
             color_names.remove("brown")
-        else:
+            if affected_progress>1:
+                con=" blocks in the box are"
+            else:
+                con=" block in the box is"
+            affected_obj = "the "
+            for i,obj in enumerate(obj_ids):
+                __, __, size = env.info[obj]
+                pose = task.get_random_pose(env, size)
+                p.resetBasePositionAndOrientation(obj, pose[0],pose[1])
+
+                if i ==affected_progress-1 and affected_progress>1:
+                    affected_obj += "and "
+                affected_obj+=color_lists[i]
+                if i<affected_progress-1 and affected_progress>1:
+                    affected_obj+=", "
+            affected_obj+= con
+        anomaly=affected_obj+" moved to other positions on the table."
+        
+    output_queue.put((2,anomaly))
+
+
+def anomaly_generator(env,output_queue,task=None,type="pick",step=0,property="distractor"): # to generate the anomaly data for VLM training
+    assert type in ["pick","place","container","miss"]
+    sleep(random.randint(5,10))
+    if property=="distractor":
+        if type =="pick": ## need to add distracting blocks
+            color_names = task.distractor_bowl
             object_template='stacking/block.urdf'
-
-        __, __, obj_size = env.info[goal_obj]
-        obj_urdf = task.fill_template(object_template, {'DIM': obj_size})
+            obj_size = (0.04, 0.04, 0.04)
+            obj_urdf = task.fill_template(object_template, {'DIM': obj_size})
+        elif type=="container":
+            color_names = task.distractor_block ## need to add distracting bowls
+            
+            #print(color_names)
+            obj_size = (0.12, 0.12, 0)
+            obj_urdf = 'bowl/bowl.urdf'
+        if color_names==0:
+            return None
+        sample_idx=random.randint(0,len(color_names)-1)
+        color=color_names[sample_idx]
+        color_value=COLORS[color]
+        
+        while True:
+            position=random.choice(rel_pos)  ## make sure the added block is in different region
+            block_pose = task.get_random_pose(env, obj_size,zone=position)
+            block_id = env.add_object(obj_urdf, block_pose)
+            if block_id is not None:            
+                p.changeVisualShape(block_id, -1, rgbaColor=color_value + [1])
+                break
         if type=="pick":
-            while True:
-                position=random.choice(list(set(rel_pos)-set(goal_region)))  ## make sure the added block is in different region
-                block_pose = task.get_random_pose(env, obj_size,zone=position)
-                block_id = env.add_object(obj_urdf, block_pose)
-                if block_id is not None:
-                    color=random.choice(color_names)
-                    color_value=COLORS[color]
-                    p.changeVisualShape(block_id, -1, rgbaColor=color_value + [1])
-                    break
-            anomaly="a never-seen {color} block appears at the {position} zone.".format(color=color,position=position)
-        elif type=="place":
-            color = random.choice(color_names)
-            color_value = COLORS[color]
-            obj_info = color + " block"
-            if "bowl" in task.task_name:
-                pose1, pose2 = place_pose
-                pose1 = list(pose1)
-                pose1[2] = 0.04
-                place_pose=(pose1,pose2)
-            obj_id = env.add_object(obj_urdf, place_pose)
-            p.changeVisualShape(obj_id, -1, rgbaColor=color_value + [1])
-            anomaly="a never-seen {obj_info} is placed in the {position}.".format(obj_info=obj_info,position=place_obj)
+            anomaly="a never-seen {color} block at the {position} zone.".format(color=color,position=position)
+        else:
+            anomaly="a never-seen {color} bowl appears at the {position} zone.".format(color=color,position=position)
+    else:
+        color_names = task.target_colors[step+1:]
+        future_goal_pick_poses=task.unfinished_goal_poses.copy()
+        goal_obj_list=list(future_goal_pick_poses.keys())[step+1:]
+        sample_idx=random.randint(0,len(goal_obj_list)-1)
 
-    elif type=="container":
-        if "box" in task.task_name:  ## need to add a brown box
-            container_size = task.get_random_size(0.05, 0.15, 0.05, 0.15, 0.05, 0.05)
-            container_template = 'container/container-template.urdf'
-            half = np.float32(container_size) / 2
-            replace = {'DIM': container_size, 'HALF': half}
-            container_urdf = task.fill_template(container_template, replace)
-            color_value = COLORS["brown"]
-            container_info = "brown box"
-        else: ##add a bowl or block
+        goal_obj=goal_obj_list[sample_idx]
+        pick_pose,place_pose,place_obj = future_goal_pick_poses[goal_obj]  ## target obj infomation
+        color=color_names[sample_idx]
+        color_value=COLORS[color]
+        if type in ["pick","place"]:
+            goal_region=determine_region(pick_pose)
+            object_template='stacking/block.urdf'
+            __, __, obj_size = env.info[goal_obj]
+            obj_urdf = task.fill_template(object_template, {'DIM': obj_size})
+            if type=="pick":
+                while True:
+                    position=random.choice(list(set(rel_pos)-set(goal_region)))  ## make sure the added block is in different region
+                    block_pose = task.get_random_pose(env, obj_size,zone=position)
+                    block_id = env.add_object(obj_urdf, block_pose)
+                    if block_id is not None:
+                        
+                        p.changeVisualShape(block_id, -1, rgbaColor=color_value + [1])
+                        break
+                anomaly="a never-seen {color} block appears at the {position} zone.".format(color=color,position=position)
+            elif type=="place":
+                color=random.choice(list(set(COLORS.keys())-set(color)))
+                color_value=COLORS[color]
+                obj_info = color + " block"
+                pose1, pose2 = place_pose
+                pose1 = list(pose1) 
+                place_pose=(pose1,pose2)
+                obj_id = env.add_object(obj_urdf, place_pose)
+                p.changeVisualShape(obj_id, -1, rgbaColor=color_value + [1])
+                anomaly="a never-seen {obj_info} is placed in the {position}.".format(obj_info=obj_info,position=place_obj)
+
+        elif type=="container":
             container_size = (0.12, 0.12, 0)
             container_urdf = 'bowl/bowl.urdf'
-            color = random.choice(color_names)
-            color_value = COLORS[color]
             container_info = color + " bowl"
-        i=0
-        while i<20:
-            position = random.choice(rel_pos)
-            container_pose = task.get_random_pose(env, container_size, position)
-            obj_id = env.add_object(container_urdf, container_pose)
+            i=0
+            while i<20:
+                goal_region=determine_region(place_pose)
+                position=random.choice(list(set(rel_pos)-set(goal_region)))
+                container_pose = task.get_random_pose(env, container_size, position)
+                obj_id = env.add_object(container_urdf, container_pose)
+                if obj_id is not None:
+                    break
+                i+=1
             if obj_id is not None:
-              break
-            i+=1
-        if obj_id is not None:
-            p.changeVisualShape(obj_id, -1, rgbaColor=color_value + [1])
-            anomaly = "a never-seen {container_info} appears at the {position} zone.".format(container_info=container_info,
-                                                                           position=position)
-        else:
-            return None
-    else: ## for cases where certain goal objects dispappear.
-        goal_obj = random.choice(list(future_goal_pick_poses.keys()))
-        color_info=task.obj_colors[goal_obj]
-        env.remove_object(goal_obj)
-        anomaly = "a {color_info} block in the table disappeared.".format(color_info=color_info)
-    return anomaly
+                p.changeVisualShape(obj_id, -1, rgbaColor=color_value + [1])
+                anomaly = "a never-seen {container_info} appears at the {position} zone.".format(container_info=container_info,
+                                                                            position=position)
+            else:
+                return None
+        else: ## for cases where certain goal objects dispappear.
+            goal_obj = random.choice(list(future_goal_pick_poses.keys()))
+            color_info=task.obj_colors[goal_obj]
+            env.remove_object(goal_obj)
+            anomaly = "a {color_info} block in the table disappeared.".format(color_info=color_info)
+    output_queue.put((2,anomaly))
 
 
 

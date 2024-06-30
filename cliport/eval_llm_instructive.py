@@ -20,78 +20,98 @@ from cliport.utils.utils import anomaly_generator
 import os
 import threading, time,queue
 
-def execution(obs,info,event,agent,env,task,output_queue,anomaly=None):
+def execution(obs,info,event,agent,env,output_queue):
     act=agent.act(obs,info)
-    if anomaly is not None:
-        anomaly_info=anomaly_generator(env,task,type=anomaly,sample=False)
-    else:
-        anomaly_info="no anomaly happened."
     obs, __, __, info=env.step(act)
-    output_queue.put(obs)
-    output_queue.put(info)
-    output_queue.put(anomaly_info)
+    output_queue.put((1,obs,info))
     event.set()
 
 def one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,step,anomaly,total_reward,vlm_args=None):
     episode_message+="### User:\nWhat is your plan for the next step?\n"
     header,lang_inst=get_legal_LLM_feedback(history_message=episode_message,return_prompt = True,llm_args= llm_args,feedback=None)
-    #print(generation)
-    #lang_inst=lang_inst.split(':')[1].strip()
     episode_message+=header+'\n'+lang_inst+'\n'
-    if "done" in lang_inst:
-        return episode_message,lang_inst,total_reward,obs,info,None
+    #print(lang_inst)
+
     task.lang_goals=[lang_inst]
     info['lang_goal']=lang_inst
     img_obs=[]
     print("Step {step}: {action}".format(step=step,action=lang_inst))
+    if "done." in lang_inst:
+        env.add_video_frame()
+        return episode_message,lang_inst,total_reward,obs,info,None, step
+    rgb_list=[]
+    depth_list=[]
+    rgb,depth= env.multi_view_render()
+    rgb_list.append(rgb)
+    depth_list.append(depth)
+    
     event = threading.Event()
     output_queue = queue.Queue()
-    actor = threading.Thread(target=execution,args=(obs,info,event,agent,env,task,output_queue,anomaly))
-    recorder=threading.Thread(target=record_img_for_reporter,args=(env,img_obs,event))
+    actor = threading.Thread(target=execution,args=(obs,info,event,agent,env,output_queue))
+    recorder=threading.Thread(target=record_img_for_reporter,args=(env,rgb_list,depth_list,event))
+    thread_list=[actor,recorder]
+    
 
-    actor.start()
-    recorder.start()
-    actor.join()
-    event.set()
-    recorder.join()
- 
-
+    
+    if anomaly is not None:
+        gt_anomaly=threading.Thread(target=anomaly_generator,args=(env,output_queue,task,anomaly,step))
+        thread_list.append(gt_anomaly)
+    
+    for thread in thread_list:
+        thread.start()
+    for thread in thread_list:
+        thread.join()
+        
+    ## get the output of all threads 
+    results=[]
     while not output_queue.empty():
-        obs= output_queue.get()
-        info=output_queue.get()
-        anomaly=output_queue.get()
-        if not use_vlm: ## use the gt feedback from Pybullet
-            #if reward>0:
-            feedback="### User:\nThe action is executed successfully and "+anomaly+'\n'
-        else:
-            feedback=get_vlm_feedback(img_obs,lang_inst,vlm_args,device)+'\n'
-        episode_message+=feedback
-        anomaly_desc=feedback.split('and')[1][1:-1]
-        print(anomaly_desc)
-        if "no anomaly" in anomaly_desc: ## start the next iteration after summarizing the progress and the future steps
-            episode_message+="### User: \nPlease describe the achieved progress and the remaining goals.\n"
-            header,state_of_progree_future=get_legal_LLM_feedback(history_message=episode_message,return_prompt = True,llm_args= llm_args,feedback=None)
-            episode_message+=header+'\n'+state_of_progree_future+'\n'
+        results.append(output_queue.get())
+        
+    if anomaly is not None:
+        if len(results)<2:
+            return None ## if the created perturbation fails
+        results.sort()
+        __, obs,info = results[0]
+        anomaly = results[1][1]
+    else:
+        __,obs, info= results[0]
+        anomaly="no anomaly happened."
+    rgb, depth = env.multi_view_render()
+    rgb_list.append(rgb)
+    depth_list.append(depth)
+    
+    if not use_vlm: ## use the gt feedback from Pybullet
+        #if reward>0:
+        feedback="### User:\nThe action is executed successfully, and "+anomaly+'\n'
+    else:
+        feedback=get_vlm_feedback(img_obs,lang_inst,vlm_args,device)+'\n'
+    episode_message+=feedback
+    anomaly_desc=feedback.split('and')[1][1:-1]
+    print(anomaly_desc)
+    if "no anomaly" in anomaly_desc: ## start the next iteration after summarizing the progress and the future steps
+        episode_message+="### User: \nPlease describe the achieved progress and the remaining goals.\n"
+        header,state_of_progree_future=get_legal_LLM_feedback(history_message=episode_message,return_prompt = True,llm_args= llm_args,feedback=None)
+        episode_message+=header+'\n'+state_of_progree_future+'\n'
 
-            return episode_message,lang_inst,total_reward,obs,info,img_obs
-        else:## start to reason the anomaly ascene
-            episode_message+="### User:\nAnalyze the effect of the anomaly ['{anomaly}'] on the task regarding progress and feasibility.\n".format(anomaly=anomaly_desc)
-            #print(episode_message)
-            header, reply=get_legal_LLM_feedback(history_message=episode_message,return_prompt = True,llm_args= llm_args,feedback=None)
-            #print(reply)
-            episode_message+=header+'\n'+reply
-            episode_message+="\n"+"### User:\nAnalyze the effect of the anomaly on future actions.\n"
-            header, reply=get_legal_LLM_feedback(history_message=episode_message,return_prompt = True,llm_args= llm_args,feedback=None)
-            #print(reply)
-            episode_message+=header+'\n'+reply
-            episode_message+="\n"+"### User:\nHow to handle this anomaly?\n"
-            header, reply=get_legal_LLM_feedback(history_message=episode_message,return_prompt = True,llm_args= llm_args,feedback=None)
-            #print(reply)
-            episode_message+=header+'\n'+reply+'\n'
-            #print(episode_message)
-            obs, __, __, info=env.step()
-            return one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,step+1,None,total_reward,vlm_args) ## assume no anomaly occurs in the recovery steps, otherwise the recurrsion will never stop
-        ## save images 
+        return episode_message,lang_inst,total_reward,obs,info,img_obs, step
+    else:## start to reason the anomaly ascene
+        episode_message+="### User:\nAnalyze the effect of the anomaly ['{anomaly}'] on the task regarding progress and feasibility.\n".format(anomaly=anomaly_desc)
+        #print(episode_message)
+        header, reply=get_legal_LLM_feedback(history_message=episode_message,return_prompt = True,llm_args= llm_args,feedback=None)
+        #print(reply)
+        episode_message+=header+'\n'+reply
+        episode_message+="\n"+"### User:\nAnalyze the effect of the anomaly on future actions.\n"
+        header, reply=get_legal_LLM_feedback(history_message=episode_message,return_prompt = True,llm_args= llm_args,feedback=None)
+        #print(reply)
+        episode_message+=header+'\n'+reply
+        episode_message+="\n"+"### User:\nHow to handle this anomaly?\n"
+        header, reply=get_legal_LLM_feedback(history_message=episode_message,return_prompt = True,llm_args= llm_args,feedback=None)
+        #print(reply)
+        episode_message+=header+'\n'+reply+'\n'
+        #print(episode_message)
+        obs, __, __, info=env.step()
+        return one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,step,None,total_reward,vlm_args) ## assume no anomaly occurs in the recovery steps, otherwise the recurrsion will never stop
+    ## save images 
 
         
         
@@ -206,7 +226,7 @@ def main(vcfg):
         n_demos = vcfg['n_demos']
 
         # Run testing and save total rewards with last transition info.
-        for i in range(0, n_demos):
+        for i in range(0, 10):
             text_path=os.path.join(txt_path,"episode_"+str(i)+".txt")
             if os.path.exists(text_path):
                 os.remove(text_path)
@@ -234,16 +254,15 @@ def main(vcfg):
             print("Initial State:", initial_state)
             
             if anomaly_type !='None':
-                anomaly_time = np.random.choice(np.arange(1, len(episode)-1), size=1, replace=False)  ## the step when the anomaly occurr
+                anomaly_time = np.random.choice(np.arange(0, len(episode)-1), size=1, replace=False)  ## the step when the anomaly occurr
                 print("{type} anomaly will occur in step {time}".format(type=anomaly_type,time=anomaly_time))
             else:
                 anomaly_time=-1
-        
-            episode_message="### User:\n"+requirment+"\n"+initial_state+"\n What is the final goal state?"
+            episode_message="### User:\n"+initial_state+"\nWhat is the final goal state?"
             episode_message=prompt+episode_message+'\n'
             #print(episode_message)
             header,goal_state=get_legal_LLM_feedback(episode_message,None,llm_args,None)
-            #print(goal_state)
+            print(goal_state)
             episode_message+=header+'\n'+goal_state+'\n'
             
             
@@ -255,28 +274,33 @@ def main(vcfg):
                     video_name = f"{vcfg['model_task']}-{video_name}"
                 env.start_rec(video_name)
                 
-                
-            for step in range(task.max_steps):
+            step=0
+            while step <task.max_steps:
                 anomaly= anomaly_type if step ==anomaly_time else None
-            
                 if use_vlm:
-                    episode_message,act_plan,reward,obs,info,img_list=one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,step,anomaly,total_reward,vlm_args,vlm_path)
+                    
+                    results=one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,step,anomaly,total_reward,vlm_args,vlm_path)
                 else:
-                    episode_message,act_plan,reward,obs,info,img_list=one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,step,anomaly,total_reward)
+                    results=one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,step,anomaly,total_reward)
+                if results is None: 
+                    break
+                episode_message,act_plan,reward,obs,info,img_list, step=results
 
                 total_reward+=reward
-
-                if img_list is not None:
-                    for j, img in enumerate(img_list):
-                        save_name = f"{vlm_path}/step_{str(step)}_{str(j)}.png"
-                        plt.imsave(save_name, img)
-                    
-                #print(episode_message[len(prompt):])
+                
+                # if img_list is not None:
+                #     for j, img in enumerate(img_list):
+                #         save_name = f"{vlm_path}/step_{str(step)}_{str(j)}.png"
+                #         plt.imsave(save_name, img)
+                #print(len(act_plan))
                 if act_plan=="done.":
                     history=episode_message[len(prompt):]
                     if "All goals are completed" in history:
+                        if record:
+                            env.end_rec()  
                         break
                                 # End recording video
+                step+=1
             if record:
                 env.end_rec()            
             execution_history=episode_message[len(prompt):]
@@ -288,11 +312,12 @@ def main(vcfg):
 
 
 
-def record_img_for_reporter(env,raw_img_list,event):
+def record_img_for_reporter(env,rgb_list,depth_list,event):
     while not event.is_set():
-        time.sleep(1.0)  ## render an image every 1s
-        img = env.render()
-        raw_img_list.append(img)
+        time.sleep(0.5)
+        rgb, depth = env.multi_view_render()
+        rgb_list.append(rgb)
+        depth_list.append(depth)
 
 
 

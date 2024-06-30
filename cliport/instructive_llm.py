@@ -61,6 +61,7 @@ def get_next_LLM_feedback(history_message: str,return_prompt: bool = False,llm_a
     decoded_output = tokenizer.decode(output[0], skip_special_tokens=True)[ori_len:]
     response = text_parsing(decoded_output)
     header_type,response=response[0],response[1]
+    response=response.split('###')[0].strip()
     return header_type,response
 
 def get_legal_LLM_feedback(history_message: str,return_prompt: bool = False,llm_args: Dict = None,feedback: str=None):

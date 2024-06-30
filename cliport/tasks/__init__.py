@@ -58,7 +58,7 @@ names = {
     'pick-and-place': PickAndPlace,
     'pick-and-place-primitive': PickAndPlacePrimitive,
     'pick-and-place-primitive-relative-pick-position':PickAndPlacePrimitiveWithRelativePickPosition,
-    'pack-box-primitive-relative-pick-position':PackBoxwithRelativePickPosition,
+
     'stack-block-pyramid-seq-seen-colors': StackBlockPyramidSeqSeenColors,
     'stack-block-pyramid-seq-unseen-colors': StackBlockPyramidSeqUnseenColors,
     'stack-block-pyramid-seq-full': StackBlockPyramidSeqFull,
@@ -68,6 +68,7 @@ names = {
     'stack-all-block-of-same-color': StackAllBlockOfSameColor,
     'stack-block-with-alternate-color': StackBlockWithAlternateColor,
     'pack-box-primitive':PackBoxPrimitive,
+    'pack-box-primitive-relative-pick-position': PackBoxwithRelativePickPosition,
     'pack-google-object-primitive':PackingGoogleObjectsPrimitive,
     'pack-google-object-relative-primitive':PackingGoogleObjectsRelativePrimitive
 }

@@ -17,7 +17,7 @@ class PackBoxPrimitive(Task):
         self.max_steps = 1
         self.task_name="pack-box-primitive"
         self.task_completed_desc = "done packing boxes."
-        self.answer_template = "The action is executed successfully and"
+        self.answer_template = "The action is executed successfully, and "
         self.obj_colors = {}
 
     def reset(self, env):
@@ -27,7 +27,7 @@ class PackBoxPrimitive(Task):
         lang_template = "put the {pick_color} block in the brown box"
         question_template = "Did the robot successfully execute the action 'put the {pick_color} block in the brown box', and did any anomaly happen?"
 
-        trashcan_pose = ((0.30, random.choice([-0.4, 0.4]), 0.05), (0.0, 0.0, 0.12, 0.1))
+        trashcan_pose = ((0.35, random.choice([-0.4, 0.4]), 0.05), (0.0, 0.0, 0.12, 0.1))
         container_template = 'trash_can/trashcan.urdf'
         env.add_object(container_template, trashcan_pose, 'fixed')
 
@@ -117,10 +117,14 @@ class PackBoxPrimitive(Task):
             p.changeVisualShape(box_id, -1, rgbaColor=colors[icolor] + [1])
             object_colors[box_id] = color_names[icolor]
         # Randomly select object in box and save ground truth pose.
+        self.inside_box_blocks={}
         object_volumes = []
         true_poses = {}
         nbr_outside_boxes = random.randint(1, len(object_ids))
         outside_boxes_objs = random.sample(object_ids, nbr_outside_boxes)
+        inside_boxes_objs=list(set(object_ids)-set(outside_boxes_objs))
+        for id, _ in inside_boxes_objs:
+            self.inside_box_blocks[id]=object_colors[id]
         outside_obj_ids = []
         for object_id, _ in outside_boxes_objs:
             # print("fuck")
@@ -140,10 +144,10 @@ class PackBoxPrimitive(Task):
             (object_points, [(zone_pose, zone_size)]), 1))
         true_poses.pop(goal_obj_id)
         self.remain_container_poses=true_poses
-        self.remain_pick_obj_info=[]
+        self.remain_obj_info=[]
         for id in outside_obj_ids:
             if id !=goal_obj_id:
-                self.remain_pick_obj_info.append((id,object_colors[id]))
+                self.remain_obj_info.append((id,object_colors[id]+" block"))
 
         self.lang_goals.append(lang_template.format(pick_color=object_colors[goal_obj_id]))
         self.question_list.append(question_template.format(pick_color=object_colors[goal_obj_id]))
@@ -164,16 +168,16 @@ class PackBoxwithRelativePickPosition(Task):
         self.lang_template = "put the {pick_obj} {pick_position} into the trash can"
         self.task_completed_desc = "done packing boxes."
         self.question_template = "Did the robot successfully execute the action 'put the {pick_obj} {pick_position} into the trash can', and did any anomaly happen?"
-        self.answer_template = "The action is executed successfully and"
+        self.answer_template = "The action is executed successfully, and "
         self.task_name="pack-box-relative-primitive"
     def reset(self, env):
         super().reset(env)
 
-        trashcan_pose = ((0.3, random.choice([-0.4, 0.4]), 0.05), (0.0, 0.0, 0.12, 0.99))
-        container_template = 'trash_can/trashcan_1.urdf'
+        trashcan_pose = ((0.35, random.choice([-0.38, 0.38]), 0.05), (0.0, 0.0, 0.12, 0.1))
+        container_template = 'trash_can/trashcan.urdf'
         trashcan_id=env.add_object(container_template, trashcan_pose, 'fixed')
         trashcan_size = p.getVisualShapeData(trashcan_id)[0][3]
-        target=random.choice(["blockinzone","blockinbox","brown box"])
+        target=random.choice(["brown box"])
 
         while True:
             container_pos = random.sample(rel_postion, 2)
@@ -279,7 +283,8 @@ class PackBoxwithRelativePickPosition(Task):
             break
         ## add confusing container
         if target=="brown box":
-            while True:
+            i=0
+            while i<20:
                 zone_size = (0.08,0.08,0.05)
                 adv_zone_pose = self.get_random_pose(env, zone_size, container_pos[1])
                 container_template = 'container/container-template.urdf'
@@ -289,6 +294,9 @@ class PackBoxwithRelativePickPosition(Task):
                 adv_obj_id = env.add_object(container_urdf, adv_zone_pose)
                 if adv_obj_id is not None:
                     break
+                i+=1
+            if i==20:
+                return None
             pick_obj_name = "brown box"
             pick_pos="at the "+container_pos[1]
         elif target=="blockinbox":
@@ -319,7 +327,7 @@ class PackBoxwithRelativePickPosition(Task):
         obj_ids=[]
         obj_ids.append((adv_obj_id, (0, None)))
         self.goals.append((
-            obj_ids,np.eye(1), [trashcan_pose], True, False, 'zone',(obj_points,[(trashcan_pose,trashcan_size)]) , 1))
+            obj_ids,np.eye(1), [trashcan_pose], False, False, 'trash',(obj_points,[(trashcan_pose,trashcan_size)]) , 1))
 
         self.lang_goals.append(self.lang_template.format(pick_obj=pick_obj_name,pick_position=pick_pos))
         self.question_list.append(self.question_template.format(pick_obj=pick_obj_name,pick_position=pick_pos))

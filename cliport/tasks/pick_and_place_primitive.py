@@ -23,7 +23,7 @@ class PickAndPlacePrimitive(Task):
         self.task_name="pick-block-primitive"
         self.pos_eps = 0.05
         self.task_completed_desc = "done placing blocks."
-        self.answer_template = "The action is executed successfully and"
+        self.answer_template = "The action is executed successfully, and "
         self.obj_colors = {}
 
     def reset(self, env):
@@ -45,8 +45,7 @@ class PickAndPlacePrimitive(Task):
         bowl_util_colors = [utils.COLORS[cn] for cn in bowl_colors]
 
         # add trash can
-        trashcan_pose = ((0.35, random.choice([-0.4, 0.4]), 0.05), (0.0, 0.0, 0.12, 0.1))
-
+        trashcan_pose = ((0.35, random.choice([-0.38, 0.38]), 0.05), (0.0, 0.0, 0.12, 0.1))
         container_template = 'trash_can/trashcan.urdf'
         trashcan_id=env.add_object(container_template, trashcan_pose, 'fixed')
         trashcan_size = p.getVisualShapeData(trashcan_id)[0][3]
@@ -152,7 +151,7 @@ class PickAndPlacePrimitiveWithRelativePickPosition(Task):
         self.task_name="pick-block-relative-primitive"
         self.pos_eps = 0.05
         self.task_completed_desc = "done placing blocks."
-        self.answer_template = "The action is executed successfully and"
+        self.answer_template = "The action is executed successfully, and "
 
     def reset(self, env):
 
@@ -174,7 +173,7 @@ class PickAndPlacePrimitiveWithRelativePickPosition(Task):
         block_util_colors = [utils.COLORS[cn] for cn in block_colors]
 
 
-        trashcan_pose = ((0.30, random.choice([-0.4, 0.4]), 0.05), (0.0, 0.0, 0.12, 0.1))
+        trashcan_pose = ((0.35, random.choice([-0.38, 0.38]), 0.05), (0.0, 0.0, 0.12, 0.1))
         container_template = 'trash_can/trashcan.urdf'
         trashcan_id=env.add_object(container_template, trashcan_pose, 'fixed')
         trashcan_size = p.getVisualShapeData(trashcan_id)[0][3]
@@ -243,7 +242,7 @@ class PickAndPlacePrimitiveWithRelativePickPosition(Task):
         obj_ids = []
         obj_ids.append((adv_obj_id, (0, None)))
         self.goals.append((
-            obj_ids, np.eye(1), [trashcan_pose], True, False, 'zone',
+            obj_ids, np.eye(1), [trashcan_pose], False, False, 'pose',
             (obj_points, [(trashcan_pose, trashcan_size)]), 1))
 
         lang_template = lang_template.format(pick_obj=pick_obj,

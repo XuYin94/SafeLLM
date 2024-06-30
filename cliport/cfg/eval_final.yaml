@@ -17,7 +17,7 @@ n_repeats: 1 # number of repeats
 gpu: [0]
 save_results: True # write results to json
 update_results: False # overwrite existing json results?
-checkpoint_type: 'steps=50001'
+checkpoint_type: 'steps=68751'
 anomaly_type: container ##[None, miss, pick, container, place]
 use_vlm: False ## True: use openflamigo. False: use the GT 
 prompt_type: 'cot'
@@ -63,7 +63,7 @@ exp_folder: eval_llm
 data_dir: /mnt/lynx1/users/zhang/Workfolder/data/episodes
 assets_root: ./cliport/environments/assets/
 
-model_path: /mnt/lynx1/users/zhang/Workfolder/exp/checkpoints_data5000/ # path to pre-trained models
+model_path: /mnt/lynx1/users/zhang/Workfolder/exp/checkpoints_fourtasks_2010000/ # path to pre-trained models
 train_config: ./cliport/cfg/train.yaml # path to train config
 save_path: ${model_dir}/${exp_folder}/${eval_task}-n${train_demos}-${mode}/checkpoints/ # path to save results
 results_path: ${model_dir}/${exp_folder}/${eval_task}-n${train_demos}-${mode}/checkpoints/ # path to existing results
