@@ -24,21 +24,24 @@ def one_step_execution(env,act,event,output_queue):
     output_queue.put((1,reward))
     event.set()
 
-def one_episode_execution(info,obs,agent,env,task,add_anomaly=False,recording_step=1):
+def one_episode_execution(agent,env,task,add_anomaly=False,recording_step=1):
     print("The step " + str(recording_step) + " execution will be recorded.")
-    progress_list=[]
-    state=task.remain_obj_info.copy()
-    #print(state)
+    obs, reward, __, info = env.step()
     for step in range(task.max_steps):
+
         act = agent.act(obs, info)
         if act==None:
             return None
         obj_id = act['obj_id']
-        if "match" in task.task_name:
-            color=state[obj_id]
+        if "matching" in task.task_name:
+            for i, block_info in enumerate(task.block_info):
+                if block_info[0]==obj_id:
+                    color=block_info[1]
+                    break
             info["lang_goal"]=info["lang_goal"].format(pick_color=color,place_color=color)
             info["question"]=info["question"].format(pick_color=color,place_color=color)
             info['answer']=info['answer'].format(pick_color=color,place_color=color)
+
         if step==recording_step:
             thread_list=[]
             rgb_list=[]
@@ -57,12 +60,13 @@ def one_episode_execution(info,obs,agent,env,task,add_anomaly=False,recording_st
             thread_list.append(record_rgb)
             if add_anomaly:
                 if act is not None:
-                    anomaly_list=["pick","place","container","miss"]
-                    # if len(progress_list)>0:
-                    #     anomaly_list.append("progress")
+                    anomaly_list=["progress"]
+                    #if step>0 and "block" in task.task_name:
+                        #anomaly_list.append("progress")
                     type=random.choice(anomaly_list)
+                    #print(type)
                     anomaly_generation = threading.Thread(target=anomaly_generator_for_primitive,
-                                                          args=(env, output_queue, task, type,progress_list))
+                                                          args=(env, output_queue, task, type,step))
                     thread_list.append(anomaly_generation)
             for thread in thread_list:
                 thread.start()
@@ -95,11 +99,11 @@ def one_episode_execution(info,obs,agent,env,task,add_anomaly=False,recording_st
                 return None
 
         else:
-            obs, reward, done, __ = env.step(act)
             print(f'| Goal: {info["lang_goal"]} | Question: {info["question"]} | Answer: {info["answer"]}')
-            if reward>0 and obj_id in state.keys():
-                progress_list.append(obj_id)
-                del state[obj_id]
+            obs, reward, done, info = env.step(act)
+            if done:
+                break
+
 
 
 
@@ -128,15 +132,15 @@ def main(cfg):
     for i  in range (0,dataset.n_episodes):
         print(f'Test: {i + 1}/{50}')
         episode, seed = dataset.load(i)
-        recording_step=random.choice(range(1,len(episode)-1))
+
         np.random.seed(seed)
         env.seed(seed)
         env.set_task(task)
 
-        obs = env.reset()
+        env.reset()
         env.set_task(task)
-        info = env.info
-        result=one_episode_execution(info,obs,agent,env,task,add_anomaly=True,recording_step=recording_step)
+        recording_step=random.randint(1,task.gt_step-1)
+        result=one_episode_execution(agent,env,task,add_anomaly=True,recording_step=recording_step)
         if result!=None:
             rgb_list,depth_list,info=result
             dataset.save_vlm_episodes(seed, rgb_list,depth_list,info,path=anmaly_data_path)

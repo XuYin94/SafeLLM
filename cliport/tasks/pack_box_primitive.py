@@ -177,7 +177,7 @@ class PackBoxwithRelativePickPosition(Task):
         container_template = 'trash_can/trashcan.urdf'
         trashcan_id=env.add_object(container_template, trashcan_pose, 'fixed')
         trashcan_size = p.getVisualShapeData(trashcan_id)[0][3]
-        target=random.choice(["brown box"])
+        target=random.choice(["brown box"]) #["blockinzone","blockinbox"]
 
         while True:
             container_pos = random.sample(rel_postion, 2)

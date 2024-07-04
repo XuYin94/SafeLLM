@@ -125,7 +125,7 @@ def main(cfg):
 
                 total_reward,episode=episode_execution(info,obs,agent,env,task,episode)
                 #print(total_reward)
-                if total_reward > 0.99 and (minimum_steps<len(episode)<10):
+                if total_reward > 0.99:
                     dataset.add(seed, episode)
 
 

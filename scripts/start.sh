@@ -9,9 +9,9 @@
 for TASK_NAME in pick-and-place-primitive pick-and-place-primitive-relative-pick-position pack-box-primitive 
 do
 
-    python cliport/primitive_generator.py  task=$TASK_NAME  n=2000 mode=train data_dir=/mnt/lynx1/users/zhang/Workfolder/data/new/primitive
+    python cliport/primitive_generator.py  task=$TASK_NAME  n=2000 mode=train data_dir=/mnt/lynx4/users/zhang/yinxu/Workfolder/data/primitive
 
-    python cliport/primitive_generator.py  task=$TASK_NAME  n=200 mode=val data_dir=/mnt/lynx1/users/zhang/Workfolder/data/new/primitive
+    python cliport/primitive_generator.py  task=$TASK_NAME  n=200 mode=val data_dir=/mnt/lynx4/users/zhang/yinxu/Workfolder/data/primitive
 
  done
 

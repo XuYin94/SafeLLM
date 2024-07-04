@@ -19,11 +19,13 @@ def recording(env,rgb_list,depth_list,event):
         depth_list.append(depth)
 
 def one_episode_execution(info,obs,agent,env,task,episode,output_queue,event,add_anomaly=False):
+    reward=0
     for _ in range(task.max_steps):
         lang_goal = info['lang_goal']
         question = info['question']
         answer = info['answer']
         act = agent.act(obs, info)
+        episode.append((obs, act, reward, info))
         if add_anomaly:
             if 'trash can' in lang_goal:
                 continue

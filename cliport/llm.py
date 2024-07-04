@@ -11,13 +11,13 @@ import os
 # os.environ["CUDA_VISIBLE_DEVICES"]="1"  
 
 OPEN_SOURCE_LLMs = {"Llama-2-7b": 
-                    {"path":"/mnt/lynx1/users/zhang/LLM_models/Meta-Llama-3-8B/",
+                    {"path":"/mnt/lynx4/users/zhang/yinxu/LLM_models/Meta-Llama-3-8B/",
                      "type": "completion"}, 
                     "Llama-3-8B": 
-                    {"path": "/mnt/lynx1/users/zhang/LLM_models/Meta-Llama-3-8B/",
+                    {"path": "/mnt/lynx4/users/zhang/yinxu/LLM_models/Meta-Llama-3-8B/",
                      "type": "completion"},
                     "Llama-3-8B-instruct":
-                     {"path":"/mnt/lynx1/users/zhang/LLM_models/Meta-Llama-3-8B-Instruct/",
+                     {"path":"/mnt/lynx4/users/zhang/yinxu/LLM_models/Meta-Llama-3-8B-Instruct/",
                      "type": "instruction"}}
 
 

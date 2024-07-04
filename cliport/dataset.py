@@ -385,7 +385,7 @@ class RavensMultiTaskDataset(RavensDataset):
             action_path = os.path.join(task_path, 'action')
             n_episodes = 0
             if os.path.exists(action_path):
-                for fname in sorted(os.listdir(action_path))[:10000]:
+                for fname in sorted(os.listdir(action_path)):
                     if '.pkl' in fname:
                         n_episodes += 1
             self.n_episodes[task] = n_episodes
@@ -417,13 +417,14 @@ class RavensMultiTaskDataset(RavensDataset):
         self._task = np.random.choice(self.tasks)
         #print(self._task)
         self._path = os.path.join(self.root_path, f'{self._task}')
-
         # Choose random episode.
         #print(len(self.sample_set[self._task]))
         if len(self.sample_set[self._task]) > 0:
             episode_id = np.random.choice(self.sample_set[self._task])
         else:
             episode_id = np.random.choice(range(self.n_episodes[self._task]))
+        #print(episode_id)
+        #print(self._task )
         episode, _ = self.load(episode_id, self.images, self.cache)
 
         # Is the task sequential like stack-block-pyramid-seq?
@@ -459,6 +460,7 @@ class RavensMultiTaskDataset(RavensDataset):
             self._task = np.random.choice(all_tasks, p=sampling_probs)
 
         self._path = os.path.join(self.root_path, f'{self._task}-{self.mode}')
+        #print(episode_id)
         return super().load(episode_id, images, cache)
 
     def get_curr_task(self):

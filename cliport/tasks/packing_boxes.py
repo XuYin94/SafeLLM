@@ -26,7 +26,7 @@ class PackingBoxes(Task):
         super().reset(env)
 
         trashcan_pose = ((0.35, random.choice([-0.4, 0.4]), 0.05), (0.0, 0.0, 0.12, 0.99))
-        container_template = 'trash_can/trashcan_1.urdf'
+        container_template = 'trash_can/trashcan.urdf'
         env.add_object(container_template, trashcan_pose, 'fixed')
 
 
@@ -44,7 +44,7 @@ class PackingBoxes(Task):
         margin = 0.01
         min_object_dim = 0.05
         bboxes = []
-        initial_objects={}
+        initial_objects=[]
 
         class TreeNode:
 
@@ -110,18 +110,13 @@ class PackingBoxes(Task):
             object_ids.append((box_id, (0, None)))
             icolor = np.random.choice(range(len(colors)), 1).squeeze()
             color_name=color_names[icolor]
-            self.obj_colors[box_id]=color_name
-            if color_name in initial_objects.keys():
-                initial_objects[color_name]+=1
-            else:
-                initial_objects[color_name]=1
+            initial_objects.append(color_name)
 
             p.changeVisualShape(box_id, -1, rgbaColor=colors[icolor] + [1])
             object_points[box_id] = self.get_box_object_points(box_id)
 
         # Randomly select object in box and save ground truth pose.
         true_poses = []
-        self.unfinished_goal_poses={}
         # self.goal = {'places': {}, 'steps': []}
         for object_id, _ in object_ids:
             true_pose = p.getBasePositionAndOrientation(object_id)
@@ -129,8 +124,6 @@ class PackingBoxes(Task):
             pose = self.get_random_pose(env, object_size)
             p.resetBasePositionAndOrientation(object_id, pose[0], pose[1])
             true_poses.append(true_pose)
-            self.unfinished_goal_poses[object_id]=[pose,true_pose,"brown box"]
-
 
         self.lang_goals.append(self.lang_template)
         self.question_list.append(self.question_template)
@@ -139,14 +132,12 @@ class PackingBoxes(Task):
             object_ids, np.eye(len(object_ids)), true_poses, False, True, 'zone',
             (object_points, [(zone_pose, zone_size)]), 1))
         self.build_initial_scene_description(initial_objects)
-
-
         return True
 
     def build_initial_scene_description(self,initial_objects):
-        for key,value in initial_objects.items():
-            desc=str(value)+" "+key+" blocks"
-            self.initial_state.append(desc)
-        self.initial_state.append("1 brown box")
-        self.initial_state.append("trash can")
+        info = "In the initial state, there are "
+        for color in initial_objects[:-1]:
+            info+=color+', '
+        info+="and "+str(initial_objects[-1])+" blocks; there is a brown box and a trash can."
+        self.initial_state = info
 
