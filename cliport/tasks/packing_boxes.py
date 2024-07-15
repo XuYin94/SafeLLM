@@ -19,7 +19,7 @@ class PackingBoxes(Task):
         self.lang_template = "pick up the {pick_color} block and place it in the brown box."
         self.question_template = "Did the robot successfully execute the action 'pick up the {pick_color} block and place it in the brown box', and did any anomaly happen?"
         self.answer_template = "The action is executed successfully, and "
-        self.task_name="Packing boxes"
+        self.task_name="packing-boxes"
         self.zone_bounds = np.array([[0.25, 0.75], [-0.5, 0.5], [0, 0.08]])
 
     def reset(self, env):
@@ -45,7 +45,7 @@ class PackingBoxes(Task):
         min_object_dim = 0.05
         bboxes = []
         initial_objects=[]
-
+        self.target_block_info=[]
         class TreeNode:
 
             def __init__(self, parent, children, bbox):
@@ -95,6 +95,7 @@ class PackingBoxes(Task):
         object_points = {}
         object_ids = []
         bboxes = np.array(bboxes)
+        self.gt_step=len(bboxes)
         object_template = 'box/box-template.urdf'
         for bbox in bboxes:
             size = bbox[3:] - bbox[:3]
@@ -111,6 +112,7 @@ class PackingBoxes(Task):
             icolor = np.random.choice(range(len(colors)), 1).squeeze()
             color_name=color_names[icolor]
             initial_objects.append(color_name)
+            self.target_block_info.append((box_id,color_name))
 
             p.changeVisualShape(box_id, -1, rgbaColor=colors[icolor] + [1])
             object_points[box_id] = self.get_box_object_points(box_id)
@@ -118,13 +120,15 @@ class PackingBoxes(Task):
         # Randomly select object in box and save ground truth pose.
         true_poses = []
         # self.goal = {'places': {}, 'steps': []}
-        for object_id, _ in object_ids:
+        for i, (object_id, _) in enumerate(object_ids):
             true_pose = p.getBasePositionAndOrientation(object_id)
             object_size = p.getVisualShapeData(object_id)[0][3]
             pose = self.get_random_pose(env, object_size)
             p.resetBasePositionAndOrientation(object_id, pose[0], pose[1])
             true_poses.append(true_pose)
-
+            assert object_id==self.target_block_info[i][0]
+            
+            self.target_block_info[i]+=(true_pose,)
         self.lang_goals.append(self.lang_template)
         self.question_list.append(self.question_template)
         self.answer_list.append(self.answer_template)
@@ -132,6 +136,7 @@ class PackingBoxes(Task):
             object_ids, np.eye(len(object_ids)), true_poses, False, True, 'zone',
             (object_points, [(zone_pose, zone_size)]), 1))
         self.build_initial_scene_description(initial_objects)
+
         return True
 
     def build_initial_scene_description(self,initial_objects):

@@ -226,7 +226,7 @@ def main(vcfg):
         n_demos = vcfg['n_demos']
 
         # Run testing and save total rewards with last transition info.
-        for i in range(0, 10):
+        for i in range(0, 50):
             text_path=os.path.join(txt_path,"episode_"+str(i)+".txt")
             if os.path.exists(text_path):
                 os.remove(text_path)
@@ -254,65 +254,66 @@ def main(vcfg):
             print("Initial State:", initial_state)
             
             if anomaly_type !='None':
-                anomaly_time = 2#np.random.choice(np.arange(1, len(episode)-1), size=1, replace=False)  ## the step when the anomaly occurr
+                anomaly_time = 1#np.random.choice(np.arange(0, len(episode)-1), size=1, replace=False)  ## the step when the anomaly occurr
                 print("{type} anomaly will occur in step {time}".format(type=anomaly_type,time=anomaly_time))
             else:
                 anomaly_time=-1
-            episode_message="### User:\n"+initial_state+"\nWhat is the final goal state?"
-            episode_message=prompt+episode_message+'\n'
+            episode_message="### User:\n"+initial_state+"\nWhat is the final goal state?\n"
+
+            episode_message=prompt+episode_message
             #print(episode_message)
             header,goal_state=get_legal_LLM_feedback(episode_message,None,llm_args,None)
             print(goal_state)
-            # episode_message+=header+'\n'+goal_state+'\n'
+            episode_message+=header+'\n'+goal_state+'\n'
             
             
-            # #Start recording video (NOTE: super slow)
-            # if record:
-            #     logging.info("Start recording video ......")
-            #     video_name = f'{task_name}-{i + 1:06d}'
-            #     if 'multi' in vcfg['model_task']:
-            #         video_name = f"{vcfg['model_task']}-{video_name}"
-            #     env.start_rec(video_name)
+            #Start recording video (NOTE: super slow)
+            if record:
+                logging.info("Start recording video ......")
+                video_name = f'{task_name}-{i + 1:06d}'
+                if 'multi' in vcfg['model_task']:
+                    video_name = f"{vcfg['model_task']}-{video_name}"
+                env.start_rec(video_name)
                 
-            # step=0
-            # while step <task.max_steps:
-            #     anomaly= anomaly_type if step ==anomaly_time else None
-            #     if use_vlm:
+            step=0
+            while step <task.max_steps:
+                anomaly= anomaly_type if step ==anomaly_time else None
+                if use_vlm:
                     
-            #         results=one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,step,anomaly,total_reward,vlm_args,vlm_path)
-            #     else:
-            #         results=one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,step,anomaly,total_reward)
-            #     if results is None: 
-            #         break
-            #     episode_message,act_plan,reward,obs,info,img_list, step=results
+                    results=one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,step,anomaly,total_reward,vlm_args,vlm_path)
+                else:
+                    results=one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,step,anomaly,total_reward)
+                if results is None: 
+                    break
+                episode_message,act_plan,reward,obs,info,img_list, step=results
 
-            #     total_reward+=reward
+                total_reward+=reward
                 
-            #     # if img_list is not None:
-            #     #     for j, img in enumerate(img_list):
-            #     #         save_name = f"{vlm_path}/step_{str(step)}_{str(j)}.png"
-            #     #         plt.imsave(save_name, img)
-            #     #print(len(act_plan))
-            #     if act_plan=="alert.":
-            #         if record:
-            #             env.end_rec()  
-            #             break
+                # if img_list is not None:
+                #     for j, img in enumerate(img_list):
+                #         save_name = f"{vlm_path}/step_{str(step)}_{str(j)}.png"
+                #         plt.imsave(save_name, img)
+                #print(len(act_plan))
+                if act_plan=="alert.":
+                    if record:
+                        env.end_rec()  
+                        break
                     
-            #     if act_plan=="done.":
-            #         history=episode_message[len(prompt):]
-            #         if "All goals are completed" in history:
-            #             if record:
-            #                 env.end_rec()  
-            #             break
-            #                     # End recording video
-            #     step+=1
-            # if record:
-            #     env.end_rec()            
-            # execution_history=episode_message[len(prompt):]
+                if act_plan=="done.":
+                    history=episode_message[len(prompt):]
+                    if "All goals are completed" in history:
+                        if record:
+                            env.end_rec()  
+                        break
+                                # End recording video
+                step+=1
+            if record:
+                env.end_rec()            
+            execution_history=episode_message[len(prompt):]
             
-            # with open(text_path, 'a') as f:
-            #     # Append a string to the file
-            #     f.write(execution_history)
+            with open(text_path, 'a') as f:
+                # Append a string to the file
+                f.write(execution_history)
             
 
 

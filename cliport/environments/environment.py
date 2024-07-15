@@ -201,7 +201,7 @@ class Environment(gym.Env):
         obs, _, _, _ = self.step()
         return obs
 
-    def step(self, action=None):
+    def step(self, action=None,action_error=False):
         """Execute action with specified primitive.
 
         Args:
@@ -211,8 +211,7 @@ class Environment(gym.Env):
           (obs, reward, done, info) tuple containing MDP step data.
         """
         if action is not None:
-            timeout = self.task.primitive(self.movej, self.movep, self.ee, action['pose0'], action['pose1'])
-
+            timeout = self.task.primitive(self.movej, self.movep, self.ee, action['pose0'], action['pose1'],action_error)
             # Exit early if action times out. We still return an observation
             # so that we don't break the Gym API contract.
             if timeout:

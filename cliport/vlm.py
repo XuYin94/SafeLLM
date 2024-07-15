@@ -41,7 +41,7 @@ def load_vlm(vlm_name: str, device: Union[torch.device, str]):
     )
     vlm.to(device)
     #checkpoint_path = hf_hub_download("openflamingo/OpenFlamingo-3B-vitl-mpt1b", "checkpoint.pt")
-    vlm.load_state_dict(torch.load('/mnt/lynx1/users/zhang/Workfolder/exp/vlm_exp/openflamingo3B/checkpoint_0.pt'.format(name=vlm_name)), strict=False)
+    vlm.load_state_dict(torch.load('/mnt/lynx4/users/zhang/yinxu/Workfolder/exp/vlm_exp/openflamingo3B/checkpoint_0.pt'.format(name=vlm_name)), strict=False)
 
     vis_processors=transforms.Compose([
     transforms.Resize((224, 224)),
@@ -100,7 +100,7 @@ if __name__=="__main__":
     import os
     device = torch.device("cuda:0") if torch.cuda.is_available() else "cpu"
     vlm, vis_processors, tokenizer=load_vlm("OpenFlamingo-3B-vitl-mpt1b",device)
-    img_list=[Image.open(os.path.join("./cliport/tests/",img)).convert("RGB") for img in os.listdir('./cliport/tests/')]
+    img_list=[Image.open(os.path.join("./test/",img)).convert("RGB") for img in os.listdir('./test/')]
     vlm_args = {
         "tokenizer": tokenizer,
         "model": vlm,

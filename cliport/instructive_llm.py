@@ -20,8 +20,9 @@ OPEN_SOURCE_LLMs = {"Llama-2-7b":
                      {"path":"/mnt/lynx4/users/zhang/yinxu/LLM_models/Meta-Llama-3-8B-Instruct/",
                      "type": "instruction"}}
 def text_parsing (generated_output: str):
+    #print(generated_output)
     before_gen=generated_output.split('\n')[:2]
-
+    #print(before_gen)
     return before_gen
 
 def load_llm(llm_name: str):
@@ -43,14 +44,12 @@ def load_llm(llm_name: str):
 
 
 
-def get_next_LLM_feedback(history_message: str,return_prompt: bool = False,llm_args: Dict = None,feedback: str=None,length=256): 
+def get_next_LLM_feedback(history_message: str,return_prompt: bool = False,llm_args: Dict = None,feedback: str=None,length=64): 
     
     tokenizer, model,streamer= llm_args["tokenizer"], llm_args["model"],llm_args["streamer"]
-
-    if feedback is not None:
-        history_message = history_message+"\n"+"### User:\n"+feedback+"\n"
     inputs = tokenizer(history_message, return_tensors="pt").to(model.device)
         # del inputs["token_type_ids"]
+    #print(history_message)
     ori_len=len(history_message)
     output = model.generate(
         **inputs,
@@ -58,7 +57,9 @@ def get_next_LLM_feedback(history_message: str,return_prompt: bool = False,llm_a
         use_cache=True,
         max_new_tokens=length
     )
-    decoded_output = tokenizer.decode(output[0], skip_special_tokens=True)[ori_len:]
+    decoded_output = tokenizer.decode(output[0], skip_special_tokens=True)
+    #print(decoded_output)
+    decoded_output=decoded_output[ori_len:]
     response = text_parsing(decoded_output)
     header_type,response=response[0],response[1]
     response=response.split('###')[0].strip()
@@ -67,8 +68,8 @@ def get_next_LLM_feedback(history_message: str,return_prompt: bool = False,llm_a
 def get_legal_LLM_feedback(history_message: str,return_prompt: bool = False,llm_args: Dict = None,feedback: str=None):
     while True:
         header_type,response=get_next_LLM_feedback(history_message,False,llm_args,feedback)
-        #print(response)
-        if header_type=="### Assistant:":
+        #print(header_type)
+        if "### Assistant:" == header_type:
             break
     return header_type,response
 

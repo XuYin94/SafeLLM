@@ -7,8 +7,8 @@ hydra:
   run:
     dir: ./
 
-episode_data_dir: /mnt/lynx1/users/zhang/Workfolder/data/  # where to load the episode_data
-data_dir: /mnt/lynx1/users/zhang/Workfolder/data/  # where to save the anomaly data for VLM training
+episode_data_dir: /mnt/lynx4/users/zhang/yinxu/Workfolder/data/episodes/  # where to load the episode_data
+data_dir: /mnt/lynx4/users/zhang/yinxu/Workfolder/data/  # where to save the anomaly data for VLM training
 assets_root: ./cliport/environments/assets/
 disp: False  # visualize PyBullet
 shared_memory: False
@@ -16,7 +16,8 @@ task: pick-and-place-primitive
 mode: train # 'train' or 'val' or 'test'
 n: 200 # number of demos to generate
 save_data: True  # write episodes to disk
-
+add_action_error: False # record the action error data
+add_anomaly: False # if the perturbation will occur
 dataset:
   type: 'single' # 'single' or 'multi'
   images: True

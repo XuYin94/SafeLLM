@@ -34,16 +34,10 @@ def episode_execution(info,obs,agent,env,task,episode):
     total_reward=0
     reward=0
     for i in range(task.max_steps):
-        if i==0:
-            print(task.initial_state)
         act = agent.act(obs, info)
         episode.append((obs, act, reward, info))
         obs, reward, done, info = env.step(act)
         total_reward+=reward
-        if reward>0:
-            if act['obj_id'] in task.unfinished_goal_poses.keys():
-                del task.unfinished_goal_poses[act['obj_id']]
-                del task.obj_colors[act['obj_id']]
         if done:
             break
     episode.append((obs, None, reward, info))
@@ -70,7 +64,7 @@ def main(cfg):
         hz=480,
         record_cfg=cfg['record']
     )
-    for name in ["put-block-in-matching-bowl","packing-boxes"]:
+    for name in ["stack-block-pyramid-seq-seen-colors-relative-position"]:
         if "bowl" in name:
             n_sample_episode=1
             minimum_steps=3
@@ -83,7 +77,7 @@ def main(cfg):
 
         # Initialize scripted oracle agent and dataset.
         agent = task.oracle(env)
-        data_path = os.path.join(cfg['data_dir'],"episodes", "{}-{}".format(name, task.mode))
+        data_path = os.path.join(cfg['data_dir'],"episode", "{}-{}".format(name, task.mode))
         #print(data_path)
         dataset = RavensDataset(data_path, cfg, n_demos=0, augment=False)
         print(f"Saving to: {data_path}")
@@ -97,7 +91,7 @@ def main(cfg):
             elif task.mode == 'val': # NOTE: beware of increasing val set to >100
                 seed = -1
             elif task.mode == 'test':
-                seed = -1 + 500000
+                seed = -1 + 10000
             else:
                 raise Exception("Invalid mode. Valid options: train, val, test")
         # Collect long-horizon training data from oracle demonstrations.
@@ -124,8 +118,8 @@ def main(cfg):
                     env.start_rec(f'{dataset.n_episodes+1:06d}')
 
                 total_reward,episode=episode_execution(info,obs,agent,env,task,episode)
-                #print(total_reward)
-                if total_reward > 0.99:
+                #print(len(episode))
+                if total_reward > 0.99 :
                     dataset.add(seed, episode)
 
 

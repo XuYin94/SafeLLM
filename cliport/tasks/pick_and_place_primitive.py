@@ -46,7 +46,7 @@ class PickAndPlacePrimitive(Task):
 
         # add trash can
         trashcan_pose = ((0.35, random.choice([-0.38, 0.38]), 0.05), (0.0, 0.0, 0.12, 0.1))
-        container_template = 'trash_can/trashcan.urdf'
+        container_template = 'trash_can/trashcan_1.urdf'
         trashcan_id=env.add_object(container_template, trashcan_pose, 'fixed')
         trashcan_size = p.getVisualShapeData(trashcan_id)[0][3]
 
@@ -159,104 +159,145 @@ class PickAndPlacePrimitiveWithRelativePickPosition(Task):
 
 
         super().reset(env)
-        target_place_type = random.choice(["block2trashcan", 'bowl2trashcan', 'blockinbowl2trashcan'])
+        target_place_type = random.choice(["stand2trashcan"])
         lang_template = "put the {pick_obj} {positional_word} the {pick_pos} into the trash can"
         question_template = "Did the robot successfully execute the action 'put the {pick_obj} {positional_word} the {pick_pos} into the trash can', and did any anomaly happen?"
 
-        n_blocks = np.random.randint(2, 3)
-        n_bowls = np.random.randint(2, 3)
-
-        bowl_colors = random.sample(all_color_names, n_bowls)
-        block_colors = random.sample(all_color_names, n_blocks)
-
-        bowl_util_colors = [utils.COLORS[cn] for cn in bowl_colors]
-        block_util_colors = [utils.COLORS[cn] for cn in block_colors]
-
-
         trashcan_pose = ((0.35, random.choice([-0.38, 0.38]), 0.05), (0.0, 0.0, 0.12, 0.1))
-        container_template = 'trash_can/trashcan.urdf'
-        trashcan_id=env.add_object(container_template, trashcan_pose, 'fixed')
+        container_template = 'trash_can/trashcan_1.urdf'
+        trashcan_id = env.add_object(container_template, trashcan_pose, 'fixed')
         trashcan_size = p.getVisualShapeData(trashcan_id)[0][3]
-        # Add bowls.
-        bowl_size = (0.14, 0.14, 0)
-        bowl_urdf = 'bowl/bowl.urdf'
-        bowl_poses = []
-        for i in range(n_bowls - 1):
-            bowl_pose = self.get_random_pose(env, bowl_size)
-            bowl_id = env.add_object(bowl_urdf, bowl_pose, 'fixed')
-            p.changeVisualShape(bowl_id, -1, rgbaColor=bowl_util_colors[i] + [1])
-            bowl_poses.append(bowl_pose)
 
-        # Add other blocks.
-        block_size = (0.04, 0.04, 0.04)
-        block_urdf = 'stacking/block.urdf'
-        pick_pos = random.sample(rel_postion, 2)
-        block_poses = []
-        for i in range(n_blocks - 1):
-            block_pose = self.get_random_pose(env, block_size)
-            block_id = env.add_object(block_urdf, block_pose)
-            p.changeVisualShape(block_id, -1, rgbaColor=block_util_colors[i] + [1])
-            block_poses.append(block_pose)
-        if target_place_type == "block2trashcan":
-            adv_info=self.add_adv_objects(env, block_size, block_urdf, 2, block_util_colors[-1])
-            if adv_info is None:
-                return None
-            valid_block_ids, pick_pos = adv_info
-            adv_obj_id=valid_block_ids[0]
-            pick_obj=block_colors[-1]+ " block"
-            place_pos = pick_pos[0]
-            position_word="at"
-        elif target_place_type == "blockinbowl2trashcan":
-            ## add two more blocks with the same color: one in the bowl and the other not
-            while True:
-                block_pose = self.get_random_pose(env, block_size, pick_pos[i])
-                block_id = env.add_object(block_urdf, block_pose)
-                if block_id is not None:
+        if target_place_type=="stand2trashcan":
+            # Add base.
+            base_size = (0.05, 0.15, 0.005)
+            base_urdf = 'stacking/stand.urdf'
+            base_pose = self.get_random_pose(env, base_size)
+            base_id=env.add_object(base_urdf, base_pose, 'fixed')
+
+            ## Add adv stand obj
+            true_pose = p.getBasePositionAndOrientation(base_id)
+            current_pos = utils.determine_region(true_pose)
+            i = 0
+            rel_pos = ['top left', 'top right', 'bottom left', 'bottom right']
+            rel_pos.remove(current_pos)
+            while i < 20:
+                adv_pos = random.choice(rel_pos)
+                pose = self.get_random_pose(env, base_size, zone=adv_pos)
+                adv_obj_id = env.add_object(base_urdf, pose)
+
+                if adv_obj_id is not None:
                     break
-                else:
-                    pick_pos = random.sample(rel_postion,2)
-            p.changeVisualShape(block_id, -1, rgbaColor=block_util_colors[-1] + [1])
+                i += 1
+            if adv_obj_id ==None:
+                return False
 
-            pose1, pose2 = bowl_poses[0]
-            pose1 = list(pose1)
-            pose1[2] = 0.020
-            pose1 = tuple(pose1)
-            adv_obj_id = env.add_object(block_urdf, (pose1, pose2))
-            p.changeVisualShape(adv_obj_id, -1, rgbaColor=block_util_colors[-1] + [1])
+            obj_points = {adv_obj_id: self.get_object_points(trashcan_id)}
+            obj_ids = []
+            obj_ids.append((adv_obj_id, (0, None)))
+            self.goals.append((
+                obj_ids, np.eye(1), [trashcan_pose], False, False, 'trash',
+                (obj_points, [(trashcan_pose, trashcan_size)]), 1))
 
-            pick_obj=block_colors[-1]+" block"
-            place_pos = bowl_colors[0]+" bowl"
-            position_word="in"
+            lang_template = lang_template.format(pick_obj="stand",
+                                                 positional_word="at",
+                                                 pick_pos=adv_pos)
+            question_template = question_template.format(pick_obj="stand",
+                                                 positional_word="at",
+                                                 pick_pos=adv_pos)
+
         else:
+            n_blocks = np.random.randint(2, 3)
+            n_bowls = np.random.randint(2, 3)
 
-            adv_info=self.add_adv_objects(env, bowl_size, bowl_urdf, 2, bowl_util_colors[-1])
-            if adv_info is None:
-                return None
-            valid_bowl_ids, pick_pos = adv_info
-            adv_obj_id=valid_bowl_ids[0]
-            pick_obj=bowl_colors[-1]+" bowl"
-            place_pos = pick_pos[0]
-            position_word="at"
+            bowl_colors = random.sample(all_color_names, n_bowls)
+            block_colors = random.sample(all_color_names, n_blocks)
 
-        obj_points = {adv_obj_id: self.get_object_points(trashcan_id)}
-        obj_ids = []
-        obj_ids.append((adv_obj_id, (0, None)))
-        self.goals.append((
-            obj_ids, np.eye(1), [trashcan_pose], False, False, 'pose',
-            (obj_points, [(trashcan_pose, trashcan_size)]), 1))
+            bowl_util_colors = [utils.COLORS[cn] for cn in bowl_colors]
+            block_util_colors = [utils.COLORS[cn] for cn in block_colors]
 
-        lang_template = lang_template.format(pick_obj=pick_obj,
-                                             positional_word=position_word,
-                                             pick_pos=place_pos)
-        question_template = question_template.format(pick_obj=pick_obj,
-                                            positional_word=position_word,
-                                             pick_pos=place_pos)
-        self.remain_container_poses=[]
-        self.remain_pick_obj_poses=[]
-        for i in range(1,len(bowl_poses)):
-            self.remain_container_poses.append((bowl_poses[i],bowl_colors[i]))
-        for i in range(1,len(block_poses)):
-            self.remain_pick_obj_poses.append((block_poses[i],block_colors[i]))
+
+
+            # Add bowls.
+            bowl_size = (0.14, 0.14, 0)
+            bowl_urdf = 'bowl/bowl.urdf'
+            bowl_poses = []
+            for i in range(n_bowls - 1):
+                bowl_pose = self.get_random_pose(env, bowl_size)
+                bowl_id = env.add_object(bowl_urdf, bowl_pose, 'fixed')
+                p.changeVisualShape(bowl_id, -1, rgbaColor=bowl_util_colors[i] + [1])
+                bowl_poses.append(bowl_pose)
+
+            # Add other blocks.
+            block_size = (0.04, 0.04, 0.04)
+            block_urdf = 'stacking/block.urdf'
+            pick_pos = random.sample(rel_postion, 2)
+            block_poses = []
+            for i in range(n_blocks - 1):
+                block_pose = self.get_random_pose(env, block_size)
+                block_id = env.add_object(block_urdf, block_pose)
+                p.changeVisualShape(block_id, -1, rgbaColor=block_util_colors[i] + [1])
+                block_poses.append(block_pose)
+            if target_place_type == "block2trashcan":
+                adv_info=self.add_adv_objects(env, block_size, block_urdf, 2, block_util_colors[-1])
+                if adv_info is None:
+                    return None
+                valid_block_ids, pick_pos = adv_info
+                adv_obj_id=valid_block_ids[0]
+                pick_obj=block_colors[-1]+ " block"
+                place_pos = pick_pos[0]
+                position_word="at"
+            elif target_place_type == "blockinbowl2trashcan":
+                ## add two more blocks with the same color: one in the bowl and the other not
+                while True:
+                    block_pose = self.get_random_pose(env, block_size, pick_pos[i])
+                    block_id = env.add_object(block_urdf, block_pose)
+                    if block_id is not None:
+                        break
+                    else:
+                        pick_pos = random.sample(rel_postion,2)
+                p.changeVisualShape(block_id, -1, rgbaColor=block_util_colors[-1] + [1])
+
+                pose1, pose2 = bowl_poses[0]
+                pose1 = list(pose1)
+                pose1[2] = 0.020
+                pose1 = tuple(pose1)
+                adv_obj_id = env.add_object(block_urdf, (pose1, pose2))
+                p.changeVisualShape(adv_obj_id, -1, rgbaColor=block_util_colors[-1] + [1])
+
+                pick_obj=block_colors[-1]+" block"
+                place_pos = bowl_colors[0]+" bowl"
+                position_word="in"
+            else:
+
+                adv_info=self.add_adv_objects(env, bowl_size, bowl_urdf, 2, bowl_util_colors[-1])
+                if adv_info is None:
+                    return None
+                valid_bowl_ids, pick_pos = adv_info
+                adv_obj_id=valid_bowl_ids[0]
+                pick_obj=bowl_colors[-1]+" bowl"
+                place_pos = pick_pos[0]
+                position_word="at"
+
+            obj_points = {adv_obj_id: self.get_object_points(trashcan_id)}
+            obj_ids = []
+            obj_ids.append((adv_obj_id, (0, None)))
+            self.goals.append((
+                obj_ids, np.eye(1), [trashcan_pose], False, False, 'pose',
+                (obj_points, [(trashcan_pose, trashcan_size)]), 1))
+
+            lang_template = lang_template.format(pick_obj=pick_obj,
+                                                 positional_word=position_word,
+                                                 pick_pos=place_pos)
+            question_template = question_template.format(pick_obj=pick_obj,
+                                                positional_word=position_word,
+                                                 pick_pos=place_pos)
+            self.remain_container_poses=[]
+            self.remain_pick_obj_poses=[]
+            for i in range(1,len(bowl_poses)):
+                self.remain_container_poses.append((bowl_poses[i],bowl_colors[i]))
+            for i in range(1,len(block_poses)):
+                self.remain_pick_obj_poses.append((block_poses[i],block_colors[i]))
         self.question_list.append(question_template)
         self.lang_goals.append(lang_template)
         self.answer_list.append(self.answer_template)

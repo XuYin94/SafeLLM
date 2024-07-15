@@ -15,7 +15,7 @@ class PickPlace():
         self._random = np.random.RandomState(seed)
         return seed
 
-    def __call__(self, movej, movep, ee, pose0, pose1):
+    def __call__(self, movej, movep, ee, pose0, pose1,action_error=False):
         """Execute pick and place primitive.
     
         Args:
@@ -50,7 +50,11 @@ class PickPlace():
 
         # Activate end effector, move up, and check picking success.
         ee.activate()
+
         timeout |= movep(postpick_pose, self.speed)
+        if action_error:
+            ee.release()  ## uncomment if you want to simulate the pick action error
+            return timeout
         pick_success = ee.check_grasp()
 
         # Execute placing primitive if pick is successful.
@@ -66,6 +70,7 @@ class PickPlace():
                     targ_pose = np.int32(targ_pose)
                     noise = np.int32(self._random.normal(0, 2.5, targ_pose.shape))
                     targ_pose += noise
+                #ee.release()  ## uncomment if you want to simulate the action error during movement
                 timeout |= movep(targ_pose, self.speed)
                 if timeout:
                     return True

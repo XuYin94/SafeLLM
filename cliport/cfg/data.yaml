@@ -7,7 +7,7 @@ hydra:
   run:
     dir: ./
 
-data_dir: /mnt/lynx1/users/zhang/Workfolder/data/  # where to store dataset
+data_dir: /mnt/lynx4/users/zhang/yinxu/Workfolder/data/  # where to store dataset
 assets_root: ./cliport/environments/assets/
 disp: False  # visualize PyBullet
 shared_memory: False

@@ -8,31 +8,22 @@ import cv2
 from cliport import tasks
 import time
 from cliport.dataset import RavensDataset
-from cliport.utils.utils import add_anomaly_object
 from cliport.environments.environment import Environment
 
 def recording(env,rgb_list,depth_list,event):
     while not event.is_set():
-        time.sleep(0.005)
+        time.sleep(0.025)
         rgb, depth = env.multi_view_render()
         rgb_list.append(rgb)
         depth_list.append(depth)
 
 def one_episode_execution(info,obs,agent,env,task,episode,output_queue,event,add_anomaly=False):
-    reward=0
     for _ in range(task.max_steps):
         lang_goal = info['lang_goal']
         question = info['question']
         answer = info['answer']
         act = agent.act(obs, info)
-        episode.append((obs, act, reward, info))
-        if add_anomaly:
-            if 'trash can' in lang_goal:
-                continue
-            if act is not None:
-                anomaly = add_anomaly_object(env, task, in_pick_position=True,oracle_pose=act)
-        else:
-            anomaly="no anomaly happened."
+        anomaly="no anomaly happened."
         obs, reward, __,__ = env.step(act)
 
         info['answer'] += anomaly
@@ -132,9 +123,9 @@ def main(cfg):
 
             while not output_queue.empty():
                 reward=output_queue.get()
-            if save_data and reward > 0: ## for the primitive actions, only a single 
+            if save_data and reward > 0: ## for the primitive actions, only a single
                 dataset.add(seed, episode)
-                dataset.save_vlm_episodes(seed,rgb_list,depth_list,path=data_path)
+                #dataset.save_vlm_episodes(seed,rgb_list,depth_list,info,path=data_path)
 
 
 

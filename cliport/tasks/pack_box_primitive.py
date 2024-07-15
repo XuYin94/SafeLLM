@@ -121,7 +121,7 @@ class PackBoxPrimitive(Task):
         object_volumes = []
         true_poses = {}
         nbr_outside_boxes = random.randint(1, len(object_ids))
-        outside_boxes_objs = random.sample(object_ids, nbr_outside_boxes)
+        outside_boxes_objs = object_ids[-nbr_outside_boxes:]
         inside_boxes_objs=list(set(object_ids)-set(outside_boxes_objs))
         for id, _ in inside_boxes_objs:
             self.inside_box_blocks[id]=object_colors[id]
@@ -135,7 +135,7 @@ class PackBoxPrimitive(Task):
             p.resetBasePositionAndOrientation(object_id, pose[0], pose[1])
             true_poses[object_id] = true_pose
             outside_obj_ids.append(object_id)
-        goal_obj_id = random.sample(outside_obj_ids, 1)[0]
+        goal_obj_id = outside_obj_ids[0]
         object_points[goal_obj_id] = self.get_object_points(goal_obj_id)
 
         # if target=="brown box":
@@ -177,7 +177,7 @@ class PackBoxwithRelativePickPosition(Task):
         container_template = 'trash_can/trashcan.urdf'
         trashcan_id=env.add_object(container_template, trashcan_pose, 'fixed')
         trashcan_size = p.getVisualShapeData(trashcan_id)[0][3]
-        target=random.choice(["brown box"]) #["blockinzone","blockinbox"]
+        target=random.choice(["brown box"])
 
         while True:
             container_pos = random.sample(rel_postion, 2)
@@ -270,7 +270,7 @@ class PackBoxwithRelativePickPosition(Task):
             self.un_finished_goal_poses = {}
             # Randomly select object in box and save ground truth pose.
             nbr_outside_boxes = random.randint(1, len(object_ids))
-            outside_boxes_objs = random.sample(object_ids, nbr_outside_boxes)
+            outside_boxes_objs = object_ids[-nbr_outside_boxes:]
 
             for object_id, _ in outside_boxes_objs:
                 true_pose = p.getBasePositionAndOrientation(object_id)
@@ -283,8 +283,7 @@ class PackBoxwithRelativePickPosition(Task):
             break
         ## add confusing container
         if target=="brown box":
-            i=0
-            while i<20:
+            while True:
                 zone_size = (0.08,0.08,0.05)
                 adv_zone_pose = self.get_random_pose(env, zone_size, container_pos[1])
                 container_template = 'container/container-template.urdf'
@@ -294,9 +293,6 @@ class PackBoxwithRelativePickPosition(Task):
                 adv_obj_id = env.add_object(container_urdf, adv_zone_pose)
                 if adv_obj_id is not None:
                     break
-                i+=1
-            if i==20:
-                return None
             pick_obj_name = "brown box"
             pick_pos="at the "+container_pos[1]
         elif target=="blockinbox":

@@ -200,7 +200,7 @@ class PutBlockInMatchingBowl(Task):
         self.max_steps = 10
         self.pos_eps = 0.05
         self.final_goal="put blocks in matching bowls"
-        self.task_name="put blocks in matching bowls "
+        self.task_name="put-blocks-in-matching-bowls "
         self.lang_template = "put the {pick_color} block in the {place_color} bowl."
         self.task_completed_desc = "done PutBlockInMatchingBowl."
         self.question_template = "Did the robot successfully execute the action 'put the {pick_color} block in the {place_color} bowl', and did any anomaly happen?"
