@@ -336,6 +336,7 @@ class Environment(gym.Env):
 
         info['lang_goal'] = self.get_lang_goal()
         info['question'] =self.get_question()
+        #print(self.get_question())
         info['answer'] =self.get_answer()
         return info
 
@@ -421,7 +422,7 @@ class Environment(gym.Env):
         p.setRealTimeSimulation(True)
         self.save_video = False
 
-    def add_video_frame(self):
+    def add_video_frame(self,scene=None):
         # Render frame.
         config = self.agent_cams[0]
         image_size = (self.record_cfg['video_height'], self.record_cfg['video_width'])
@@ -431,6 +432,8 @@ class Environment(gym.Env):
         # Add language instruction to video.
         if self.record_cfg['add_text']:
             lang_goal = self.get_lang_goal()
+            # if scene is not None:
+            #     lang_goal=scene
             reward = f"Success: {self.task.get_reward():.3f}"
 
             font = cv2.FONT_HERSHEY_DUPLEX

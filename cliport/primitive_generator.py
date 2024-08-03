@@ -18,11 +18,13 @@ def recording(env,rgb_list,depth_list,event):
         depth_list.append(depth)
 
 def one_episode_execution(info,obs,agent,env,task,episode,output_queue,event,add_anomaly=False):
+    #reward=0.0
     for _ in range(task.max_steps):
         lang_goal = info['lang_goal']
         question = info['question']
         answer = info['answer']
         act = agent.act(obs, info)
+        episode.append((obs, act, 0.0, info))
         anomaly="no anomaly happened."
         obs, reward, __,__ = env.step(act)
 
@@ -36,7 +38,8 @@ def one_episode_execution(info,obs,agent,env,task,episode,output_queue,event,add
                 f'| Goal: {lang_goal} | Question: {question} | Answer: {answer}')
 
             break
-    episode.append((obs, act, reward, info))
+    #print(reward)
+    episode.append((obs, None, reward, info))
     output_queue.put(reward)
     event.set()
 
@@ -123,9 +126,9 @@ def main(cfg):
 
             while not output_queue.empty():
                 reward=output_queue.get()
-            if save_data and reward > 0: ## for the primitive actions, only a single
-                dataset.add(seed, episode)
-                #dataset.save_vlm_episodes(seed,rgb_list,depth_list,info,path=data_path)
+                if reward > 0: ## for the primitive actions, only a single
+                    dataset.add(seed, episode)
+                    #dataset.save_vlm_episodes(seed,rgb_list,depth_list,info,path=data_path)
 
 
 

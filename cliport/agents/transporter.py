@@ -194,7 +194,7 @@ class TransporterAgent(LightningModule):
 
     def check_save_iteration(self):
         global_step = self.total_steps
-        if global_step %self.save_steps==0:
+        if global_step % self.save_steps==0:
             # self.trainer.validate(self)
             # val_loss = self.trainer.callback_metrics['vl/loss']
             steps = f'{global_step + 1:05d}'
@@ -204,7 +204,7 @@ class TransporterAgent(LightningModule):
             ckpt_path = os.path.join(checkpoint_path, filename)
             self.trainer.save_checkpoint(ckpt_path)
 
-        if global_step % 1000 == 0:
+        if global_step % 1875 == 0:
             # save lastest checkpoint
             # print(f"Saving last.ckpt Epoch: {self.trainer.current_epoch} | Global Step: {self.trainer.global_step}")
             self.save_last_checkpoint()

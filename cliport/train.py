@@ -74,6 +74,7 @@ def main(cfg):
     if last_checkpoint:
         print(f"Resuming: {last_checkpoint}")
         last_ckpt = torch.load(last_checkpoint)
+        print(trainer.current_epoch)
         trainer.current_epoch=last_ckpt['epoch']
         trainer.global_step=last_ckpt['global_step']
         del last_ckpt

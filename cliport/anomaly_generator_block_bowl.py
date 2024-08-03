@@ -13,7 +13,7 @@ import threading, queue
 
 def recording(env,rgb_list,depth_list,event):
     while not event.is_set():
-        time.sleep(0.005)
+        time.sleep(0.0001)
         rgb, depth = env.multi_view_render()
         rgb_list.append(rgb)
         depth_list.append(depth) ## if you want to save the depth info
@@ -34,15 +34,13 @@ def one_episode_execution(agent,env,task,add_anomaly=False,action_error=False,re
             return None
 
         obj_id = act['obj_id']
-        if "matching" in task.task_name:
-            for i, block_info in enumerate(task.block_info):
-                if block_info[0]==obj_id:
-                    color=block_info[1]
-                    processed_objs.append((color,obj_id))
-                    break
-            info["lang_goal"]=info["lang_goal"].format(pick_color=color,place_color=color)
-            info["question"]=info["question"].format(pick_color=color,place_color=color)
-            info['answer']=info['answer'].format(pick_color=color,place_color=color)
+        for i, block_info in enumerate(task.block_info):
+            if block_info[0]==obj_id:
+                color=block_info[1]
+                break
+        info["lang_goal"]=info["lang_goal"].format(pick_color=color,place_color=color)
+        info["question"]=info["question"].format(pick_color=color,place_color=color)
+        info['answer']=info['answer'].format(pick_color=color,place_color=color)
 
         if step==recording_step:
             thread_list=[]
@@ -67,7 +65,7 @@ def one_episode_execution(agent,env,task,add_anomaly=False,action_error=False,re
             if add_anomaly:
                 if act is not None:
                     perturbation_list=["addition","removal"]
-                    if step>0:
+                    if len(processed_objs)>0:
                         perturbation_list.append("displacement")
                     perturbation_type=random.choice(perturbation_list)
                     type=random.choice(["distractor","None"])
@@ -117,6 +115,8 @@ def one_episode_execution(agent,env,task,add_anomaly=False,action_error=False,re
         else:
             print(f'| Goal: {info["lang_goal"]} | Question: {info["question"]} | Answer: {info["answer"]}')
             obs, reward, done, info = env.step(act)
+            if reward>0:
+                processed_objs.append((color,obj_id))
             if done:
                 break
 

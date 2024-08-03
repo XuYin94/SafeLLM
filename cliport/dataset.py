@@ -319,22 +319,28 @@ class RavensMultiTaskDataset(RavensDataset):
         # all tasks
         'multi-all': {
             'train': [
-                'pick-and-place-primitive',
-                'pick-and-place-primitive-relative-pick-position',
+                #'pick-and-place-primitive',
+                #'pick-and-place-primitive-relative-pick-position',
                 'pack-box-primitive-relative-pick-position',
                 'pack-box-primitive'
+                # 'stack-block-pyramid-seq-seen-colors-primitive',
+                # 'stack-block-pyramid-seq-seen-colors-relative-position'
             ],
             'val': [
-                'pick-and-place-primitive',
-                'pick-and-place-primitive-relative-pick-position',
+                #'pick-and-place-primitive',
+                #'pick-and-place-primitive-relative-pick-position',
                 'pack-box-primitive-relative-pick-position',
                 'pack-box-primitive'
+                # 'stack-block-pyramid-seq-seen-colors-primitive',
+                # 'stack-block-pyramid-seq-seen-colors-relative-position'
             ],
             'test': [
-                'pick-and-place-primitive',
-                'pick-and-place-primitive-relative-pick-position',
+                #'pick-and-place-primitive',
+                #'pick-and-place-primitive-relative-pick-position',
                 'pack-box-primitive-relative-pick-position',
                 'pack-box-primitive'
+                # 'stack-block-pyramid-seq-seen-colors-primitive',
+                # 'stack-block-pyramid-seq-seen-colors-relative-position'
             ],
         }
 
@@ -417,7 +423,9 @@ class RavensMultiTaskDataset(RavensDataset):
 
         # Is the task sequential like stack-block-pyramid-seq?
         is_sequential_task = '-seq' in self._path.split("/")[-1]
-
+        #print(self._task)
+        #print(episode_id)
+        #print(len(episode))
         # Return random observation action pair (and goal) from episode.
         i = np.random.choice(range(len(episode) - 1))
         g = i + 1 if is_sequential_task else -1

@@ -204,13 +204,13 @@ class PutBlockInMatchingBowl(Task):
         self.lang_template = "put the {pick_color} block in the {place_color} bowl."
         self.task_completed_desc = "done PutBlockInMatchingBowl."
         self.question_template = "Did the robot successfully execute the action 'put the {pick_color} block in the {place_color} bowl', and did any anomaly happen?"
-        self.answer_template = "The action is executed successfully, and "
+        self.answer_template = "The action succeeded, and "
         self.seed = 0
 
     def reset(self, env):
         super().reset(env)
 
-        trashcan_pose = ((0.30, random.choice([-0.4, 0.4]), 0.05), (0.0, 0.0, 0.12, 0.1))
+        trashcan_pose = ((0.35, random.choice([-0.4, 0.4]), 0.05), (0.0, 0.0, 0.12, 0.1))
         container_template = 'trash_can/trashcan.urdf'
         env.add_object(container_template, trashcan_pose, 'fixed')
 
@@ -248,7 +248,6 @@ class PutBlockInMatchingBowl(Task):
 
         # Goal: put each block in a different bowl.
         self.goals.append((blocks, np.eye(len(blocks)), bowl_poses, False, True, 'pose', None, 1))
-        self.lang_goals.append(self.lang_template)
 
         # Only one mistake allowed.
         self.max_steps = len(blocks) + 2
@@ -317,7 +316,7 @@ class PutBlockInMatchingBowl(Task):
 
 
     def get_colors(self):
-            return utils.TRAIN_COLORS if self.mode == 'train' else utils.EVAL_COLORS
+            return utils.ALL_COLORS
 
 class PutAllBlockInABowl(Task):
     """Put all the blocks in a bowl base class and task"""

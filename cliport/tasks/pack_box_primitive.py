@@ -17,7 +17,7 @@ class PackBoxPrimitive(Task):
         self.max_steps = 1
         self.task_name="pack-box-primitive"
         self.task_completed_desc = "done packing boxes."
-        self.answer_template = "The action is executed successfully, and "
+        self.answer_template = "The action succeed, and "
         self.obj_colors = {}
 
     def reset(self, env):
@@ -168,7 +168,7 @@ class PackBoxwithRelativePickPosition(Task):
         self.lang_template = "put the {pick_obj} {pick_position} into the trash can"
         self.task_completed_desc = "done packing boxes."
         self.question_template = "Did the robot successfully execute the action 'put the {pick_obj} {pick_position} into the trash can', and did any anomaly happen?"
-        self.answer_template = "The action is executed successfully, and "
+        self.answer_template = "The action succeed, and "
         self.task_name="pack-box-relative-primitive"
     def reset(self, env):
         super().reset(env)
@@ -177,7 +177,7 @@ class PackBoxwithRelativePickPosition(Task):
         container_template = 'trash_can/trashcan.urdf'
         trashcan_id=env.add_object(container_template, trashcan_pose, 'fixed')
         trashcan_size = p.getVisualShapeData(trashcan_id)[0][3]
-        target=random.choice(["brown box"])
+        target=random.choice(["blockinzone","blockinbox","brown box"])
 
         while True:
             container_pos = random.sample(rel_postion, 2)
@@ -283,7 +283,8 @@ class PackBoxwithRelativePickPosition(Task):
             break
         ## add confusing container
         if target=="brown box":
-            while True:
+            i=0
+            while i<50:
                 zone_size = (0.08,0.08,0.05)
                 adv_zone_pose = self.get_random_pose(env, zone_size, container_pos[1])
                 container_template = 'container/container-template.urdf'
@@ -293,6 +294,9 @@ class PackBoxwithRelativePickPosition(Task):
                 adv_obj_id = env.add_object(container_urdf, adv_zone_pose)
                 if adv_obj_id is not None:
                     break
+                i+=1
+            if adv_obj_id == None:
+                return None
             pick_obj_name = "brown box"
             pick_pos="at the "+container_pos[1]
         elif target=="blockinbox":

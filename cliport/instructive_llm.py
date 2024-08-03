@@ -18,6 +18,9 @@ OPEN_SOURCE_LLMs = {"Llama-2-7b":
                      "type": "completion"},
                     "Llama-3-8B-instruct":
                      {"path":"/mnt/lynx4/users/zhang/yinxu/LLM_models/Meta-Llama-3-8B-Instruct/",
+                     "type": "instruction"},
+                    "Llama-3.1-8B-instruct":
+                     {"path":"/mnt/lynx4/users/zhang/yinxu/LLM_models/Meta-Llama-3.1-8B-Instruct/",
                      "type": "instruction"}}
 def text_parsing (generated_output: str):
     #print(generated_output)
@@ -61,6 +64,7 @@ def get_next_LLM_feedback(history_message: str,return_prompt: bool = False,llm_a
     #print(decoded_output)
     decoded_output=decoded_output[ori_len:]
     response = text_parsing(decoded_output)
+    #print(response)
     header_type,response=response[0],response[1]
     response=response.split('###')[0].strip()
     return header_type,response

@@ -141,7 +141,7 @@ class Task:
 
             # Unpack next goal step.
             objs, matches, targs, replace, rotations, _, _, _ = self.goals[0]
-
+            #print(self.goals[0])
             # Match objects to targets without replacement.
             if not replace:
 
@@ -195,9 +195,11 @@ class Task:
 
             # Trigger task reset if no object is visible.
             if pick_mask is None or np.sum(pick_mask) == 0:
+                print("fuck")
                 self.goals = []
                 self.lang_goals = []
                 self.question_list = []
+                self.answer_list=[]
                 print('Object for pick is not visible. Skipping demonstration.')
                 return
 
@@ -318,6 +320,18 @@ class Task:
         reward = self.progress + step_reward - self._rewards
         self._rewards = self.progress + step_reward
 
+        # Move to next goal step if current goal step is complete.
+        if np.abs(max_reward - step_reward) < 0.01:
+            self.progress += max_reward  # Update task progress.
+            self.goals.pop(0)
+            if "Pyramid" in self.task_name:
+                if len(self.lang_goals) > 0:
+                    self.lang_goals.pop(0)
+                    self.question_list.pop(0)
+            if len(self.pick_obj_names) > 0:
+                assert len(self.place_obj_names) > 0
+                self.pick_obj_names.pop(0)
+                self.place_obj_names.pop(0)
 
         return reward, info
 
@@ -433,7 +447,8 @@ class Task:
         else:
             return self.lang_goals[0]
     def get_question(self):
-        if len(self.lang_goals) == 0:
+        #print(len(self.question_list))
+        if len(self.question_list) == 0:
             return self.task_completed_desc
         else:
             return self.question_list[0]

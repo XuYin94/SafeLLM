@@ -13,7 +13,11 @@ def get_help_infomation(task):
             "The instruction is 'put current-seen blocks in the brown box'.\n" +
             "Before providing the action plan, please define the final goal state.\n"+
             "For the planned action steps, ensure each action follows the format 'put the [object1] in the [object2]'.")
-    
+    else:
+        please_help=(
+            "The instruction is 'Put blocks together to form a three-row pyramid'. \n"+
+            "Before providing the action plan, please define the final goal state by specifying which blocks should be placed on the bottom, middle, and top rows.\n" +
+            "For the planned action steps, ensure each action follows the format 'put the [object1] on the [object2]'.")
     return please_help
 
 
@@ -21,9 +25,9 @@ def get_cot_prompt(task, anomaly_type="pick"):
     please_help=get_help_infomation(task)
    
     if anomaly_type=="None":
-        episode_list=get_normal_execution(task=task)[:3]
-    else:
         episode_list=get_normal_execution(task=task)[:5]
+    else:
+        episode_list=get_normal_execution(task=task)[:3]
         episode_list+=get_cot_handling_prompt(task=task,anomaly_type=anomaly_type)
     
     random.shuffle(episode_list)
@@ -43,7 +47,7 @@ def get_normal_execution(task):
     
     if "-matching-bowl" in task:
         example_1 = ("### User:\n"+
-                    "In the initial state, there are green, red, purple, and yellow blocks; there are green, red, purple, cyan, and blue bowls; and a trash can.\n "+
+                    "In the initial state, there are green, red, purple, and yellow blocks; there are green, red, purple, cyan, and blue bowls; and a trash can.\n"+
                     ##"{please_help}\n"+
                     "What is the final goal state?\n"+
                     "### Assistant:\n"+
@@ -77,7 +81,7 @@ def get_normal_execution(task):
                     "### User:\n"+
                     'Please describe The progress and the remaining goals.\n'+
                     "### Assistant:\n"+
-                    "The achieves progress is ['the green, red and purple blocks are in their corresponding bowls']. All goals are completed.\n" +
+                    "The progress is ['the green, red and purple blocks are in their corresponding bowls']. All goals are completed.\n" +
                     "### User:\n"+
                     "What is your plan for the next step?\n" +
                     "### Assistant:\n"+
@@ -85,7 +89,7 @@ def get_normal_execution(task):
                     )
         
         example_2 = ("### User:\n"+
-                    "In the initial state, there are yellow, blue, orange, green, cyan, and pink blocks; there are yellow, blue, and orange bowls; and a trash can.\n " +
+                    "In the initial state, there are yellow, blue, orange, green, cyan, and pink blocks; there are yellow, blue, and orange bowls; and a trash can.\n" +
                     #"{please_help}\n"+ 			
                     "What is the final goal state?\n"
                     "### Assistant:\n"+
@@ -126,7 +130,7 @@ def get_normal_execution(task):
                     "done.\n") 
         
         example_3 = ("### User:\n"+
-                    "In the initial state, there are white, red, pink, and green blocks; there are white, red, pink, yellow, and cyan bowls; and a trash can.\n " +
+                    "In the initial state, there are white, red, pink, and green blocks; there are white, red, pink, yellow, and cyan bowls; and a trash can.\n" +
                     #"{please_help}\n"+ 			
                     "What is the final goal state?\n"
                     "### Assistant:\n"+
@@ -149,7 +153,7 @@ def get_normal_execution(task):
                     "### User:\n"+
                     "Please describe The progress and the remaining goals.\n"+
                     "### Assistant:\n"+
-                    "The achieves progress is ['the white and red blocks are in their corresponding bowls']. The remaining goal is ['put the pink block in its corresponding bowl'.]\n"+
+                    "The progress is ['the white and red blocks are in their corresponding bowls']. The remaining goal is ['put the pink block in its corresponding bowl'.]\n"+
                     "### User:\n"+
                     "What is your plan for the next step?\n"+
                     "### Assistant:\n"+
@@ -513,7 +517,8 @@ def get_normal_execution(task):
         episode_list=[example_1,example_2,example_3,example_4,example_5,example_6,example_7,example_8,example_9,example_10]
     
     elif task=="packing-boxes":
-        episode_1=("### User:\n"+
+        episode_1=(
+            "### User:\n"+
             "In the initial state, there are red, blue, green, yellow, orange, and purple blocks; there is a brown box and a trash can.\n"+
             ##"{please_help}\n"+
             "What is the final goal state?\n"+
@@ -599,7 +604,7 @@ def get_normal_execution(task):
             "### User:\n"+
             "Please describe the achieved progress and the remaining goals.\n"+
             "### Assistant:\n"+
-            "The achieved progress is ['An orange block is in the brown box']. The remaining goal is ['Put pink block, orange block, cyan block, orange block, and pink block in the brown box'].\n"+
+            "The progress is ['An orange block is in the brown box']. The remaining goal is ['Put pink block, orange block, cyan block, orange block, and pink block in the brown box'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
@@ -609,7 +614,7 @@ def get_normal_execution(task):
             "### User:\n"+
             "Please describe the achieved progress and the remaining goals.\n"+
             "### Assistant:\n"+
-            "The achieved progress is ['An orange block and a pink block are in the brown box']. The remaining goal is ['Put orange block, cyan block, orange block, and pink block in the brown box'].\n"+
+            "The progress is ['An orange block and a pink block are in the brown box']. The remaining goal is ['Put orange block, cyan block, orange block, and pink block in the brown box'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
@@ -619,7 +624,7 @@ def get_normal_execution(task):
             "### User:\n"+
             "Please describe the achieved progress and the remaining goals.\n"+
             "### Assistant:\n"+
-            "The achieved progress is ['Orange block, pink block, and orange block are in the brown box']. The remaining goal is ['Put cyan block, orange block, and pink block in the brown box'].\n"+
+            "The progress is ['Orange block, pink block, and orange block are in the brown box']. The remaining goal is ['Put cyan block, orange block, and pink block in the brown box'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
@@ -629,7 +634,7 @@ def get_normal_execution(task):
             "### User:\n"+
             "Please describe the achieved progress and the remaining goals.\n"+
             "### Assistant:\n"+
-            "The achieved progress is ['Orange block, pink block, orange block, and cyan block are in the brown box']. The remaining goal is ['Put orange block and pink block in the brown box'].\n"+
+            "The progress is ['Orange block, pink block, orange block, and cyan block are in the brown box']. The remaining goal is ['Put orange block and pink block in the brown box'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
@@ -639,7 +644,7 @@ def get_normal_execution(task):
             "### User:\n"+
             "Please describe the achieved progress and the remaining goals.\n"+
             "### Assistant:\n"+
-            "The achieved progress is ['Orange block, pink block, orange block, cyan block, and orange block are in the brown box']. The remaining goal is ['Put the pink block in the brown box'].\n"+
+            "The progress is ['Orange block, pink block, orange block, cyan block, and orange block are in the brown box']. The remaining goal is ['Put the pink block in the brown box'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
@@ -649,7 +654,7 @@ def get_normal_execution(task):
             "### User:\n"+
             "Please describe the achieved progress and the remaining goals.\n"+
             "### Assistant:\n"+
-            "The achieved progress is ['Orange block, pink block, orange block, cyan block, orange block, and pink block are in the brown box']. All goals are completed.\n"+
+            "The progress is ['Orange block, pink block, orange block, cyan block, orange block, and pink block are in the brown box']. All goals are completed.\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
@@ -801,6 +806,363 @@ def get_normal_execution(task):
 
         episode_list=[episode_1,episode_2,episode_3,episode_4]
     
+    elif "pyramid" in task:
+        episode_1=(
+            "### User:\n"+
+            "In the initial state, there are gray, red, blue, brown, white, pink, and green blocks; there is a stand and a trash can.\n"+
+            "What is the final goal state?\n"+
+            "### Assistant:\n"+
+            "Final goal state: ['the gray, red, and blue blocks make the bottom row; the brown and white blocks make the middle row; the pink block makes the top row'].\n"+
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n"+
+            "put the gray block on the lightest brown block of the stand.\n"+
+            "### User:\n"+
+            "The action succeeded, and no anomaly happened.\n"+
+            "### User:\n"+
+            "Please describe the achieved progress and the remaining goals.\n"
+            "### Assistant:\n"+
+            "Progress: [a gray block is on the stand]. Remaining goals: ['put the red and blue blocks on the stand to make the bottom row'; 'put the brown and white blocks on top of the bottom row to make the middle row'; 'put the pink block on top of the middle row to make the top row']\n"+
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n"+
+            "put the red block on the middle brown block of the stand.\n"+
+            "### User:\n"+
+            "The action succeeded, and no anomaly happened.\n"+
+            "### User:\n"+
+            "Please describe the achieved progress and the remaining goals.\n"
+            "### Assistant:\n"+
+            "Progress: [The gray and red blocks are on the stand]. Remaining goals: ['put the blue block on the stand to make the bottom row'; 'put the brown and white blocks on top of the bottom row to make the middle row'; 'put the pink block on top of the middle row to make the top row']\n"+
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n"+
+            "put the blue block on the darkest brown block of the stand.\n"+
+            "### User:\n"+
+            "The action succeeded, and no anomaly happened.\n"+
+            "### User:\n"+
+            "Please describe the achieved progress and the remaining goals.\n"+
+            "### Assistant:\n"+
+            "Progress: [The bottom row (gray, red, and blue blocks) is built]. Remaining goals: ['put the brown and white blocks on top of the bottom row to make the middle row'; 'put the pink block on top of the middle row to make the top row']\n"+
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n"+
+            "put the brown block on the gray and red blocks.\n"+
+            "### User:\n"+
+            "The action succeeded, and no anomaly happened.\n"+
+            "### User:\n"+
+            "Please describe the achieved progress and the remaining goals.\n"+
+            "### Assistant:\n"+
+            "Progress: [The bottom row (gray, red, and blue blocks) is built, and the brown block is on top of the bottom row]. Remaining goals: ['put the white blocks on top of the bottom row to make the middle row'; 'put the pink block on top of the middle row to make the top row']\n"+
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n"+
+            "put the white block on the red and blue blocks.\n"+
+            "### User:\n"+
+            "The action succeeded, and no anomaly happened.\n"+
+            "### User:\n"+
+            "Please describe the achieved progress and the remaining goals.\n"+
+            "### Assistant:\n"+
+            "Progress: [The bottom (gray, red, and blue blocks) and the middle row (brown and white blocks) are built]. Remaining goals: ['put the pink block on top of the middle row to make the top row']\n"+
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n"+
+            "put the pink block on the brown and white blocks.\n"+
+            "### User:\n"+
+            "The action succeeded, and no anomaly happened.\n"+
+            "### User:\n"+
+            "Please describe the achieved progress and the remaining goals.\n"+
+            "### Assistant:\n"+
+            "Progress: [The bottom (gray, red, and blue blocks), the middle row (brown and white blocks), and the top row (the pink block) are built]. All goals are completed\n"+
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n"+
+            "done.\n")
+		
+        episode_2 = (
+            "### User:\n" +
+            "In the initial state, there are yellow, blue, red, orange, green, brown, pink, and gray blocks; there is a stand and a trash can.\n" +
+            "What is the final goal state?\n" +
+            "### Assistant:\n" +
+            "Final goal state: ['the yellow, blue, and red blocks make the bottom row; the orange and green blocks make in the middle row; the brown block makes the top row'].\n" +
+            "### User:\n" +
+            "What is your plan for the next step?\n" +
+            "### Assistant:\n" +
+            "put the yellow block on the lightest brown block of the stand.\n" +
+            "### User:\n" +
+            "The action succeeded, and no anomaly happened.\n" +
+			"### User:\n"+
+			"Please describe the achieved progress and the remaining goals.\n"+
+            "### Assistant:\n"+
+            "Progress: [a yellow block is on the stand]. Remaining goals: ['put the blue and red blocks on the stand to make the bottom row'; 'put the orange and green blocks on top of the bottom row to make the middle row'; 'put the brown block on top of the middle row to make the top row']\n"+
+            "### User:\n" +
+            "What is your plan for the next step?\n" +
+            "### Assistant:\n" +
+            "put the blue block on the middle brown block of the stand.\n" +
+			"### User:\n" +
+            "The action succeeded, and no anomaly happened.\n" +
+			"### User:\n"+
+			"Please describe the achieved progress and the remaining goals.\n"+
+            "### Assistant:\n"+
+            "Progress: [The yellow and blue blocks are on the stand]. Remaining goals: ['put the red block on the stand to make the bottom row'; 'put the orange and green blocks on top of the bottom row to make the middle row'; 'put the brown block on top of the middle row to make the top row']\n"+
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n"+
+            "put the red block on the darkest brown block of the stand.\n"+
+            "### User:\n"+
+            "The action succeeded, and no anomaly happened.\n"+
+			"### User:\n"+
+			"Please describe the achieved progress and the remaining goals.\n"+
+            "### Assistant:\n"+
+            "Progress: [The bottom row (yellow, blue, and red blocks) is built]. Remaining goals: ['put the orange and green blocks on top of the bottom row to make the middle row'; 'put the brown block on top of the middle row to make the top row']\n"+
+            "### User:\n" +
+            "What is your plan for the next step?\n" +
+            "### Assistant:\n" +
+            "put the orange block on the yellow and blue blocks.\n" +
+            "### User:\n" +
+            "The action succeeded, and no anomaly happened.\n" +
+			"### User:\n"+
+			"Please describe the achieved progress and the remaining goals.\n"+
+            "### Assistant:\n"+
+            "Progress: [The bottom row (yellow, blue, and red blocks) is built, the orange block is on top of the bottom row]. Remaining goals: ['put the green blocks on top of the bottom row to make the middle row'; 'put the brown block on top of the middle row to make the top row']\n"+
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n"+
+            "put the green block on the blue and red blocks.\n" +
+            "### User:\n"+
+            "The action succeeded, and no anomaly happened.\n" +
+			"### User:\n"+
+			"Please describe the achieved progress and the remaining goals.\n"+
+            "### Assistant:\n"+
+            "Progress: [The bottom (yellow, blue, and red blocks) and the middle row (orange and green blocks) are built]. Remaining goals: ['put the brown block on top of the middle row to make the top row']\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n" +
+            "put the brown block on the orange and green blocks.\n" +
+            "### User:\n" +
+            "The action succeeded, and no anomaly happened.\n" +
+			"### User:\n"+
+			"Please describe the achieved progress and the remaining goals.\n"+
+            "### Assistant:\n"+
+            "Progress: [The bottom (yellow, blue, and red blocks), the middle row (orange and green blocks), and the top row (the brown block) are built]. All goals are completed\n"+
+			"### User:\n"+
+            "What is your plan for the next step?\n" +
+            "### Assistant:\n" +
+            "done.\n")
+        
+        episode_3=(
+            "### User:\n" +
+            "In the initial state, there are orange, purple, white, green, yellow, brown, and pink blocks; there is a stand and a trash can.\n" +
+            "What is the final goal state?\n" +
+            "### Assistant:\n" +
+            "Final goal state: ['the orange, purple, and white blocks make the bottom row; the green and yellow blocks make the middle row; the brown block makes the top row'].\n" +
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n"+
+            "put the orange block on the lightest brown block of the stand.\n" +
+            "### User:\n"+
+            "The action succeeded, and no anomaly happened.\n" +
+            "### User:\n"+
+            "Please describe the achieved progress and the remaining goals.\n"+
+            "### Assistant:\n"+
+            "Progress: [an orange block is on the stand]. Remaining goals: ['put the purple and white blocks on the stand to make the bottom row'; 'put the green and yellow blocks on top of the bottom row to make the middle row'; 'put the brown block on top of the middle row to make the top row']\n" +
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n"+
+            "put the purple block on the middle brown block of the stand.\n"+
+            "### User:\n"+
+            "The action succeeded, and no anomaly happened.\n"+
+            "### User:\n"+
+            "Please describe the achieved progress and the remaining goals.\n"+
+            "### Assistant:\n"+
+            "Progress: [The orange and purple blocks are on the stand]. Remaining goals: ['put the white block on the stand to make the bottom row'; 'put the green and yellow blocks on top of the bottom row to make the middle row'; 'put the brown block on top of the middle row to make the top row']\n" +
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n"+
+            "put the white block on the darkest brown block of the stand.\n"+
+            "### User:\n"+
+            "The action succeeded, and no anomaly happened.\n"+
+            "### User:\n"+
+            "Please describe the achieved progress and the remaining goals.\n"+
+            "### Assistant:\n"+
+            "Progress: [The bottom row (orange, purple, and white blocks) is built]. Remaining goals: ['put the green and yellow blocks on top of the bottom row to make the middle row'; 'put the brown block on top of the middle row to make the top row']\n" +
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n" +
+            "put the green block on the orange and purple blocks.\n" +
+            "### User:\n" +
+            "The action succeeded, and no anomaly happened.\n"+
+            "### User:\n"+
+            "Please describe the achieved progress and the remaining goals.\n"+
+            "### Assistant:\n"+
+            "Progress: [The bottom row (orange, purple, and white blocks) is built, and the green block is on top of the bottom row]. Remaining goals: ['put the yellow block on top of the bottom row to make the middle row'; 'put the brown block on top of the middle row to make the top row']\n" +
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n"+
+            "put the yellow block on the purple and white blocks.\n"+
+            "### User:\n" +
+            "The action succeeded, and no anomaly happened.\n"+
+            "### User:\n"+
+            "Please describe the achieved progress and the remaining goals.\n"+
+            "### Assistant:\n"+
+            "Progress: [The bottom (orange, purple, and white blocks) and the middle row (green and yellow blocks) are built]. Remaining goals: ['put the brown block on top of the middle row to make the top row']\n" +
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n"+
+            "put the brown block on the green and yellow blocks.\n"+
+            "### User:\n"+
+            "The action succeeded, and no anomaly happened.\n"+
+            "### User:\n"+
+            "Please describe the achieved progress and the remaining goals.\n"+
+            "### Assistant:\n"+
+            "Progress: [The bottom (orange, purple, and white blocks), the middle row (green and yellow blocks), and the top row (the brown block) are built]. All goals are completed\n" +
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n" +
+            "done.\n")
+        
+        episode_4=(
+            "### User:\n" +
+            "In the initial state, there are gray, pink, yellow, red, green, blue, and purple blocks; there is a stand and a trash can.\n" +
+            "What is the final goal state?\n"+
+            "### Assistant:\n"+
+            "Final goal state: ['the gray, pink, and yellow blocks make bottom row; the red and green blocks make the middle row; the blue block makes the top row'].\n" +
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n"+
+            "put the gray block on the lightest brown block of the stand.\n"+
+            "### User:\n"+
+            "The action succeeded, and no anomaly happened.\n"+
+            "### User:\n"+
+            "Please describe the achieved progress and the remaining goals.\n"+
+            "### Assistant:\n"+
+            "Progress: [a gray block is on the stand]. Remaining goals: ['put the pink and yellow blocks on the stand to make the bottom row'; 'put the red and green blocks on top of the bottom row to make the middle row'; 'put the blue block on top of the middle row to make the top row']\n" +
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n"+
+            "put the pink block on the middle brown block of the stand.\n" +
+            "### User:\n"+
+            "The action succeeded, and no anomaly happened.\n" +
+            "### User:\n"+
+            "Please describe the achieved progress and the remaining goals.\n"+
+            "### Assistant:\n"+
+            "Progress: [The gray and pink blocks are on the stand]. Remaining goals: ['put the yellow block on the stand to make the bottom row'; 'put the red and green blocks on top of the bottom row to make the middle row'; 'put the blue block on top of the middle row to make the top row']\n" +
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n"+
+            "put the yellow block on the darkest brown block of the stand.\n"+
+            "### User:\n"+
+            "The action succeeded, and no anomaly happened.\n"+
+            "### User:\n"+
+            "Please describe the achieved progress and the remaining goals.\n"+
+            "### Assistant:\n" +
+            "Progress: [The bottom row (gray, pink, and yellow blocks) is built]. Remaining goals: ['put the red and green blocks on top of the bottom row to make the middle row'; 'put the blue block on top of the middle row to make the top row']\n" +
+            "### User:\n" +
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n"+
+            "put the red block on the gray and pink blocks.\n"+
+            "### User:\n" +
+            "The action succeeded, and no anomaly happened.\n" +
+            "### User:\n"+
+            "Please describe the achieved progress and the remaining goals.\n" +
+            "### Assistant:\n"+
+            "Progress: [The bottom row (gray, pink, and yellow blocks) is built, and red block is on top of the bottom row]. Remaining goals: ['put the green blocks on top of the bottom row to make the middle row'; 'put the blue block on top of the middle row to make the top row']\n" +
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n" +
+            "put the green block on the pink and yellow blocks.\n"+
+            "### User:\n" +
+            "The action succeeded, and no anomaly happened.\n"+
+            "### User:\n"+
+            "Please describe the achieved progress and the remaining goals.\n"+
+            "### Assistant:\n"+
+            "Progress: [The bottom (gray, pink, and yellow blocks) and the middle row (red and green blocks) are built]. Remaining goals: ['put the blue block on top of the middle row to make the top row']\n" +
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n" +
+            "put the blue block on the red and green blocks.\n"+
+            "### User:\n"+
+            "The action succeeded, and no anomaly happened.\n"+
+            "### User:\n"+
+            "Please describe the achieved progress and the remaining goals.\n"+
+            "### Assistant:\n" +
+            "Progress: [The bottom (gray, pink, and yellow blocks), the middle row (red and green blocks), and the top row (the blue block) are built]. All goals are completed\n" +
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n"+
+            "done.\n"
+        )
+
+        episode_5=(
+            "### User:\n" +
+            "In the initial state, there are blue, yellow, green, red, white, pink, and orange blocks; there is a stand and a trash can.\n" +
+            "What is the final goal state?\n"+
+            "### Assistant:\n"+
+            "Final goal state: ['the blue, yellow, and green blocks make the bottom row; the red and white blocks make the middle row; the pink block makes the top row'].\n"+
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n"+
+            "put the blue block on the lightest brown block of the stand.\n"+
+            "### User:\n"+
+            "The action succeeded, and no anomaly happened.\n"+
+            "### User:\n"+
+            "Please describe the achieved progress and the remaining goals.\n"+
+            "### Assistant:\n"+
+            "Progress: [a blue block is on the stand]. Remaining goals: ['put the yellow and green blocks on the stand to make the bottom row'; 'put the red and white blocks on top of the bottom row to make the middle row'; 'put the pink block on top of the middle row to make the top row']\n"+
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n" +
+            "put the yellow block on the middle brown block of the stand.\n"+
+            "### User:\n"+
+            "The action succeeded, and no anomaly happened.\n"+
+            "### User:\n"+
+            "Please describe the achieved progress and the remaining goals.\n"+
+            "### Assistant:\n"+
+            "Progress: [The blue and yellow blocks are on the stand]. Remaining goals: ['put the green block on the stand to make the bottom row'; 'put the red and white blocks on  top of the bottom row to make the middle row'; 'put the pink block on top of the middle row to make the top row']\n" +
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n" +
+            "put the green block on the darkest brown block of the stand.\n"+
+            "### User:\n"+
+            "The action succeeded, and no anomaly happened.\n"+
+            "### User:\n"+
+            "Please describe the achieved progress and the remaining goals.\n"+
+            "### Assistant:\n"+
+            "Progress: [The bottom row (blue, yellow, and green blocks) is built]. Remaining goals: ['put the red and white blocks on top of the bottom row to make the middle row'; 'put the pink block on top of the middle row to make the top row']\n" +
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n"+
+            "put the red block on the blue and yellow blocks.\n"+
+            "### User:\n" +
+            "The action succeeded, and no anomaly happened.\n"+
+            "### User:\n"+
+            "Please describe the achieved progress and the remaining goals.\n"+
+            "### Assistant:\n"+
+            "Progress: [The bottom row (blue, yellow, and green blocks) is built, and the red block is on top of the bottom row]. Remaining goals: ['put the white block on top of the bottom row to make the middle row'; 'put the pink block on top of the middle row to make the top row']\n"+
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n"+
+            "put the white block on the yellow and green blocks.\n"+
+            "### User:\n"+
+            "The action succeeded, and no anomaly happened.\n"+
+            "### User:\n"+
+            "Please describe the achieved progress and the remaining goals.\n"+
+            "### Assistant:\n"+
+            "Progress: [The bottom (blue, yellow, and green blocks) and the middle row (red and white blocks) are built]. Remaining goals: ['put the pink block on top of the middle row to make the top row']\n"+
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n" +
+            "put the pink block on the red and white blocks.\n"+
+            "### User:\n"+
+            "The action succeeded, and no anomaly happened.\n"+
+            "### User:\n"+
+            "Please describe the achieved progress and the remaining goals.\n"+
+            "### Assistant:\n"+
+            "Progress: [The bottom (blue, yellow, and green blocks), the middle row (red and white blocks), and the top row (the pink block) are built]. All goals are completed\n"+
+            "### User:\n"+
+            "What is your plan for the next step?\n"+
+            "### Assistant:\n"+
+            "done.\n"
+        )
+        episode_list=[episode_1,episode_2,episode_3,episode_4,episode_5]
     return episode_list 
     
     
@@ -833,7 +1195,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n" +
                 "How to handle this anomaly?\n" +
                 "### Assistant:\n" +
-                "No need to take action.\n" +
+                "No action needed\n" +
                 "### User:\n" +
                 "What is your plan for the next step?\n" +
                 "### Assistant:\n" +
@@ -881,7 +1243,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n" +
                 "How to handle this anomaly?\n" +
                 "### Assistant:\n" +
-                "No need to take action.\n" +
+                "No action needed\n" +
                 "### User:\n" +
                 "What is your plan for the next step?\n" +
                 "### Assistant:\n" +
@@ -930,7 +1292,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n" +
                 "How to handle this anomaly?\n" +
                 "### Assistant:\n" +
-                "No need to take action.\n" +
+                "No action needed\n" +
                 "### User:\n" +
                 "What is your plan for the next step?\n" +
                 "### Assistant:\n" +
@@ -979,7 +1341,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n" +
                 "How to handle this anomaly?\n" +
                 "### Assistant:\n" +
-                "No need to take action.\n" +
+                "No action needed\n" +
                 "### User:\n" +
                 "What is your plan for the next step?\n" +
                 "### Assistant:\n" +
@@ -997,7 +1359,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n" +
                 "How to handle this anomaly?\n" +
                 "### Assistant:\n" +
-                "No need to take action.\n" +
+                "No action needed\n" +
                 "### User:\n"+
                 "What is your plan for the next step?\n" +
                 "### Assistant:\n"+
@@ -1441,7 +1803,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                         "### User:\n"+
                         "How to handle this anomaly?\n"+
                         "### Assistant:\n"+
-                        "No need to take action.\n"+
+                        "No action needed\n"+
                         "### User:\n"+
                         "What is your plan for the next step?\n"+
                         "### Assistant:\n"+
@@ -1509,7 +1871,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                         "### User:\n" +
                         "How to handle this anomaly?\n" +
                         "### Assistant:\n" +
-                        "No need to take action.\n" +
+                        "No action needed\n" +
                         "### User:\n" +
                         "What is your plan for the next step?\n" +
                         "### Assistant:\n" +
@@ -1555,7 +1917,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                         "### User:\n" +
                         "How to handle this anomaly?\n" +
                         "### Assistant:\n" +
-                        "No need to take action.\n" +
+                        "No action needed\n" +
                         "### User:\n" +
                         "What is your plan for the next step?\n" +
                         "### Assistant:\n" +
@@ -1634,7 +1996,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                         "### User:\n" +
                         "How to handle this anomaly?\n" +
                         "### Assistant:\n" +
-                        "No need to take action.\n" +
+                        "No action needed\n" +
                         "### User:\n" +
                         "What is your plan for the next step?\n" +
                         "### Assistant:\n"
@@ -1652,7 +2014,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                         "### User:\n" +
                         "How to handle this anomaly?\n" +
                         "### Assistant:\n" +
-                        "No need to take action.\n" +
+                        "No action needed\n" +
                         "### User:\n"
                         "What is your plan for the next step?\n" +
                         "### Assistant:\n"
@@ -1732,7 +2094,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                         "### User:\n"+
                         "How to handle this anomaly?\n"+
                         "### Assistant:\n"+
-                        "No need to take action.\n"+
+                        "No action needed\n"+
                         "### User:\n"+
                         "What is your plan for the next step?\n"+
                         "### Assistant:\n"+
@@ -1773,7 +2135,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n" +
                 "How to handle this anomaly?\n" +
                 "### Assistant:\n" +
-                "No need to take action.\n" +
+                "No action needed\n" +
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
                 "put the cyan block in the cyan bowl.\n"+
@@ -1868,7 +2230,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
-                "No need to take action.\n"+
+                "No action needed\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -1909,7 +2271,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
-                "No need to take action.\n"
+                "No action needed\n"
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -2145,7 +2507,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
-                "No need to take action.\n"+
+                "No action needed\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -2196,7 +2558,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
-                "No need to take action.\n"+
+                "No action needed\n"+
 				"### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -2214,7 +2576,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
-                "No need to take action.\n"+
+                "No action needed\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -2350,7 +2712,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
-                "No need to take action.\n"+
+                "No action needed\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -2368,7 +2730,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
-                "No need to take action.\n"+
+                "No action needed\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -2447,7 +2809,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
-                "No need to take action.\n"+
+                "No action needed\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -2538,7 +2900,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
-                "No need to take action.\n"+
+                "No action needed\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -2633,7 +2995,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### Assistant:\n"+
                 "done.\n")
             
-        episode_3=(
+            episode_3=(
                 "### User:\n"+
                 "In the initial state, there are orange, purple, cyan, and white blocks; there is a brown box and a trash can.\n"+
                 "What is the final goal state?\n"+
@@ -2703,7 +3065,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "done.\n"
             )
 
-        episode_4=(
+            episode_4=(
                 "### User:\n"+
                 "In the initial state, there are pink, blue, gray, cyan, and green blocks; there is a brown box and a trash can.\n"+
                 "What is the final goal state?\n"+
@@ -2781,5 +3143,1364 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
                 "done.\n")
-        anomaly_episode_list=[episode_1,episode_2,episode_3,episode_4]
+            anomaly_episode_list=[episode_1,episode_2,episode_3,episode_4]
+    
+        elif anomaly_type=="displacement":
+            episode_1=(
+                "### User:\n"+
+                "In the initial state, there are yellow, red, orange, blue, and green blocks; there is a brown box and a trash can.\n"+
+                "What is the final goal state?\n"+
+                "### Assistant:\n"+
+                "The final goal state is ['Yellow block, red block, orange block, blue block, and green block are in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the yellow block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The progress is ['A yellow block is in the brown box']. The remaining goal is ['Put red block, orange block, blue block, and green block in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the red block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The progress is ['A yellow block and a red block are in the brown box']. The remaining goal is ['Put orange block, blue block, and green block in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the orange block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and the yellow and red blocks in the brown box are moved to other positions on the table.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly [the yellow and red blocks in the brown box are moved to other positions on the table] on the task regarding progress and feasibility.\n"+
+                "### Assistant:\n"+
+                "The progress is disrupted, and the yellow and red blocks are not in the brown box; the current progress is ['The orange block is in the brown box']. The task feasibility is unaffected since the remaining target objects [yellow block, red block, blue block, green block] are still available.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly on future actions.\n"+
+                "### Assistant:\n"+
+                "The robot will not be affected.\n"+
+                "### User:\n"+
+                "How to handle this anomaly?\n"+
+                "### Assistant:\n"+
+                "Put the yellow and red blocks back in the brown box to resume progress.\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the yellow block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The progress is ['A yellow block and an orange block are in the brown box']. The remaining goal is ['Put the red block in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the red block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The anomaly has been addressed. The progress is ['Yellow block, red block, and orange block are in the brown box']. The remaining goal is ['Put blue and green blocks in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the blue block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The progress is ['Yellow block, red block, orange block, and blue block are in the brown box']. The remaining goal is ['Put the green block in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the green block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The progress is ['Yellow block, red block, orange block, blue block, and green block are in the brown box']. All goals are completed.\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "done.\n"
+                )
+            episode_2=(
+                "### User:\n"+
+                "In the initial state, there are pink, blue, gray, cyan, and green blocks; there is a brown box and a trash can.\n"+
+                "What is the final goal state?\n"+
+                "### Assistant:\n"+
+                "The final goal state is ['Pink block, blue block, gray block, cyan block, and green block are in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the pink block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The progress is ['A pink block is in the brown box']. The remaining goal is ['Put blue block, gray block, cyan block, and green block in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the blue block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The progress is ['A pink block and a blue block are in the brown box']. The remaining goal is ['Put gray block, cyan block, and green block in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the gray block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and the pink and blue blocks in the brown box are moved to other positions on the table.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly [the pink and blue blocks in the brown box are moved to other positions on the table] on the task regarding progress and feasibility.\n"+
+                "### Assistant:\n"+
+                "The progress is disrupted, and the pink and blue blocks are not in the brown box; the current progress is ['The gray block is in the brown box']. The task feasibility is unaffected since the remaining target objects [pink block, blue block, cyan block, green block] are still available.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly on future actions.\n"+
+                "### Assistant:\n"+
+                "The robot will not be affected.\n"+
+                "### User:\n"+
+                "How to handle this anomaly?\n"+
+                "### Assistant:\n"+
+                "Put the pink and blue blocks back in the brown box to resume progress.\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the pink block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The progress is ['A pink block and a gray block are in the brown box']. The remaining goal is ['Put the blue block in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the blue block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The anomaly has been addressed. The progress is ['Pink block, blue block, and gray block are in the brown box']. The remaining goal is ['Put cyan and green blocks in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the cyan block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and the pink, blue, and gray blocks in the brown box are moved to other positions on the table.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly [the pink, blue, and gray blocks in the brown box are moved to other positions on the table] on the task regarding progress and feasibility.\n"+
+                "### Assistant:\n"+
+                "The progress is disrupted, and the pink, blue, and gray blocks are not in the brown box; the current progress is ['The cyan block is in the brown box']. The task feasibility is unaffected since the remaining target objects [pink block, blue block, gray block, green block] are still available.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly on future actions.\n"+
+                "### Assistant:\n"+
+                "The robot will not be affected.\n"+
+                "### User:\n"+
+                "How to handle this anomaly?\n"+
+                "### Assistant:\n"+
+                "Put the pink, blue, and gray blocks back in the brown box to resume progress.\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the pink block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The progress is ['A pink block and a cyan block are in the brown box']. The remaining goal is ['Put the blue block in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the blue block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The progress is ['Pink block, blue block, and cyan block are in the brown box']. The remaining goal is ['Put gray and green blocks in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the gray block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The anomaly has been addressed. The current progress is ['Pink block, blue block, gray block, and cyan block are in the brown box']. The remaining goal is ['Put the green block in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the green block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The progress is ['Pink block, blue block, gray block, cyan block, and green block are in the brown box']. All goals are completed.\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "done.\n"
+                )
+
+            episode_3=(
+                "### User:\n"+
+                "In the initial state, there are orange, purple, red, blue, and yellow blocks; there is a brown box and a trash can.\n"+
+                "What is the final goal state?\n"+
+                "### Assistant:\n"+
+                "The final goal state is ['Orange block, purple block, red block, blue block, and yellow block are in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the orange block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The progress is ['An orange block is in the brown box']. The remaining goal is ['Put purple block, red block, blue block, and yellow block in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the purple block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The progress is ['An orange block and a purple block are in the brown box']. The remaining goal is ['Put red block, blue block, and yellow block in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the red block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and the orange and purple blocks in the brown box are moved to other positions on the table.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly [the orange and purple blocks in the brown box are moved to other positions on the table] on the task regarding progress and feasibility.\n"+
+                "### Assistant:\n"+
+                "The progress is disrupted, and the orange and purple blocks are not in the brown box; the current progress is ['The red block is in the brown box']. The task feasibility is unaffected since the remaining target objects [orange block, purple block, blue block, yellow block] are still available.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly on future actions.\n"+
+                "### Assistant:\n"+
+                "The robot will not be affected.\n"+
+                "### User:\n"+
+                "How to handle this anomaly?\n"+
+                "### Assistant:\n"+
+                "Put the orange and purple blocks back in the brown box to resume progress.\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the orange block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The progress is ['An orange block and a red block are in the brown box']. The remaining goal is ['Put the purple block in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the purple block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The anomaly has been addressed. The current progress is ['Orange block, purple block, and red block are in the brown box']. The remaining goal is ['Put blue and yellow blocks in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the blue block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and the orange, purple, and red blocks in the brown box are moved to other positions on the table.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly [the orange, purple, and red blocks in the brown box are moved to other positions on the table] on the task regarding progress and feasibility.\n"+
+                "### Assistant:\n"+
+                "The progress is disrupted, and the orange, purple, and red blocks are not in the brown box; the current progress is ['The blue block is in the brown box']. The task feasibility is unaffected since the remaining target objects [orange block, purple block, red block, yellow block] are still available.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly on future actions.\n"+
+                "### Assistant:\n"+
+                "The robot will not be affected.\n"+
+                "### User:\n"+
+                "How to handle this anomaly?\n"+
+                "### Assistant:\n"+
+                "Put the orange, purple, and red blocks back in the brown box to resume progress.\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the orange block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The progress is ['An orange block and a blue block are in the brown box']. The remaining goal is ['Put the purple block in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the purple block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The progress is ['Orange block, purple block, and blue block are in the brown box']. The remaining goal is ['Put red and yellow blocks in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the red block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The anomaly has been addressed. The current progress is ['Orange block, purple block, red block, and blue block are in the brown box']. The remaining goal is ['Put the yellow block in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the yellow block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The progress is ['Orange block, blue block, purple block, red block, and yellow block are in the brown box']. All goals are completed.\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "done.\n"
+            )
+            anomaly_episode_list=[episode_1,episode_2,episode_3]
+        elif anomaly_type=="removal":
+            episode_1=(
+                "### User:\n"+
+                "In the initial state, there are cyan, pink, gray, white, and green blocks; there is a brown box and a trash can.\n"+
+                "What is the final goal state?\n"+
+                "### Assistant:\n"+
+                "The final goal state is ['Cyan block, pink block, gray block, white block, and green block are in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the cyan block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The progress is ['A cyan block is in the brown box']. The remaining goal is ['Put pink block, gray block, white block, and green block in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the pink block in the brown box.\n"
+                "### User:\n"+
+                "The action succeeded, and the white block on the table disappeared.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly [the white block on the table disappeared] on the task regarding progress and feasibility.\n"+
+                "### Assistant:\n"+
+                "The progress ['A cyan block and a pink block are in the brown box'] is unaffected; the task feasibility is affected since the disappeared white block is among the remaining target objects [gray block, white block, green block].\n" +
+                "### User:\n" +
+                "Analyze the effect of the anomaly on future actions.\n" +
+                "### Assistant:\n" +
+                "The robot will not be affected.\n" +
+                "### User:\n" +
+                "How to handle this anomaly?\n" +
+                "### Assistant:\n" +
+                "The task feasibility is affected.\n" +
+                "### User:\n" +
+                "What is your plan for the next step?\n" +
+                "### Assistant:\n" +
+                "alert.\n" )
+            
+            episode_2=(
+                "### User:\n"+
+                "In the initial state, there are cyan, pink, gray, white, and green blocks; there is a brown box and a trash can.\n"+
+                "What is the final goal state?\n"+
+                "### Assistant:\n"+
+                "The final goal state is ['Cyan block, pink block, gray block, white block, and green block are in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the cyan block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The progress is ['A cyan block is in the brown box']. The remaining goal is ['Put pink block, gray block, white block, and green block in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the pink block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and the white block on the table disappeared.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly [the white block on the table disappeared] on the task regarding progress and feasibility.\n"+
+                "### Assistant:\n"+
+                "The progress ['A cyan block and a pink block are in the brown box'] is unaffected; the task feasibility is affected since the disappeared white block is among the remaining target objects [gray block, white block, green block].\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly on future actions.\n"+
+                "### Assistant:\n"+
+                "The robot will not be affected.\n"+
+                "### User:\n"+
+                "How to handle this anomaly?\n"+
+                "### Assistant:\n"+
+                "The task feasibility is affected.\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "alert.\n"
+            )
+
+            anomaly_episode_list=[episode_1,episode_2]
+    elif "pyramid" in task:
+        if  anomaly_type=="addition":
+            episode_1=(
+                "### User:\n"+
+                "In the initial state, there are red, blue, green, yellow, orange, pink, purple, and gray blocks; there is a stand and a trash can.\n"+
+                "What is the final goal state?\n"+
+                "### Assistant:\n"+
+                "Final goal state: ['the red, blue, and green blocks are in the bottom row; the yellow and orange blocks are in the middle row; the pink block is in the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the red block on the lightest brown block of the stand.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['a red block is on the stand']. Remaining goals: ['put the blue and green blocks on the stand to make the bottom row'; 'put the yellow and orange blocks on the bottom row to make the middle row'; 'put the pink block on the middle row to make the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the blue block on the middle brown block of the stand.\n"+
+                "### User:\n"+
+                "The action succeeded, and a never-seen purple block appears at the top right.\n"+
+                "### User:\n"
+                "Analyze the effect of the anomaly [a never-seen purple block appears at the top right] on the task regarding progress and feasibility.\n" +
+                "### Assistant:\n"
+                "The progress ['The red and blue blocks are on the stand'] is unaffected; the task feasibility is unaffected since the remaining target objects [green block, yellow block, orange block, pink block] are still available.\n" +
+                "### User:\n"
+                "Analyze the effect of the anomaly on future actions.\n" +
+                "### Assistant:\n"
+                "The robot will not be affected since the anomaly block [purple block at the top right] is not a target object and has a different color from any target blocks.\n" +
+                "### User:\n" +
+                "How to handle this anomaly?\n" +
+                "### Assistant:\n" +
+                "No action needed\n" +
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the green block on the darkest brown block of the stand.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['The bottom row (red, blue, and green blocks) is built']. Remaining goals: ['put the yellow and orange blocks on the bottom row to make the middle row'; 'put the pink block on the middle row to make the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the yellow block on the red and blue blocks.\n"+
+                "### User:\n"+
+                "The action succeeded, and a never-seen pink block appears at the bottom left.\n"+
+                "### User:\n"
+                "Analyze the effect of the anomaly [a never-seen pink block appears at the bottom left] on the task regarding progress and feasibility.\n" +
+                "### Assistant:\n"
+                "The progress ['The bottom row (red, blue, and green blocks) is built, and the yellow block is on top of the bottom row'] is unaffected; the task feasibility is unaffected since the remaining target objects [orange block, pink bowl] are still available.\n" +
+                "### User:\n"
+                "Analyze the effect of the anomaly on future actions.\n" +
+                "### Assistant:\n"
+                "The robot may mistake the anomaly block [pink block at the bottom left] for the target pink block since they have the same color.\n" +
+                "### User:\n"
+                "How to handle this anomaly?\n" +
+                "### Assistant:\n"
+                "Remove the anomaly block to prevent confusion.\n" +
+                "### User:\n"
+                "What is your plan for the next step?\n" +
+                "### Assistant:\n"
+                "put the pink block at the bottom left into the trash can.\n" +
+                "### User:\n"
+                "The action succeeded, and no anomaly happened.\n" +
+                "### User:\n"
+                "Please describe The progress and the remaining goals.\n" +
+                "### Assistant:\n"
+                "The anomaly has been addressed. Progress: ['The yellow block is on the built bottom row (red, blue, and green blocks)']. Remaining goals: ['put the orange block on the bottom row to make the middle row'; 'put the pink block on the middle row to make the top row'].\n" +
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the orange block on the blue and green blocks.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['The bottom row (red, blue, and green blocks) and the middle row (yellow and orange blocks) are built']. Remaining goals: ['put the pink block on the middle row to make the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the pink block on the yellow and orange blocks.\n"+
+                "### User:\n"+
+                "The action succeeded, and a never-seen gray block appears at the top right.\n"+
+                "### User:\n"
+                "Analyze the effect of the anomaly [a never-seen gray block appears at the top right] on the task regarding progress and feasibility.\n" +
+                "### Assistant:\n"
+                "The progress ['The bottom row (red, blue, and green blocks), the middle row (yellow and orange blocks), and the top row (the pink block) are built'] is unaffected; the task feasibility is unaffected since there is no target object left and all goals are completed.\n"
+                "Analyze the effect of the anomaly on future actions.\n" +
+                "### Assistant:\n" +
+                "The robot will not be affected since the anomaly block [gray block appears at the top right] is not a target object and all goals are completed.\n" +
+                "### User:\n" +
+                "How to handle this anomaly?\n" +
+                "### Assistant:\n" +
+                "No action needed\n" +
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "done.\n")
+
+            episode_2=(
+                "### User:\n"+
+                "In the initial state, there are blue, green, yellow, red, orange, pink, purple, and gray blocks; there is a stand and a trash can.\n"+
+                "What is the final goal state?\n"+
+                "### Assistant:\n"+
+                "Final goal state: ['the blue, green, and yellow blocks make the bottom row; the red and orange blocks make the middle row; the pink block makes the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the blue block on the lightest brown block of the stand.\n"+
+                "### User:\n"+
+                "The action succeeded, and a never-seen gray block appears at the top left.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly [a never-seen gray block appears at the top left] on the task regarding progress and feasibility.\n"+
+                "### Assistant:\n"+
+                "The progress ['a blue block is on the stand'] is unaffected; the task feasibility is unaffected since the remaining target objects [green block, yellow block, red block, orange block, pink block] are still available.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly on future actions.\n"+
+                "### Assistant:\n"+
+                "The robot will not be affected since the anomaly block [gray block at the top left] is not a target object and has a different color from any target blocks.\n"+
+                "### User:\n"+
+                "How to handle this anomaly?\n"+
+                "### Assistant:\n"+
+                "No action needed\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the green block on the middle brown block of the stand.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['The blue and green blocks are on the stand']. Remaining goals: ['put the yellow block on the stand to make the bottom row'; 'put the red and orange blocks on the bottom row to make the middle row'; 'put the pink block on the middle row to make the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the yellow block on the darkest brown block of the stand.\n"+
+                "### User:\n"+
+                "The action succeeded, and a never-seen red block appears at the bottom right.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly [a never-seen red block appears at the bottom right] on the task regarding progress and feasibility.\n"+
+                "### Assistant:\n"+
+                "The progress ['The bottom row (blue, green, and yellow blocks) is built'] is unaffected; the task feasibility is unaffected since the remaining target objects [red block, orange block, pink block] are still available.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly on future actions.\n"+
+                "### Assistant:\n"+
+                "The robot may mistake the anomaly block [red block at the bottom right] for the target red block since they have the same color.\n"+
+                "### User:\n"+
+                "How to handle this anomaly?\n"+
+                "### Assistant:\n"+
+                "Remove the anomaly block to prevent confusion.\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the red block at the bottom right into the trash can.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The anomaly has been addressed. Progress: ['The bottom row (blue, green, and yellow blocks) is built']. Remaining goals: ['put the red and orange blocks on the bottom row to make the middle row'; 'put the pink block on the middle row to make the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the red block on the blue and green blocks.\n"+
+                "### User:\n"+
+                "The action succeeded, and a never-seen pink block appears at the top right.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly [a never-seen pink block appears at the top right] on the task regarding progress and feasibility.\n"+
+                "### Assistant:\n"+
+                "The progress ['The bottom row (blue, green, and yellow blocks) is built, and the red block is on top of the bottom row'] is unaffected; the task feasibility is unaffected since the remaining target objects [orange block, pink block] are still available.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly on future actions.\n"+
+                "### Assistant:\n"+
+                "The robot may mistake the anomaly block [pink block at the top right] for the target pink block since they have the same color.\n"+
+                "### User:\n"+
+                "How to handle this anomaly?\n"+
+                "### Assistant:\n"+
+                "Remove the anomaly block to prevent confusion.\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the pink block at the top right into the trash can.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The anomaly has been addressed. Progress: ['The bottom row (blue, green, and yellow blocks) is built, and and the red block) is on top of the bottom row']. Remaining goals: ['put the orange block on the bottom row to make the middle row'; 'put the pink block on the middle row to make the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the orange block on the green and yellow blocks.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['The bottom row (blue, green, and yellow blocks) and the middle row (red and orange blocks) are built']. Remaining goals: ['put the pink block on the middle row to make the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the pink block on the red and orange blocks.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['The bottom row (blue, green, and yellow blocks), the middle row (red and orange blocks), and the top row (the pink block) are built']. All goals are completed.\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "done.\n"
+            )
+
+            episode_3=(
+                "### User:\n"+
+                "In the initial state, there are yellow, blue, red, green, orange, white, and pink blocks; there is a stand and a trash can.\n"+
+                "What is the final goal state?\n"+
+                "### Assistant:\n"+
+                "Final goal state: ['the yellow, blue, and red blocks make the bottom row; the green and orange blocks make the middle row; the white block makes the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the yellow block on the lightest brown block of the stand.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['a yellow block is on the stand']. Remaining goals: ['put the blue and red blocks on the stand to make the bottom row'; 'put the green and orange blocks on the bottom row to make the middle row'; 'put the white block on the middle row to make the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the blue block on the middle brown block of the stand.\n"+
+                "### User:\n"+
+                "The action succeeded, and a never-seen cyan block appears in the darkest brown block of the stand.\n"+
+                "### User:\n"
+                "Analyze the effect of the anomaly [a never-seen cyan block appears in the darkest brown block of the stand] on the task regarding progress and feasibility.\n" +
+                "### Assistant:\n"
+                "The progress ['The yellow and blue blocks are on the stand'] is unaffected; the task feasibility is unaffected since the remaining target objects [red block, green block, orange block, white block] are still available.\n" +
+                "### User:\n"
+                "Analyze the effect of the anomaly on future actions.\n" +
+                "### Assistant:\n"
+                "The anomaly block [cyan block on the darkest brown block of the stand] takes the expected position of the target red block, and the robot may not find a space to put the target red block to make the bottom row.\n"+
+                "### User:\n"
+                "How to handle this anomaly?\n" +
+                "### Assistant:\n"
+                "Remove the anomaly block to prevent confusion.\n" +
+                "### User:\n"
+                "What is your plan for the next step?\n" +
+                "### Assistant:\n"
+                "put the cyan block on the darkest brown block of the stand into the trash can.\n" +
+                "### User:\n"
+                "The action succeeded, and no anomaly happened.\n" +
+                "### User:\n"
+                "Please describe The progress and the remaining goals.\n" +
+                "### Assistant:\n"
+                "The anomaly has been addressed. Progress: ['The yellow and blue blocks are on the stand']. Remaining goals: ['put the red block on the stand to complete the bottom row'; 'put the green and orange blocks on top of the bottom row to make the middle row'; 'put the white block on top of the middle row to make the top row'].\n" +
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the red block on the darkest brown block of the stand.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['The bottom row (yellow, blue, and red blocks) is built']. Remaining goals: ['put the green and orange blocks on the bottom row to make the middle row'; 'put the white block on the middle row to make the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the green block on the yellow and blue blocks.\n"+
+                "### User:\n"+
+                "The action succeeded, and a never-seen pink block is placed on the blue and red blocks.\n"+
+                "### User:\n"
+                "Analyze the effect of the anomaly [a never-seen pink block is placed on the blue and red blocks] on the task regarding progress and feasibility.\n" +
+                "### Assistant:\n"
+                "The progress ['The green block is on top of the built bottom row (yellow, blue, and red blocks)'] is unaffected; the task feasibility is unaffected since the remaining target objects [orange block, white block] are still available.\n" +
+                "### User:\n"
+                "Analyze the effect of the anomaly on future actions.\n" +
+                "### Assistant:\n"
+                "The anomaly block [pink block on the blue and red blocks] takes the expected position of the target orange block, and the robot may not find a space to put the target orange block to make the middle row.\n"+
+                "### User:\n"
+                "How to handle this anomaly?\n" +
+                "### Assistant:\n"
+                "Remove the anomaly block to prevent confusion.\n" +
+                "### User:\n"
+                "What is your plan for the next step?\n" +
+                "### Assistant:\n"
+                "put the pink block on the blue and red blocks into the trash can.\n" +
+                "### User:\n"
+                "The action succeeded, and no anomaly happened.\n" +
+                "### User:\n"
+                "Please describe The progress and the remaining goals.\n" +
+                "### Assistant:\n"
+                "The anomaly has been addressed. Progress: ['The bottom row (yellow, blue, and red blocks) is built, and the green block is on top of the bottom row']. Remaining goals: ['put the orange blocks on top of the bottom row to make the middle row'; 'put the white block on top of the middle row to make the top row'].\n" +
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the orange block on the blue and red blocks.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['The bottom row (yellow, blue, and red blocks) and the middle row (green and orange blocks) are built']. Remaining goals: ['put the white block on the middle row to make the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the white block on the green and orange blocks.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['The bottom row (yellow, blue, and red blocks), the middle row (green and orange blocks), and the top row (the white block) are built']. All goals are completed.\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "done.\n"
+            )
+
+            episode_4=(
+                "### User:\n"+
+                "In the initial state, there are red, blue, green, yellow, orange, pink, purple, and gray blocks; there is a stand and a trash can.\n"+
+                "What is the final goal state?\n"+
+                "### Assistant:\n"+
+                "Final goal state: ['the red, blue, and green blocks make the bottom row; the yellow and orange blocks make the middle row; the pink block makes the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the red block on the lightest brown block of the stand.\n"+
+                "### User:\n"+
+                "The action succeeded, and a never-seen purple block appears on the middle brown block of the stand.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly [a never-seen purple block appears on the middle brown block of the stand] on the task regarding progress and feasibility.\n"+
+                "### Assistant:\n"+
+                "The progress ['a red block is on the stand'] is unaffected; the task feasibility is affected since the remaining target objects [blue block, green block, yellow block, orange block, pink block] are still available.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly on future actions.\n"+
+                "### Assistant:\n"+
+                "The anomaly block [purple block on the middle brown block of the stand] takes the expected position of the target blue block, and the robot may not find a space to put the target blue block to make the bottom row.\n"+
+                "### User:\n"+
+                "How to handle this anomaly?\n"+
+                "### Assistant:\n"+
+                "Remove the anomaly block to prevent confusion.\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the purple block on the middle brown block of the stand into the trash can.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The anomaly has been addressed. Progress: ['a red block is on the stand']. Remaining goals: ['put the blue and green blocks on the stand to make the bottom row'; 'put the yellow and orange blocks on the bottom row to make the middle row'; 'put the pink block on the middle row to make the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the blue block on the middle brown block of the stand.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['The red and blue blocks are on the stand']. Remaining goals: ['put the green block on the darkest brown block of the stand to complete the bottom row'; 'put the yellow and orange blocks on top of the bottom row to make the middle row'; 'put the pink block on top of the middle row to make the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the green block on the darkest brown block of the stand.\n"+
+                "### User:\n"+
+                "The action succeeded, and a never-seen red block is placed on the red and blue blocks.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly [a never-seen red block is placed on the red and blue blocks] on the task regarding progress and feasibility.\n"+
+                "### Assistant:\n"+
+                "The progress ['The bottom row (red, blue, and green blocks) is built'] is unaffected; the task feasibility is unaffected since the remaining target objects [yellow block, orange block, pink block] are still available.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly on future actions.\n"+
+                "### Assistant:\n"+
+                "The anomaly block [red block on the red and blue blocks] takes the expected position of the target yellow block, and the robot may not find a space to put the target yellow block to make the middle row.\n"+
+                "### User:\n"+
+                "How to handle this anomaly?\n"+
+                "### Assistant:\n"+
+                "Remove the anomaly block to prevent confusion.\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the red block on the red and blue blocks into the trash can.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The anomaly has been addressed. Progress: ['The bottom row (red, blue, and green blocks) is built']. Remaining goals: ['put the yellow and orange blocks on the bottom row to make the middle row'; 'put the pink block on the middle row to make the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the yellow block on the red and blue blocks.\n"+
+                "### User:\n"+
+                "The action succeeded, and a never-seen pink block is placed on the blue and green blocks.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly [a never-seen pink block appears on the blue and green blocks] on the task regarding progress and feasibility.\n"+
+                "### Assistant:\n"+
+                "The progress ['The yellow block is on top of the built bottom row (red, blue, and green blocks)'] is unaffected; the task feasibility is unaffected since the remaining target objects [orange block, pink block] are still available.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly on future actions.\n"+
+                "### Assistant:\n"+
+                "The anomaly block [pink block on the blue and green blocks] takes the expected position of the target orange block, and the robot may not find a space to put the target orange block to make the middle row.\n"+
+                "### User:\n"+
+                "How to handle this anomaly?\n"+
+                "### Assistant:\n"+
+                "Remove the anomaly block to prevent confusion.\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the pink block on the blue and green blocks into the trash can.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The anomaly has been addressed. Progress: ['The bottom row (red, blue, and green blocks) is built, and the yellow block is on top of the bottom row']. Remaining goals: ['put the orange block on top of the bottom row to make the middle row'; 'put the pink block on the middle row to make the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the orange block on the blue and green blocks.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['The bottom row (red, blue, and green blocks) and the middle row (yellow and orange blocks) are built']. Remaining goals: ['put the pink block on the middle row to make the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the pink block on the yellow and orange blocks.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['The bottom row (red, blue, and green blocks), the middle row (yellow and orange blocks), and the top row (the pink block) are built']. All goals are completed.\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "done.\n"
+            )
+
+            episode_5=(
+                "### User:\n"+
+                "In the initial state, there are cyan, pink, gray, white, green, orange, and yellow blocks; there is a stand and a trash can.\n"+
+                "What is the final goal state?\n"+
+                "### Assistant:\n"+
+                "Final goal state: ['the cyan, pink, and gray blocks make the bottom row; the white and green blocks make the middle row; the orange block makes the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the cyan block on the lightest brown block of the stand.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['a cyan block is on the stand']. Remaining goals: ['put the pink and gray blocks on the stand to make the bottom row'; 'put the white and green blocks on the bottom row to make the middle row'; 'put the orange block on the middle row to make the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the pink block on the middle brown block of the stand.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['The cyan and pink blocks are on the stand']. Remaining goals: ['put the gray block on the darkest brown block of the stand to complete the bottom row'; 'put the white and green blocks on the bottom row to make the middle row'; 'put the orange block on the middle row to make the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the gray block on the darkest brown block of the stand.\n"+
+                "### User:\n"+
+                "The action succeeded, and a never-seen stand appears at the top right.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly [a never-seen stand appears at the top right] on the task regarding progress and feasibility.\n"+
+                "### Assistant:\n"+
+                "The progress ['The bottom row (cyan, pink, and gray blocks) is built'] is unaffected; the task feasibility is unaffected since the remaining target objects [white block, green block, orange block] are still available.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly on future actions.\n"+
+                "### Assistant:\n"+
+                "The robot may mistake the anomaly stand [stand at the top right] as the target stand since they have the same color.\n"+
+                "### User:\n"+
+                "How to handle this anomaly?\n"+
+                "### Assistant:\n"+
+                "Remove the anomaly stand to prevent confusion.\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the stand at the top right into the trash can.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The anomaly has been addressed. Progress: ['The bottom row (cyan, pink, and gray blocks) is built']. Remaining goals: ['put the white block on the bottom row to make the middle row'; 'put the green block on the bottom row to make the middle row'; 'put the orange block on the middle row to make the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the white block on the cyan and pink blocks.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['The bottom row (cyan, pink, and gray blocks) is built, and the white block is on top of the bottom row']. Remaining goals: ['put the green block on the bottom row to make the middle row'; 'put the orange block on the middle row to make the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the green block on the pink and gray blocks.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['The bottom row (cyan, pink, and gray blocks) and the middle row (white and green blocks) are built']. Remaining goals: ['put the orange block on the middle row to make the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the orange block on the white and green blocks.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['The bottom row (cyan, pink, and gray blocks), the middle row (white and green blocks), and the top row (the orange block) are built']. All goals are completed.\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "done.\n"
+            )
+
+            
+            anomaly_episode_list=[episode_2,episode_3,episode_4,episode_5]
+        elif anomaly_type=="removal":
+            episode_1 = (
+                "### User:\n" +
+                "In the initial state, there are red, green, blue, yellow, orange, pink, purple, and gray blocks; there is a stand and a trash can.\n" +
+                "What is the final goal state?\n" +
+                "### Assistant:\n" +
+                "Final goal state: ['The red, green, and blue blocks make the bottom row; the yellow and orange blocks make the middle row; the pink block makes the top row'].\n" +
+                "### User:\n" +
+                "What is your plan for the next step?\n" +
+                "### Assistant:\n" +
+                "put the red block on the lightest brown block of the stand.\n" +
+                "### User:\n" +
+                "The action succeeded, and no anomaly happened.\n" +
+                "### User:\n" +
+                "Please describe the achieved progress and the remaining goals.\n" +
+                "### Assistant:\n" +
+                "The progress is ['A red block is on the stand']. The remaining goals are ['Put the green and blue blocks on the stand to make the bottom row'; 'Put the yellow and orange blocks on top of the bottom row to make the middle row'; 'Put the pink block on top of the middle row to make the top row'].\n" +
+                "### User:\n" +
+                "What is your plan for the next step?\n" +
+                "### Assistant:\n" +
+                "put the green block on the middle brown block of the stand.\n" +
+                "### User:\n" +
+                "The action succeeded, and the orange block on the table disappears.\n" +
+                "### User:\n" +
+                "Analyze the effect of the anomaly [the orange block on the table disappears] on the task regarding progress and feasibility.\n" +
+                "### Assistant:\n" +
+                "The progress ['The red and green blocks are on the stand'] is unaffected; the task feasibility is unaffected since the disappeared orange block is among the remaining target objects [blue block, yellow block, orange block, pink block].\n" 
+                "### User:\n" +
+                "Analyze the effect of the anomaly on future actions.\n" +
+                "### Assistant:\n" +
+                "The robot will not be affected.\n" +
+                "### User:\n" +
+                "How to handle this anomaly?\n" +
+                "### Assistant:\n" +
+                "Need to alert since the task feasibility is affected.\n" +
+                "### User:\n" +
+                "What is your plan for the next step?\n" +
+                "### Assistant:\n" +
+                "alert.\n"
+            )
+            episode_2 = (
+                "### User:\n" +
+                "In the initial state, there are blue, yellow, green, red, purple, pink, orange, and gray blocks; there is a stand and a trash can.\n" +
+                "What is the final goal state?\n" +
+                "### Assistant:\n" +
+                "Final goal state: ['The blue, yellow, and green blocks make the bottom row; the red and purple blocks make the middle row; the pink block makes the top row'].\n" +
+                "### User:\n" +
+                "What is your plan for the next step?\n" +
+                "### Assistant:\n" +
+                "put the blue block on the lightest brown block of the stand.\n" +
+                "### User:\n" +
+                "The action succeeded, and no anomaly happened.\n" +
+                "### User:\n" +
+                "Please describe the achieved progress and the remaining goals.\n" +
+                "### Assistant:\n" +
+                "The progress is ['A blue block is on the stand']. The remaining goals are ['Put the yellow and green blocks on the stand to make the bottom row'; 'Put the red and purple blocks on top of the bottom row to make the middle row'; 'Put the pink block on top of the middle row to make the top row'].\n" +
+                "### User:\n" +
+                "What is your plan for the next step?\n" +
+                "### Assistant:\n" +
+                "put the yellow block on the middle brown block of the stand.\n" +
+                "### User:\n" +
+                "The action succeeded, and the orange block on the table disappears.\n" +
+                "### User:\n" +
+                "Analyze the effect of the anomaly [the orange block on the table disappears] on the task regarding progress and feasibility.\n" +
+                "### Assistant:\n" +
+                "The progress ['A blue block and a yellow block are on the stand'] is unaffected; the task feasibility is unaffected since the disappeared orange block is not among the remaining target objects [green block, red block, purple block, pink block].\n" +
+                "### User:\n" +
+                "Analyze the effect of the anomaly on future actions.\n" +
+                "### Assistant:\n" +
+                "The robot will not be affected.\n" +
+                "### User:\n" +
+                "How to handle this anomaly?\n" +
+                "### Assistant:\n" +
+                "No action needed.\n" +
+                "### User:\n" +
+                "What is your plan for the next step?\n" +
+                "### Assistant:\n" +
+                "put the green block on the darkest brown block of the stand.\n" +
+                "### User:\n" +
+                "The action succeeded, and no anomaly happened.\n" +
+                "### User:\n" +
+                "Please describe the achieved progress and the remaining goals.\n" +
+                "### Assistant:\n" +
+                "The progress is ['The bottom row (blue, yellow, and green blocks) is built']. Remaining goals: ['Put the red and purple blocks on top of the bottom row to make the middle row'; 'Put the pink block on top of the middle row to make the top row'].\n" +
+                "### User:\n" +
+                "What is your plan for the next step?\n" +
+                "### Assistant:\n" +
+                "put the red block on the blue and yellow blocks.\n" +
+                "### User:\n" +
+                "The action succeeded, and no anomaly happened.\n" +
+                "### User:\n" +
+                "Please describe the achieved progress and the remaining goals.\n" +
+                "### Assistant:\n" +
+                "The progress is ['The bottom row (blue, yellow, and green blocks) and the middle row (red block) are built']. Remaining goals: ['Put the purple block on the middle row to complete it'; 'Put the pink block on the middle row to make the top row'].\n" +
+                "### User:\n" +
+                "What is your plan for the next step?\n" +
+                "### Assistant:\n" +
+                "put the purple block on the yellow and green blocks.\n" +
+                "### User:\n" +
+                "The action succeeded, and no anomaly happened.\n" +
+                "### User:\n" +
+                "Please describe the achieved progress and the remaining goals.\n" +
+                "### Assistant:\n" +
+                "The progress is ['The bottom row (blue, yellow, and green blocks) and the middle row (red and purple blocks) are built']. Remaining goals: ['Put the pink block on the middle row to make the top row'].\n" +
+                "### User:\n" +
+                "What is your plan for the next step?\n" +
+                "### Assistant:\n" +
+                "put the pink block on the red and purple blocks.\n" +
+                "### User:\n" +
+                "The action succeeded, and no anomaly happened.\n" +
+                "### User:\n" +
+                "Please describe the achieved progress and the remaining goals.\n" +
+                "### Assistant:\n" +
+                "The progress is ['The bottom row (blue, yellow, and green blocks), the middle row (red and purple blocks), and the top row (the pink block) are built']. All goals are completed.\n" +
+                "### User:\n" +
+                "What is your plan for the next step?\n" +
+                "### Assistant:\n" +
+                "done.\n"
+            )
+
+            episode_3 = (
+                "### User:\n" +
+                "In the initial state, there are cyan, white, green, red, purple, pink, yellow, and gray blocks; there is a stand and a trash can.\n" +
+                "What is the final goal state?\n" +
+                "### Assistant:\n" +
+                "Final goal state: ['The cyan, white, and green blocks make the bottom row; the red and purple blocks make the middle row; the pink block makes the top row'].\n" +
+                "### User:\n" +
+                "What is your plan for the next step?\n" +
+                "### Assistant:\n" +
+                "put the cyan block on the lightest brown block of the stand.\n" +
+                "### User:\n" +
+                "The action succeeded, and no anomaly happened.\n" +
+                "### User:\n" +
+                "Please describe the achieved progress and the remaining goals.\n" +
+                "### Assistant:\n" +
+                "The progress is ['A cyan block is on the stand']. The remaining goals are ['Put the white and green blocks on the stand to make the bottom row'; 'Put the red and purple blocks on top of the bottom row to make the middle row'; 'Put the pink block on top of the middle row to make the top row'].\n" +
+                "### User:\n" +
+                "What is your plan for the next step?\n" +
+                "### Assistant:\n" +
+                "put the white block on the middle brown block of the stand.\n" +
+                "### User:\n" +
+                "The action succeeded, and the yellow block on the table disappears.\n" +
+                "### User:\n" +
+                "Analyze the effect of the anomaly [the yellow block on the table disappears] on the task regarding progress and feasibility.\n" +
+                "### Assistant:\n" +
+                "The progress ['A cyan block and a white block are on the stand'] is unaffected; the task feasibility is unaffected since the disappeared yellow block is not among the remaining target objects [green block, red block, purple block, pink block].\n" +
+                "### User:\n" +
+                "Analyze the effect of the anomaly on future actions.\n" +
+                "### Assistant:\n" +
+                "The robot will not be affected.\n" +
+                "### User:\n" +
+                "How to handle this anomaly?\n" +
+                "### Assistant:\n" +
+                "No action needed.\n" +
+                "### User:\n" +
+                "What is your plan for the next step?\n" +
+                "### Assistant:\n" +
+                "put the green block on the darkest brown block of the stand.\n" +
+                "### User:\n" +
+                "The action succeeded, and the purple block on table disappears.\n" +
+                "### User:\n" +
+                "Analyze the effect of the anomaly [the purple block on table disappears] on the task regarding progress and feasibility.\n" +
+                "### Assistant:\n" +
+                "The progress ['The bottom row (blue, yellow, and green blocks) is built'] is unaffected; the task feasibility is affected since the disappeared purple block is among the remaining target objects [red block, purple block, pink block].\n" +
+                "### User:\n" +
+                "Analyze the effect of the anomaly on future actions.\n" +
+                "### Assistant:\n" +
+                "The robot will not be affected.\n" +
+                "### User:\n" +
+                "How to handle this anomaly?\n" +
+                "### Assistant:\n" +
+                "Need to alert since the task feasibility is affected.\n" +
+                "### User:\n" +
+                "What is your plan for the next step?\n" +
+                "### Assistant:\n" +
+                "alert.\n"
+            )
+            anomaly_episode_list=[episode_1,episode_2,episode_3]
+        elif anomaly_type=="displcement":
+            episode_1 = (
+                "### User:\n"+
+                "In the initial state, there are blue, yellow, green, red, purple, pink, orange, and brown blocks; there is a stand and a trash can.\n"+
+                "What is the final goal state?\n"+
+                "### Assistant:\n"+
+                "Final goal state: ['the blue, yellow, and green blocks make the bottom row; the red and purple blocks make the middle row; the pink block makes the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the blue block on the lightest brown block of the stand.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the yellow block on the middle brown block of the stand.\n"+
+                "### User:\n"+
+                "The action succeeded, and the blue block on the stand is amoved to another position on the table.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly [the blue block on the stand amoved to another position on the table.] on the task regarding progress and feasibility.\n"+
+                "### Assistant:\n"+
+                "Progress is disrupted, and the blue block used to make the bottom row is moved to another position on the table. The current progress is ['the yellow block is on the middle brown block of the stand']; the task feasibility is unaffected since the remaining target objects [blue block, green block, red block, purple block, pink block] are still available.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly on future actions.\n"+
+                "### Assistant:\n"+
+                "The robot will not be affected.\n"+
+                "### User:\n"+
+                "How to handle this anomaly?\n"+
+                "### Assistant:\n"+
+                "Put the blue block back to the stand to resume the progress.\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the blue block on the lightest brown block of the stand.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The anomaly has been addressed. Progress: ['The blue and yellow blocks are on the stand']. Remaining goals: ['put the green block on the stand to make the bottom row'; 'put the red and purple blocks on top of the bottom row to make the middle row'; 'put the pink block on top of the middle row to make the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the green block on the darkest brown block of the stand.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['The bottom row (blue, yellow, and green blocks) is built']. Remaining goals: ['put the red and purple blocks on top of the bottom row to make the middle row'; 'put the pink block on top of the middle row to make the top row']\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the red block on the blue and yellow blocks.\n"+
+                "### User:\n"+
+                "The action succeeded, and the green block on the stand is amoved to another position on the table.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly [the green block on the stand is amoved to another position on the table.] on the task regarding progress and feasibility.\n"+
+                "### Assistant:\n"+
+                "Progress is disrupted, and the green block used to make the bottom row is moved to another position on the table. The current progress is ['the blue and yellow blocks are on the stand']; the task feasibility is unaffected since the remaining target objects [green block, purple block, pink block] are still available.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly on future actions.\n"+
+                "### Assistant:\n"+
+                "The robot will not be affected.\n"+
+                "### User:\n"+
+                "How to handle this anomaly?\n"+
+                "### Assistant:\n"+
+                "Put the green block back to the the stand to resume the progress.\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the green block on the darkest brown block of the stand.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The anomaly has been addressed. Progress: ['The bottom row (blue, yellow, and green blocks) is built, and the red block is on top of the bottom row']. Remaining goals: ['put the purple block on top of the bottom row to make the middle row'; 'put the pink block on the middle row to make the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the purple block on the yellow and green blocks.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['The bottom row (blue, yellow, and green blocks) and the middle row (red and purple blocks) are built']. Remaining goals: ['put the pink block on the middle row to make the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the pink block on the red and purple blocks.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['The bottom row (blue, yellow, and green blocks), the middle row (red and purple blocks), and the top row (the pink block) are built']. All goals are completed.\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "done.\n"
+            )
+
+            episode_2 = (
+                "### User:\n"+
+                "In the initial state, there are blue, yellow, green, red, purple, pink, orange, and brown blocks; there is a stand and a trash can.\n"+
+                "What is the final goal state?\n"+
+                "### Assistant:\n"+
+                "Final goal state: ['the blue, yellow, and green blocks make the bottom row; the red and purple blocks make the middle row; the pink block makes the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the blue block on the lightest brown block of the stand.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "Progress: ['A blue block is on the stand']. Remaining goals: ['put the yellow and green blocks on the stand to make the bottom row'; 'put the red and purple blocks on top of the bottom row to make the middle row'; 'put the pink block on top of the middle row to make the top row']\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the blue yellow block on the middle brown block of the stand.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['The blue and yellow blocks are on the stand']. Remaining goals: ['put the green block on the stand to make the bottom row'; 'put the red and purple blocks on top of the bottom row to make the middle row'; 'put the pink block on top of the middle row to make the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the green block on the darkest brown block of the stand.\n"+
+                "### User:\n"+
+                "The action succeeded, and the blue and yellow blocks on the stand are moved to other positions of the table.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly [the blue and yellow blocks on the stand are moved to other positions of the table] on the task regarding progress and feasibility.\n"+
+                "### Assistant:\n"+
+                "Progress is disrupted, and the blue and yellow blocks used to make the bottom row are moved to other positions. The current progress is ['A green block is on the stand']; the task feasibility is unaffected since the remaining target objects [blue block, yellow block, red block, purple block, pink block] are still available.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly on future actions.\n"+
+                "### Assistant:\n"+
+                "The robot will not be affected.\n"+
+                "### User:\n"+
+                "How to handle this anomaly?\n"+
+                "### Assistant:\n"+
+                "Put the blue and yellow blocks back to the stand to resume the progress.\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the blue block on the lightest brown block of the stand.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['The blue and green blocks are on the stand']. To address this anomaly, the remaining goal is ['put the yellow block on the middle brown block of the stand'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the yellow block on the middle brown block of the stand.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The anomaly has been addressed. Progress: ['The bottom row (blue, yellow, and green blocks) is built']. Remaining goals: ['put the red and purple blocks on top of the bottom row to make the middle row'; 'put the pink block on top of the middle row to make the top row']\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the red block on the blue and yellow blocks.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### Assistant:\n"+
+                "Progress: ['The bottom row (blue, yellow, and green blocks) is built, and the red block is on top of the bottom row']. Remaining goals: ['put the purple block on top of the bottom row to make the middle row'; 'put the pink block on the middle row to make the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the purple block on the yellow and green blocks.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['The bottom row (blue, yellow, and green blocks) and the middle row (red and purple blocks) are built']. Remaining goals: ['put the pink block on the middle row to make the top row'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the pink block on the red and purple blocks.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['The bottom row (blue, yellow, and green blocks), the middle row (red and purple blocks), and the top row (the pink block) are built']. All goals are completed.\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "done.\n"
+            )
+
+            anomaly_episode_list=[episode_1,episode_2]
+        
+        
     return anomaly_episode_list    

@@ -14,7 +14,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size=".05 .05 .005"/>
+        <box size=".06 .05 .005"/>
       </geometry>
       <material name="brown">
         <color rgba="0.61176471 0.45882353 0.37254902 1"/>
@@ -23,7 +23,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <box size=".05 .05 .005"/>
+        <box size=".06 .05 .005"/>
       </geometry>
     </collision>
   </link>
@@ -37,7 +37,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 -0.05 0"/>
       <geometry>
-        <box size=".05 .05 .005"/>
+        <box size=".06 .05 .005"/>
       </geometry>
       <material name="lightbrown">
         <color rgba="0.91764706 0.68823529 0.55882353 1"/>
@@ -46,7 +46,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 -0.05 0"/>
       <geometry>
-        <box size=".05 .05 .005"/>
+        <box size=".06 .05 .005"/>
       </geometry>
     </collision>
   </link>
@@ -65,7 +65,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0.05 0"/>
       <geometry>
-        <box size=".05 .05 .005"/>
+        <box size=".06 .05 .005"/>
       </geometry>
       <material name="darkbrown">
         <color rgba="0.30588235 0.22941176 0.18627451 1"/>
@@ -74,7 +74,7 @@
     <collision>
       <origin rpy="0 0 0" xyz="0 0.05 0"/>
       <geometry>
-        <box size=".05 .05 .005"/>
+        <box size=".06 .05 .005"/>
       </geometry>
     </collision>
   </link>

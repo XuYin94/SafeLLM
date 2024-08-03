@@ -13,7 +13,7 @@ from distributed import init_distributed_device, world_info_from_env
 from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
 from train_utils import (
-    train_one_epoch,train_one_epoch_with_robot,
+    train_one_epoch_with_robot,
     get_mp_policy_dtype,
     save_checkpoint,
 )
@@ -42,7 +42,7 @@ import functools
 from open_flamingo import create_model_and_transforms
 
 
-
+#os.environ["CUDA_VISIBLE_DEVICES"]="7"
 
 def random_seed(seed=42, rank=0):
     torch.manual_seed(seed + rank)
@@ -55,10 +55,10 @@ def main():
     # model configuration args
     parser.add_argument("--vision_encoder_path", default="ViT-L-14", type=str)
     parser.add_argument("--vision_encoder_pretrained", default="openai", type=str)
-    parser.add_argument("--lm_path", default="facebook/opt-1.3b", type=str)
+    parser.add_argument("--lm_path", default="anas-awadalla/mpt-1b-redpajama-200b-dolly", type=str)
     parser.add_argument(
         "--tokenizer_path",
-        default="facebook/opt-30b",
+        default="anas-awadalla/mpt-1b-redpajama-200b-dolly",
         type=str,
         help="path to tokenizer",
     )
@@ -73,7 +73,7 @@ def main():
     parser.add_argument(
         "--run_name",
         type=str,
-        default="/mnt/lynx1/users/zhang/Workfolder/exp/vlm_exp/openflamingo3B",
+        default="/mnt/lynx1/users/zhang/Workfolder/exp/vlm_exp/OpenFlamingo-3B-vitl-mpt1b-dolly",
         help="used to name saving directory and wandb run",
     )
     parser.add_argument(
@@ -87,7 +87,7 @@ def main():
         action="store_true",
         help="delete previous checkpoint when saving new checkpoint",
     )
-    parser.add_argument("--batch_size_robot", type=int, default=128)
+    parser.add_argument("--batch_size_robot", type=int, default=32)
     parser.add_argument("--gradient_accumulation_steps", type=int, default=1)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--learning_rate", default=1e-4, type=float)
@@ -130,9 +130,9 @@ def main():
     # data args
     parser.add_argument(
         "--robot_shards",
-        default="/mnt/lynx1/users/zhang/Workfolder/data/vlm/shards/shard-{000000..000014}.tar",
+        default="/mnt/lynx4/users/zhang/yinxu/Workfolder/data/vlm/shards/one_view/shard-{000000..000060}.tar",
         type=str,
-        help="path to c4 shards, this should be a glob pattern such as /path/to/shards/shard-{0000..0999}.tar",
+        help="path to c4 shards, this should be a glob pattern such as /path/to/shards/shard-{000..0999}.tar",
     )
     parser.add_argument("--workers", type=int, default=1)
     parser.add_argument("--train_num_samples_robot", type=int, default=100000)
@@ -220,10 +220,12 @@ def main():
         os.environ["TRANSFORMERS_OFFLINE"] = "1"
     args.local_rank, args.rank, args.world_size = world_info_from_env()
     device_id = init_distributed_device(args)
+    #print(device_id)
     random_seed(args.seed)
 
 
-
+    print(args.lm_path)
+    print(args.tokenizer_path)
     # Initialize model
     model, image_processor, tokenizer = create_model_and_transforms(
         args.vision_encoder_path,

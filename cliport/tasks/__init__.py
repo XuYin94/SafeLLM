@@ -26,7 +26,7 @@ from  cliport.tasks.put_block_in_bowl import PutAllBlockInAZone
 from  cliport.tasks.put_block_in_bowl import PickAndPlace
 from  cliport.tasks.stack_block_pyramid import StackBlockPyramid
 from  cliport.tasks.stack_block_pyramid_seq import StackBlockPyramidSeqSeenColors
-from  cliport.tasks.stack_block_pyramid_seq import StackBlockPyramidSeqUnseenColors,StackBlockPyramidSeqUnseenColorswithrelativepickposition
+from  cliport.tasks.stack_block_pyramid_seq import StackBlockPyramidSeqUnseenColors,StackBlockPyramidSeqUnseenColorswithrelativepickposition,StackBlockPyramidSeqUnseenColorsPrimitive
 from  cliport.tasks.stack_block_pyramid_seq import StackBlockPyramidSeqFull
 from  cliport.tasks.stack_block_pyramid_seq import StackBlockPyramidWithoutSeq
 from  cliport.tasks.stack_block_pyramid_seq import StackAllBlock
@@ -39,6 +39,7 @@ names = {
     'place-red-in-green': PlaceRedInGreen,
     'stack-block-pyramid': StackBlockPyramid,
     'stack-block-pyramid-seq-seen-colors-relative-position':StackBlockPyramidSeqUnseenColorswithrelativepickposition,
+    'stack-block-pyramid-seq-seen-colors-primitive': StackBlockPyramidSeqUnseenColorsPrimitive,
     'packing-shapes': PackingShapes,
     'packing-boxes-pairs-seen-colors': PackingBoxesPairsSeenColors,
     'packing-boxes-pairs-unseen-colors': PackingBoxesPairsUnseenColors,

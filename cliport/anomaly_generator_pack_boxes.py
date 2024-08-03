@@ -13,7 +13,7 @@ import threading, queue
 
 def recording(env,rgb_list,depth_list,event):
     while not event.is_set():
-        time.sleep(0.005)
+        time.sleep(0.0001)
         rgb, depth = env.multi_view_render()
         rgb_list.append(rgb)
         depth_list.append(depth)
@@ -52,7 +52,7 @@ def one_episode_execution(info,obs,agent,env,task,add_anomaly=False,action_error
         thread_list.append(record_rgb)
         if add_anomaly:
             if act is not None:
-                perturbation_list=["addition", "removal"]
+                perturbation_list=["addition"]
                 if len(progress_list)>0:
                     perturbation_list.append("displacement")
                 perturbation_type=random.choice(perturbation_list)
