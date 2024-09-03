@@ -115,7 +115,7 @@ def one_episode_execution(agent,env,task,add_anomaly=False,action_error=False,re
 
             obs, reward, done, info = env.step(act)
             if reward>0:
-                processed_objs.append((task.target_block_info, obj_id))
+                processed_objs.append(obj_id)
             if done:
                 break
 

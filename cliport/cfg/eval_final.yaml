@@ -17,9 +17,10 @@ n_repeats: 1 # number of repeats
 gpu: [0]
 save_results: True # write results to json
 update_results: False # overwrite existing json results?
-checkpoint_type: 'steps=52501'
-anomaly_type:  addition ##[None, addition, removal, displacement]
-use_vlm: False ## True: use openflamigo. False: use the GT 
+checkpoint_type: 'steps=48751'
+anomaly_type:  None ##[None, addition, removal, displacement]
+use_vlm: True ## True: use openflamigo. False: use the GT feedback from the simulator 
+vlm_device: cuda:1
 prompt_type: 'cot'
 
 actor:
@@ -53,17 +54,17 @@ planner:
 
 disp: False
 shared_memory: False
-eval_task: stack-block-pyramid-seq-seen-colors ## ["packing-boxes","put-block-in-matching-bowl","stack-block-pyramid-seq-unseen-colors"]
+eval_task: put-block-in-matching-bowl ## ["packing-boxes","put-block-in-matching-bowl","stack-block-pyramid-seq-unseen-colors"]
 model_task: ${eval_task} # task the model was trained on (e.g. multi-language-conditioned or packing-boxes-pairs-seen-colors)
 type: single # 'single' or 'multi'
 
 # paths
-model_dir: /mnt/lynx4/users/zhang/yinxu/Workfolder/exp/
+model_dir: /mnt/bear1/users/zhangkang/yinxu/Workfolder/exp/
 exp_folder: eval_llm
-data_dir: /mnt/lynx4/users/zhang/yinxu/Workfolder/data/episodes
+data_dir: /mnt/bear1/users/zhangkang/yinxu/Workfolder/data/episodes
 assets_root: ./cliport/environments/assets/
 
-model_path: /mnt/lynx4/users/zhang/yinxu/Workfolder/exp/checkpoints_six_tasks/ # path to pre-trained models
+model_path: /mnt/bear1/users/zhangkang/yinxu/Workfolder/exp/checkpoints_matching/ # path to pre-trained models
 train_config: ./cliport/cfg/train.yaml # path to train config
 save_path: ${model_dir}/${exp_folder}/${eval_task}-n${train_demos}-${mode}/checkpoints/ # path to save results
 results_path: ${model_dir}/${exp_folder}/${eval_task}-n${train_demos}-${mode}/checkpoints/ # path to existing results

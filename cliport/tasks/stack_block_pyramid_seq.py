@@ -146,7 +146,7 @@ class StackBlockPyramidSeqUnseenColors(Task):
         container_template = 'trash_can/trashcan.urdf'
         env.add_object(container_template, trashcan_pose, 'fixed')
 
-        nbr_blocks=6 if self.mode=="train" else random.randint(7,9)
+        nbr_blocks=random.randint(7,9)
 
         # Add base.
         base_size = (0.06, 0.18, 0.005)
@@ -156,12 +156,16 @@ class StackBlockPyramidSeqUnseenColors(Task):
         self.container_info=[stand_id,base_pose]
 
         # Block colors.
-        color_names = self.get_colors()
-        #print(len(color_names))
-        # Shuffle the block colors.
-        random.shuffle(color_names)
-        colors = [utils.COLORS[cn] for cn in color_names]
+        all_color_names = self.get_colors()
+        random.shuffle(all_color_names)
 
+        colors = [utils.COLORS[c] for c in all_color_names]
+
+        #relevant_color_names = all_color_names[:4]
+        target_block_seq =sorted(np.random.choice(range(4), 6, replace=True))
+        target_block_colors=[all_color_names[i] for i in target_block_seq]
+        target_list=np.unique(target_block_seq)
+        self.target_color=[all_color_names[i] for i in target_list]
         # Add blocks.
         objs = []
         # sym = np.pi / 2
@@ -171,9 +175,16 @@ class StackBlockPyramidSeqUnseenColors(Task):
         for i in range(nbr_blocks):
             block_pose = self.get_random_pose(env, block_size)
             block_id = env.add_object(block_urdf, block_pose)
-            p.changeVisualShape(block_id, -1, rgbaColor=colors[i] + [1])
+            if i<6:
+                p.changeVisualShape(block_id, -1, rgbaColor=colors[target_block_seq[i]] + [1])
+                self.block_info.append((block_id, target_block_colors[i]))
+            else:
+                icolor =np.random.choice(range(4,len(colors)), 1).squeeze()
+                p.changeVisualShape(block_id, -1, rgbaColor=colors[icolor] + [1])
+                self.block_info.append((block_id, all_color_names[icolor]))
             objs.append((block_id, (np.pi / 2, None)))
-            self.block_info.append((block_id,color_names[i]))
+
+
 
         # Associate placement locations for goals.
         place_pos = [(0, -0.05, 0.03), (0, 0, 0.03),
@@ -185,9 +196,9 @@ class StackBlockPyramidSeqUnseenColors(Task):
         block_position="the lightest brown block of the stand"
         self.goals.append(([objs[0]], np.ones((1, 1)), [targs[0]],
                            False, True, 'pose', None, 1 / 6))
-        self.lang_goals.append(self.lang_template.format(pick=color_names[0],
+        self.lang_goals.append(self.lang_template.format(pick=target_block_colors[0],
                                                          place=block_position))
-        self.question_list.append(self.question_template.format(pick=color_names[0],
+        self.question_list.append(self.question_template.format(pick=target_block_colors[0],
                                                          place=block_position))
 
         self.block_info[0]+=(targs[0],block_position,)
@@ -195,9 +206,9 @@ class StackBlockPyramidSeqUnseenColors(Task):
         block_position="the middle brown block of the stand"
         self.goals.append(([objs[1]], np.ones((1, 1)), [targs[1]],
                            False, True, 'pose', None, 1 / 6))
-        self.lang_goals.append(self.lang_template.format(pick=color_names[1],
+        self.lang_goals.append(self.lang_template.format(pick=target_block_colors[1],
                                                          place=block_position))
-        self.question_list.append(self.question_template.format(pick=color_names[1],
+        self.question_list.append(self.question_template.format(pick=target_block_colors[1],
                                                          place=block_position))
         self.block_info[1]+=(targs[1],block_position,)
 
@@ -205,55 +216,59 @@ class StackBlockPyramidSeqUnseenColors(Task):
         block_position="the darkest brown block of the stand"
         self.goals.append(([objs[2]], np.ones((1, 1)), [targs[2]],
                            False, True, 'pose', None, 1 / 6))
-        self.lang_goals.append(self.lang_template.format(pick=color_names[2],
+        self.lang_goals.append(self.lang_template.format(pick=target_block_colors[2],
                                                          place=block_position))
-        self.question_list.append(self.question_template.format(pick=color_names[2],
+        self.question_list.append(self.question_template.format(pick=target_block_colors[2],
                                                          place=block_position))
 
         self.block_info[2]+=(targs[2],block_position,)
 
 
         # Goal: make middle row.
-        block_position=f"the {color_names[0]} and {color_names[1]} blocks"
+        block_position=f"the {target_block_colors[0]} and {target_block_colors[1]} blocks"
         self.goals.append(([objs[3]], np.ones((1, 1)), [targs[3]],
                            False, True, 'pose', None, 1 / 6))
-        self.lang_goals.append(self.lang_template.format(pick=color_names[3],
+        self.lang_goals.append(self.lang_template.format(pick=target_block_colors[3],
                                                          place=block_position))
-        self.question_list.append(self.question_template.format(pick=color_names[3],
+        self.question_list.append(self.question_template.format(pick=target_block_colors[3],
                                                          place=block_position))
         self.block_info[3]+=(targs[3],block_position,)
 
 
-        block_position=f"the {color_names[1]} and {color_names[2]} blocks"
+        block_position=f"the {target_block_colors[1]} and {target_block_colors[2]} blocks"
         self.goals.append(([objs[4]], np.ones((1, 1)), [targs[4]],
                            False, True, 'pose', None, 1 / 6))
-        self.lang_goals.append(self.lang_template.format(pick=color_names[4],
+        self.lang_goals.append(self.lang_template.format(pick=target_block_colors[4],
                                                          place=block_position))
-        self.question_list.append(self.question_template.format(pick=color_names[4],
+        self.question_list.append(self.question_template.format(pick=target_block_colors[4],
                                                          place=block_position))
         self.block_info[4]+=(targs[4],block_position,)
 
         # Goal: make top row.
-        block_position=f"the {color_names[3]} and {color_names[4]} blocks"
+        block_position=f"the {target_block_colors[3]} and {target_block_colors[4]} blocks"
         self.goals.append(([objs[5]], np.ones((1, 1)), [targs[5]],
                            False, True, 'pose', None, 1 / 6))
-        self.lang_goals.append(self.lang_template.format(pick=color_names[5],
+        self.lang_goals.append(self.lang_template.format(pick=target_block_colors[5],
                                                          place=block_position))
-        self.question_list.append(self.question_template.format(pick=color_names[5],
+        self.question_list.append(self.question_template.format(pick=target_block_colors[5],
                                                          place=block_position))
         self.block_info[5]+=(targs[5],block_position,)
         self.answer_list.append(self.answer_template)
         color_list=[item[1] for item in self.block_info]
-        self.build_initial_scene_description(color_list)
+        self.build_initial_scene_description(color_list,self.target_color)
+
         return True
     def get_colors(self):
         return utils.ALL_COLORS
 
-    def build_initial_scene_description(self,initial_objects):
+    def build_initial_scene_description(self,initial_objects,target_color):
         info = "In the initial state, there are "
         for color in initial_objects[:-1]:
             info+=color+', '
-        info+="and "+str(initial_objects[-1])+" blocks; there is a stand and a trash can."
+        info+="and "+str(initial_objects[-1])+" blocks; there is a stand and a trash can. The instruction is 'Please stack a pyramid with the '.\n"
+        for color in target_color[:-1]:
+            info += color + ', '
+        info+="and "+str(target_color[-1])+" blocks'."
         self.initial_state = info
 
 

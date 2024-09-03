@@ -14,7 +14,7 @@ from  cliport.tasks.place_red_in_green import PlaceRedInGreen
 from  cliport.tasks.pick_and_place_primitive import PickAndPlacePrimitive
 from  cliport.tasks.pick_and_place_primitive import PickAndPlacePrimitiveWithRelativePickPosition
 from cliport.tasks.pack_google_object_primitive import PackingGoogleObjectsPrimitive,PackingGoogleObjectsRelativePrimitive
-from cliport.tasks.pack_box_primitive import PackBoxPrimitive,PackBoxwithRelativePickPosition
+from cliport.tasks.pack_box_primitive import PackBoxPrimitive,PackBoxwithRelativePickPosition,PackBoxPrimitiveaAnomaly
 from  cliport.tasks.put_block_in_bowl import PutBlockInBowlSeenColors
 from  cliport.tasks.put_block_in_bowl import PutBlockInBowlUnseenColors
 from  cliport.tasks.put_block_in_bowl import PutBlockInBowlFull
@@ -69,6 +69,7 @@ names = {
     'stack-all-block-of-same-color': StackAllBlockOfSameColor,
     'stack-block-with-alternate-color': StackBlockWithAlternateColor,
     'pack-box-primitive':PackBoxPrimitive,
+    'pack-box-anomaly': PackBoxPrimitiveaAnomaly,
     'pack-box-primitive-relative-pick-position': PackBoxwithRelativePickPosition,
     'pack-google-object-primitive':PackingGoogleObjectsPrimitive,
     'pack-google-object-relative-primitive':PackingGoogleObjectsRelativePrimitive

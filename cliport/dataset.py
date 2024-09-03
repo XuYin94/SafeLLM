@@ -319,26 +319,26 @@ class RavensMultiTaskDataset(RavensDataset):
         # all tasks
         'multi-all': {
             'train': [
-                #'pick-and-place-primitive',
-                #'pick-and-place-primitive-relative-pick-position',
-                'pack-box-primitive-relative-pick-position',
-                'pack-box-primitive'
+                'pick-and-place-primitive',
+                'pick-and-place-primitive-relative-pick-position',
+                # 'pack-box-primitive-relative-pick-position',
+                # 'pack-box-primitive'
                 # 'stack-block-pyramid-seq-seen-colors-primitive',
                 # 'stack-block-pyramid-seq-seen-colors-relative-position'
             ],
             'val': [
-                #'pick-and-place-primitive',
-                #'pick-and-place-primitive-relative-pick-position',
-                'pack-box-primitive-relative-pick-position',
-                'pack-box-primitive'
+                'pick-and-place-primitive',
+                'pick-and-place-primitive-relative-pick-position',
+                # 'pack-box-primitive-relative-pick-position',
+                # 'pack-box-primitive'
                 # 'stack-block-pyramid-seq-seen-colors-primitive',
                 # 'stack-block-pyramid-seq-seen-colors-relative-position'
             ],
             'test': [
-                #'pick-and-place-primitive',
-                #'pick-and-place-primitive-relative-pick-position',
-                'pack-box-primitive-relative-pick-position',
-                'pack-box-primitive'
+                'pick-and-place-primitive',
+                'pick-and-place-primitive-relative-pick-position',
+                # 'pack-box-primitive-relative-pick-position',
+                # 'pack-box-primitive'
                 # 'stack-block-pyramid-seq-seen-colors-primitive',
                 # 'stack-block-pyramid-seq-seen-colors-relative-position'
             ],

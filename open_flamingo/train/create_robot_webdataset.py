@@ -22,9 +22,9 @@ shard_writer_params = {
     "encoder": True,
 }    
 path_list=[
-    'pack-box-primitive-train',
+    #'pack-box-primitive-train',
     'put-block-in-matching-bowl-train',
-    'stack-block-pyramid-seq-unseen-colors-train'
+    #'stack-block-pyramid-seq-unseen-colors-train'
 ]
 
 def get_shard_pattern(path: str):
@@ -56,7 +56,7 @@ def convert_pkl2shards_two_view(root_path,output_path):
                             sample_data={}
                             base64_images = []
                             episode_path=sorted(os.listdir(os.path.join(sub_path,field,fname)))
-                            episode_path=[episode_path[0],episode_path[-1]]  ## only use the 1st/last render images to infer the robot action and the anomaly scene
+                            #episode_path=[episode_path[0],episode_path[-1]]  ## only use the 1st/last render images to infer the robot action and the anomaly scene
                             for img_idx, img in enumerate(episode_path):
                                 
                                 #image = Image.open(os.path.join(sub_path,'font_img',fname,img)).convert("RGB")
@@ -68,9 +68,9 @@ def convert_pkl2shards_two_view(root_path,output_path):
                             question_text=load_field(sub_path,"info",fname+'.pkl')["question"]
                             answer_text=load_field(sub_path,"info",fname+'.pkl')["answer"]
                             action=re.findall(pattern, question_text)[0]
-                            if field=="view_3":
+                            if field=="view_0":
                                 question_text="Did the robot successfully execute the action '"+str(action)+"'? "
-                                if 'succee' in type:
+                                if 'succee ' in type:
                                     answer_text="succeed"
                                 else:
                                     answer_text="failed"
@@ -81,6 +81,7 @@ def convert_pkl2shards_two_view(root_path,output_path):
                                 answer_text=''.join(answer_text.split(' and ')[1:])
                             language_x+="Answer: "+answer_text
                             language_x+="<|endofchunk|><|endoftext|>"
+                            #print(language_x)
                             sample_data["img"]=base64_images
                             sample_data["text"]=language_x
                             key_str = uuid.uuid4().hex
@@ -98,13 +99,14 @@ def convert_pkl2shards(root_path,output_path):
             for __, type in enumerate(os.listdir(task_path)):
                 for task in os.listdir(os.path.join(task_path,type)):
                     sub_path=os.path.join(task_path,type)
-                    for field in ["view_0","view_3"]:
+                    for field in ["view_0"]:
                         for fname in sorted(os.listdir(os.path.join(sub_path,field))):
                             language_x=""
                             sample_data={}
                             base64_images = []
                             episode_path=sorted(os.listdir(os.path.join(sub_path,field,fname)))
-                            episode_path=[episode_path[0],episode_path[-1]]  ## only use the 1st/last render images to infer the robot action and the anomaly scene
+                            #episode_path=[episode_path[0],episode_path[-1]]  ## only use the 1st/last render images to infer the robot action and the anomaly scene
+                            #print(len(episode_path))
                             for img_idx, img in enumerate(episode_path):
                                 
                                 #image = Image.open(os.path.join(sub_path,'font_img',fname,img)).convert("RGB")
@@ -133,8 +135,8 @@ def convert_pkl2shards(root_path,output_path):
 
 if __name__ == "__main__":
 
-    #convert_pkl2shards("/mnt/lynx4/users/zhang/yinxu/Workfolder/data/vlm/","/mnt/lynx4/users/zhang/yinxu/Workfolder/data/vlm/shards/one_view")
-    convert_pkl2shards_two_view("/mnt/lynx4/users/zhang/yinxu/Workfolder/data/vlm/","/mnt/lynx4/users/zhang/yinxu/Workfolder/data/vlm/shards/two_view/")
+    #convert_pkl2shards("/mnt/bear1/users/zhangkang/yinxu/Workfolder/data/vlm/","/mnt/bear1/users/zhangkang/yinxu/Workfolder/data/vlm/shards/one_view")
+    convert_pkl2shards_two_view("/mnt/bear1/users/zhangkang/yinxu/Workfolder/data/vlm/","/mnt/bear1/users/zhangkang/yinxu/Workfolder/data/vlm/shards/two_view/")
     # data = pickle.load(open("/mnt/lynx1/users/zhang/Workfolder/data/primitive/pick-and-place-primitive-train/info/000012-26.pkl", 'rb'))
     # print(data)
     #data=load_field()

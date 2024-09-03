@@ -16,12 +16,12 @@ dataset:
 
 train:
   # folders
-  exp_folder: /mnt/lynx4/users/zhang/yinxu/Workfolder/exp
+  exp_folder: /mnt/bear1/users/zhangkang/yinxu/Workfolder/exp
   exp_note: note
 #  train_dir: ${root_dir}/${train.exp_folder}/${train.task}-${train.agent}-n${train.n_demos}-train
 #  data_dir: ${root_dir}/data  # asdf: /${train.task}
-  train_dir: /mnt/lynx4/users/zhang/yinxu/Workfolder/exp
-  data_dir: /mnt/lynx4/users/zhang/yinxu/Workfolder/data/primitive
+  train_dir: /mnt/bear1/users/zhangkang/yinxu/Workfolder/exp
+  data_dir: /mnt/bear1/users/zhangkang/yinxu/Workfolder/data/primitive
 
   # task configs
   task: multi_primitive

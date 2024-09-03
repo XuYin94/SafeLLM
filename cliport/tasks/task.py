@@ -81,31 +81,25 @@ class Task:
             [center_pos[1], self.bounds[1, 1]],
         ])
         self.area_boundary = {
-            # "center": {
-            #     "x_start": center_pos[0],
-            #     "x_end": center_pos[0],
-            #     "y_start": center_pos[1],
-            #     "y_end": center_pos[1]
-            # },
-            "top left": {
+            "bottom right": {
                 "x_start": top_left_area[0, 0],
                 "x_end": top_left_area[0, 1],
                 "y_start": top_left_area[1, 0],
                 "y_end": top_left_area[1, 1]
             },
-            "top right": {
+            "bottom left": {
                 "x_start": top_right_area[0, 0],
                 "x_end": top_right_area[0, 1],
                 "y_start": top_right_area[1, 0],
                 "y_end": top_right_area[1, 1]
             },
-            "bottom left": {
+            "top right": {
                 "x_start": bottom_left_area[0, 0],
                 "x_end": bottom_left_area[0, 1],
                 "y_start": bottom_left_area[1, 0],
                 "y_end": bottom_left_area[1, 1]
             },
-            "bottom right": {
+            "top left": {
                 "x_start": bottom_right_area[0, 0],
                 "x_end": bottom_right_area[0, 1],
                 "y_start": bottom_right_area[1, 0],

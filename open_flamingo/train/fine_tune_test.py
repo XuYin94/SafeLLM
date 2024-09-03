@@ -73,7 +73,7 @@ def main():
     parser.add_argument(
         "--run_name",
         type=str,
-        default="/mnt/lynx1/users/zhang/Workfolder/exp/vlm_exp/OpenFlamingo-3B-vitl-mpt1b-dolly",
+        default="/mnt/bear1/users/zhangkang/yinxu/Workfolder/exp/OpenFlamingo-3B-vitl-mpt1b-dolly/single/",
         help="used to name saving directory and wandb run",
     )
     parser.add_argument(
@@ -130,7 +130,7 @@ def main():
     # data args
     parser.add_argument(
         "--robot_shards",
-        default="/mnt/lynx4/users/zhang/yinxu/Workfolder/data/vlm/shards/one_view/shard-{000000..000060}.tar",
+        default="/mnt/bear1/users/zhangkang/yinxu/Workfolder/data/vlm/shards/one_view/shard-{000000..000010}.tar",
         type=str,
         help="path to c4 shards, this should be a glob pattern such as /path/to/shards/shard-{000..0999}.tar",
     )
@@ -336,6 +336,7 @@ def main():
         )
 
     else:
+        #model.vision_encoder.requires_grad_(True)
         model = model.to(device_id)
         ddp_model = DDP(model, device_ids=[device_id])
 

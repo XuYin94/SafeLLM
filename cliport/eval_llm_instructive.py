@@ -3,8 +3,10 @@
 import json
 import logging
 import os
-
+import random
+from PIL import Image
 import hydra
+from sklearn.metrics import confusion_matrix
 import numpy as np
 import torch
 from matplotlib import pyplot as plt
@@ -26,7 +28,7 @@ def execution(obs,info,event,agent,env,output_queue):
     output_queue.put((1,obs,reward,info))
     event.set()
 
-def one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,step,anomaly,state=None,vlm_args=None):
+def one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,step,anomaly,handling_type="None",state=None,vlm_args=None,vlm_device=None,vlm_inference_type='single'):
     episode_message+="### User:\nWhat is your plan for the next step?\n"
     header,lang_inst=get_legal_LLM_feedback(history_message=episode_message,return_prompt = True,llm_args= llm_args,feedback=None)
     episode_message+=header+'\n'+lang_inst+'\n'
@@ -34,7 +36,7 @@ def one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,
 
     task.lang_goals=[lang_inst]
     info['lang_goal']=lang_inst
-    img_obs=[]
+    #img_obs=[]
     print("Step {step}: {action}".format(step=step,action=lang_inst))
     if "done." in lang_inst or "alert." in lang_inst:
         env.add_video_frame()
@@ -42,6 +44,7 @@ def one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,
     rgb_list=[]
     depth_list=[]
     rgb,depth= env.multi_view_render()
+    #print(type(rgb))
     rgb_list.append(rgb)
     depth_list.append(depth)
     
@@ -55,7 +58,7 @@ def one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,
     
     if anomaly is not None:
         #env,output_queue,task=None,perturbation="pick",step=0,type="None",progress=None
-        gt_anomaly=threading.Thread(target=anomaly_generator,args=(env,output_queue,task,anomaly,step,"None",state))
+        gt_anomaly=threading.Thread(target=anomaly_generator,args=(env,output_queue,task,anomaly,step,handling_type,state))
         thread_list.append(gt_anomaly)
     
     for thread in thread_list:
@@ -77,25 +80,38 @@ def one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,
     else:
         __,obs,reward, info= results[0]
         anomaly="no anomaly happened."
+    print("Ground-truth feedback: "+anomaly)
     rgb, depth = env.multi_view_render()
     rgb_list.append(rgb)
-    depth_list.append(depth)
+    #img_rgb = cv2.cvtColor(np.uint8(rgb[0]) , cv2.COLOR_BGR2RGB)
+    #cv2.imwrite(os.path.join('./', str(1) + ".png"), img_rgb)
     
     if not use_vlm: ## use the gt feedback from Pybullet
         #if reward>0:
         feedback="### User:\nThe action succeed, and "+anomaly+'\n'
     else:
-        feedback=get_vlm_feedback(img_obs,lang_inst,vlm_args,device)+'\n'
+        if vlm_inference_type=="single":
+            #rgb_list=[rgb_list[0],rgb_list[-1]]  ## only use the start & end state obs for vlm inference
+            input_list=[Image.fromarray(np.uint8(multi_view_obs[0])).convert('RGB') for multi_view_obs in rgb_list]
+            input_list=[input_list[0]] + random.sample(input_list[1:-1], 2) + [input_list[-1]]
+        else:
+            input_list_1=[ Image.fromarray(np.uint8(multi_view_obs[0])).convert('RGB')  for multi_view_obs in rgb_list]
+            input_list_2=[ Image.fromarray(np.uint8(multi_view_obs[-1])).convert('RGB')  for multi_view_obs in rgb_list]
+            input_list_1=[input_list_1[0]] + random.sample(input_list_1[1:-1], 2) + [input_list_1[-1]]
+            input_list_2=[input_list_2[0]] + random.sample(input_list_2[1:-1], 2) + [input_list_2[-1]]
+            input_list=[input_list_1,input_list_2]
+        print(len(input_list))
+        feedback=get_vlm_feedback(vlm_args,input_list,lang_inst,device=vlm_device,configuration=vlm_inference_type)
+        print("Feed back from VLM: "+feedback)
     #env.add_video_frame(scene=feedback)
     episode_message+=feedback
     anomaly_desc=anomaly
-    print(anomaly_desc)
     if "no anomaly" in anomaly_desc: ## start the next iteration after summarizing the progress and the future steps
         episode_message+="### User: \nPlease describe the achieved progress and the remaining goals.\n"
         header,state_of_progree_future=get_legal_LLM_feedback(history_message=episode_message,return_prompt = True,llm_args= llm_args,feedback=None)
         episode_message+=header+'\n'+state_of_progree_future+'\n'
 
-        return episode_message,lang_inst,reward,obs,info,img_obs, step
+        return episode_message,lang_inst,reward,obs,info,rgb_list, step
     else:## start to reason the anomaly ascene
         episode_message+="### User:\nAnalyze the effect of the anomaly ['{anomaly}'] on the task regarding progress and feasibility.\n".format(anomaly=anomaly_desc)
         #print(episode_message)
@@ -112,7 +128,7 @@ def one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,
         episode_message+=header+'\n'+reply+'\n'
         #print(episode_message)
         obs, __, __, info=env.step()
-        return one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,step,anomaly=None,state=state,vlm_args=vlm_args) ## assume no anomaly occurs in the recovery steps, otherwise the recurrsion will never stop
+        return one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,step,anomaly=None,handling_type="None",state=state,vlm_args=vlm_args) ## assume no anomaly occurs in the recovery steps, otherwise the recurrsion will never stop
     ## save images 
 
         
@@ -192,18 +208,19 @@ def main(vcfg):
     # #Load VLM
     if use_vlm:
         vlm_path=os.path.join(save_path,'vlm')
+        device=torch.device(vcfg['vlm_device'])
         if not os.path.exists(vlm_path):
             os.makedirs(vlm_path)
-        vlm_model, vis_processors, tokenizer = load_vlm("OpenFlamingo-9B-vitl-mpt7b", device)
+        vlm_model, vis_processors, tokenizer = load_vlm("OpenFlamingo-3B-vitl-mpt1b-dolly", device)
         vlm_args = {
             "tokenizer": tokenizer,
             "model": vlm_model,
-            "vis_processors": vis_processors
+            "vis_processor": vis_processors
         }
     txt_path=vcfg['record']['txt_path']
     if not os.path.exists(txt_path):
         os.makedirs(txt_path)
-
+    all_results={}
     # Evaluation loop
     logging.info(f"Evaluating: {str(ckpts_to_eval)}")
     for ckpt in ckpts_to_eval:
@@ -228,13 +245,16 @@ def main(vcfg):
         n_demos = vcfg['n_demos']
 
         # Run testing and save total rewards with last transition info.
-        for i in range(0, 50):
+        alert_true=[]
+        alert_pred=[]
+        for i in range(0, 100):
             text_path=os.path.join(txt_path,"episode_"+str(i)+".txt")
             if os.path.exists(text_path):
                 os.remove(text_path)
             logging.info(f'Test: {i + 1}/{n_demos}')
             episode, seed = ds.load(i)
             total_reward = 0
+            total_nbr_action=0
             np.random.seed(seed)
 
             # set task
@@ -254,10 +274,15 @@ def main(vcfg):
             
             print(f'THE FINAL GOAL: {final_goal}')
             print("Initial State:", initial_state)
-            
+            handling_type=np.random.choice(["distractor","None"])
             if anomaly_type !='None':
                 anomaly_time = 1#np.random.choice(np.arange(0, len(episode)-1), size=1, replace=False)  ## the step when the anomaly occurr
                 print("{type} anomaly will occur in step {time}".format(type=anomaly_type,time=anomaly_time))
+                if anomaly_type=="removal":
+                    if handling_type=="None":
+                        alert_true.append(0)
+                    else:
+                        alert_true.append(1)
             else:
                 anomaly_time=-1
             episode_message="### User:\n"+initial_state+"\nWhat is the final goal state?\n"
@@ -280,7 +305,6 @@ def main(vcfg):
             step=0
             state=0 
             occured=False
-            print(len(episode_message))
             while step <task.max_steps:
                 if step ==anomaly_time and not occured:
                     anomaly= anomaly_type  
@@ -289,23 +313,24 @@ def main(vcfg):
                     anomaly=None
                 #print(state)
                 if use_vlm:
-                    results=one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,step,anomaly,state,vlm_args,vlm_path)
+                    results=one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,step,anomaly,handling_type,state,vlm_args,vlm_device=device)
                 else:
-                    results=one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,step,anomaly,state)
+                    results=one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,step,anomaly,state=state)
                 if results is None: 
                     break
                 episode_message,act_plan,reward,obs,info,img_list, step=results
-                print(reward)
+                #print(reward)
                 if reward>0:
                     state+=1
-                    total_reward+=reward
-                
+                total_reward+=reward
+                total_nbr_action+=1
                 # if img_list is not None:
                 #     for j, img in enumerate(img_list):
                 #         save_name = f"{vlm_path}/step_{str(step)}_{str(j)}.png"
                 #         plt.imsave(save_name, img)
                 #print(len(act_plan))
-                if act_plan=="alert.":
+                if act_plan=="alert." and anomaly_type=="removal":
+                    alert_pred.append(1)
                     if record:
                         env.end_rec()  
                         break
@@ -313,6 +338,8 @@ def main(vcfg):
                 if act_plan=="done.":
                     history=episode_message[len(prompt):]
                     if "All goals are completed" in history:
+                        if anomaly_type=="removal":
+                            alert_pred.append(0)
                         if record:
                             env.end_rec()  
                         break
@@ -325,6 +352,18 @@ def main(vcfg):
             with open(text_path, 'a') as f:
                 # Append a string to the file
                 f.write(execution_history)
+            
+            ## compute the success rate (SR), nbr of actions (NA), and alert accuracy (acc).
+        
+        all_results[ckpt] = {
+            'SR': total_reward,
+            'nbr_action':total_nbr_action
+        }
+        if anomaly_type=="removal":
+            tn, fp, fn, tp = confusion_matrix(alert_true, alert_pred).ravel()
+            all_results[ckpt]['tp']=tp
+            all_results[ckpt]['fp']=fp
+             
             
 
 

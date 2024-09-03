@@ -36,9 +36,6 @@ def load_vlm(vlm_name: str, device: Union[torch.device, str]):
     logging.info("-" * 10 + f"Loading the VLM {vlm_name}" + "-" * 10)
     assert vlm_name in model_name.keys()
     model_config=model_name[vlm_name]
-    print(model_config)
-    # Initialize model
-    
     
     vlm,__, txt_processors = create_model_and_transforms(
         clip_vision_encoder_path="ViT-L-14",
@@ -49,7 +46,7 @@ def load_vlm(vlm_name: str, device: Union[torch.device, str]):
     )
     vlm.to(device)
     #state_dict = torch.load(hf_hub_download("openflamingo/OpenFlamingo-3B-vitl-mpt1b", "checkpoint.pt"))
-    state_dict=torch.load('/mnt/lynx4/users/zhang/yinxu/Workfolder/exp/OpenFlamingo-4B-vitl-rpj3b-langinstruct/checkpoint_2.pt')['model_state_dict']
+    state_dict=torch.load('/mnt/bear1/users/zhangkang/yinxu/Workfolder/exp/OpenFlamingo-3B-vitl-mpt1b-dolly/single/checkpoint_4.pt')['model_state_dict']
     state_dict = {k.replace("module.", ""): v for k, v in state_dict.items()}
     vlm.load_state_dict(state_dict,strict=False)
 
@@ -60,17 +57,16 @@ def load_vlm(vlm_name: str, device: Union[torch.device, str]):
 ])
     return vlm, vis_processors, txt_processors
 
-
-
-
 def parse_openflamingo_generation(output: str):
     """Extract the answer from the output combining prompts and answers.
 
     output example:
     <image><image>Did the robot successfully execute the action 'place the red block into the brown box', and did any anomaly happen? Answer: The action is executed successfully<|endofchunk|>
     """
-    answer = output.split("Answer:")[1].strip("<|endofchunk|>").strip()
-    print(answer)
+    print(output)
+    #print(output.split("Answer:")[-1].strip().split('<|endofchunk|>')[0])
+    answer = output.split("Answer:")[-1].strip().split('<|endofchunk|>')[0]
+    #print(answer)
     return answer
 
 
@@ -84,7 +80,7 @@ def get_vlm_feedback(
     tokenizer, vlm, vis_processor = vlm_args["tokenizer"], vlm_args["model"], vlm_args["vis_processor"]
     if configuration=="single":
         text_question="Did the robot successfully execute the action '{inst}'?, and did any anomaly happen?".format(inst=inst)
-
+        #print(type(obs[0]))
         visual_input=[vis_processor(img)for img in obs]
         vision_x=torch.stack(visual_input, dim=0).unsqueeze(1).unsqueeze(0).to(device)  ## convert the format to batch_size x num_media x num_frames x channels x height x width.
 
@@ -105,10 +101,12 @@ def get_vlm_feedback(
         feedback=parse_openflamingo_generation(generated_text)
     else:
         ##font_view,topdown_view=obs[0],obs[1]
-        question_list=["Did the robot successfully execute the action '{inst}'?","Did any anomaly happen when the robot executed the action '{inst}'?"]
+        question_list=["Did the robot successfully execute the action '{inst}'?".format(inst=inst), "Did any anomaly happen when the robot executed the action '{inst}'?".format(inst=inst)]
         Answer="The action {action_result}, and {pertur_desc}"
         feedback_list=[]
+        #obs=[[view[0],view[-1]]for view in obs]
         for i in range(2):
+            obs[i][0].save('./'+str(i)+'.png')
             visual_input=[vis_processor(img)for img in obs[i]]
             vision_x=torch.stack(visual_input, dim=0).unsqueeze(1).unsqueeze(0).to(device)  ## convert the format to batch_size x num_media x num_frames x channels x height x width.
 
@@ -116,7 +114,6 @@ def get_vlm_feedback(
             for j in range(vision_x.shape[1]):
                 text_input+="<image>"
             text_input+="Question: {question} Answer: ".format(question=question_list[i])
-            #print(text_input)
             lang_x = tokenizer([text_input],return_tensors="pt",).to(device)
             generated_text = vlm.generate(
             vision_x=vision_x,
@@ -124,23 +121,30 @@ def get_vlm_feedback(
             attention_mask=lang_x["attention_mask"],
             max_new_tokens=64,
             num_beams=3,
-            pad_token_id=50277)   
-            feedback_list.append(tokenizer.decode(generated_text[0]))
-        feedback=feedback.format(action_result=feedback_list[0],pertur_desc=feedback_list[1])
+            pad_token_id=50277)
+            output=tokenizer.decode(generated_text[0])   
+            #print(parse_openflamingo_generation(output))
+            feedback_list.append(parse_openflamingo_generation(output))
+        feedback=Answer.format(action_result=feedback_list[0],pertur_desc=feedback_list[1])
             
     return feedback
 
 
 if __name__=="__main__":
     import os
+    input_path="/mnt/bear1/users/zhangkang/yinxu/Workfolder/data/vlm/put-block-in-matching-bowl-train/failure_pertubation/view_0/000000-0"
     device = torch.device("cuda:0") if torch.cuda.is_available() else "cpu"
     vlm, vis_processors, tokenizer=load_vlm("OpenFlamingo-3B-vitl-mpt1b-dolly",device)
-    img_list=[Image.open(os.path.join("/mnt/lynx4/users/zhang/yinxu/Workfolder/data/vlm/pack-box-primitive-train/failure_pertubation/view_0/000000-0",img)).convert("RGB") for img in os.listdir('/mnt/lynx4/users/zhang/yinxu/Workfolder/data/vlm/pack-box-primitive-train/failure_pertubation/view_0/000000-0')]
     vlm_args = {
         "tokenizer": tokenizer,
         "model": vlm,
         "vis_processor": vis_processors
     }
-    inst="put the orange block in the brown box"
-    feedback=get_vlm_feedback(vlm_args,img_list,inst,device)
-    #print(feedback)
+    inst="put the blue block in the blue bowl"
+    img_list=[Image.open(os.path.join(input_path,img)).convert("RGB") for img in os.listdir(input_path)]
+    feedback=get_vlm_feedback(vlm_args,img_list,inst,device,configuration="single")
+    print(feedback)
+    # input_path="/mnt/bear1/users/zhangkang/yinxu/Workfolder/data/vlm/put-block-in-matching-bowl-train/failure_pertubation/view_3/000000-0"
+    # img_list_2=[Image.open(os.path.join(input_path,img)).convert("RGB") for img in os.listdir(input_path)]
+    # feedback=get_vlm_feedback(vlm_args,[img_list,img_list_2],inst,device,configuration="multi")
+    # print(feedback)

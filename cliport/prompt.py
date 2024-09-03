@@ -519,11 +519,11 @@ def get_normal_execution(task):
     elif task=="packing-boxes":
         episode_1=(
             "### User:\n"+
-            "In the initial state, there are red, blue, green, yellow, orange, and purple blocks; there is a brown box and a trash can.\n"+
+            "In the initial state, there are red, blue, green, yellow, orange, and purple blocks; there is a brown box and a trash can. The instruction is 'Please put all red, blue, and green blocks in the brown box'.\n"+
             ##"{please_help}\n"+
             "What is the final goal state?\n"+
             "### Assistant:\n"+
-            "The final goal state is ['Red block, blue block, red block, green block, blue block, and yellow block are in the brown box'].\n"+
+            "The final goal state is ['Red block, blue block, red block, green block, and blue block are in the brown box'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
@@ -533,7 +533,7 @@ def get_normal_execution(task):
             "### User:\n"+
             "Please describe the achieved progress and the remaining goals.\n"+
             "### Assistant:\n"+
-            "The progress is ['A red block is in the brown box']. The remaining goal is ['Put blue block, red block, green block, blue block, and yellow block in the brown box'].\n"+
+            "Progress: ['A red block is in the brown box']. Remaining goals: ['Put blue block, red block, green block, and blue block in the brown box'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
@@ -543,7 +543,7 @@ def get_normal_execution(task):
             "### User:\n"+
             "Please describe the achieved progress and the remaining goals.\n"+
             "### Assistant:\n"+
-            "The progress is ['A red block and a blue block are in the brown box']. The remaining goal is ['Put red block, green block, blue block, and yellow block in the brown box'].\n"+
+            "Progress: ['A red block and a blue block are in the brown box']. Remaining goals: ['Put red block, green block, and blue block in the brown box'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
@@ -553,7 +553,7 @@ def get_normal_execution(task):
             "### User:\n"+
             "Please describe the achieved progress and the remaining goals.\n"+
             "### Assistant:\n"+
-            "The progress is ['Red block, blue block, and red block are in the brown box']. The remaining goal is ['Put green block, blue block, and yellow block in the brown box'].\n"+
+            "Progress: ['Red block, blue block, and red block are in the brown box']. Remaining goals: ['Put green block and blue block in the brown box'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
@@ -563,34 +563,23 @@ def get_normal_execution(task):
             "### User:\n"+
             "Please describe the achieved progress and the remaining goals.\n"+
             "### Assistant:\n"+
-            "The progress is ['Red block, blue block, red block, and green block are in the brown box']. The remaining goal is ['Put blue block and yellow block in the brown box'].\n"+
+            "Progress: ['Red block, blue block, red block, and green block are in the brown box']. Remaining goals: ['Put the blue block in the brown box'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
             "put the blue block in the brown box.\n"+
             "### User:\n"+
             "The action succeeded, and no anomaly happened.\n"+
-            "### User:\n"+
-            "Please describe the achieved progress and the remaining goals.\n"+
             "### Assistant:\n"+
-            "The progress is ['Red block, blue block, red block, green block, and blue block are in the brown box']. The remaining goal is ['Put the yellow block in the brown box'].\n"+
-            "### User:\n"+
-            "What is your plan for the next step?\n"+
-            "### Assistant:\n"+
-            "put the yellow block in the brown box.\n"+
-            "### User:\n"+
-            "The action succeeded, and no anomaly happened.\n"+
-            "### User:\n"+
-            "Please describe the achieved progress and the remaining goals.\n"+
-            "### Assistant:\n"+
-            "The progress is ['Red block, blue block, red block, green block, blue block, and yellow block are in the brown box']. All goals are completed.\n"+
+            "Progress: ['Red block, blue block, red block, green block, and blue block are in the brown box']. All goals are completed.\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
             "done.\n")
         
-        episode_2=("### User:\n"+
-            "In the initial state, there are orange, pink, orange, cyan, orange, and pink blocks; there is a brown box and a trash can.\n"+
+        episode_2=(
+            "### User:\n"+
+            "In the initial state, there are orange, pink, orange, cyan, orange, pink, green, and gray blocks; there is a brown box and a trash can. The instruction is 'Please put the orange, pink and cyan blocks in the brown box'.\n"+
             ##"{please_help}\n"+            
             "What is the final goal state?\n"+
             "### Assistant:\n"+
@@ -604,7 +593,7 @@ def get_normal_execution(task):
             "### User:\n"+
             "Please describe the achieved progress and the remaining goals.\n"+
             "### Assistant:\n"+
-            "The progress is ['An orange block is in the brown box']. The remaining goal is ['Put pink block, orange block, cyan block, orange block, and pink block in the brown box'].\n"+
+            "Progress: ['An orange block is in the brown box']. Remaining goals: ['Put pink block, orange block, cyan block, orange block, and pink block in the brown box'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
@@ -614,7 +603,7 @@ def get_normal_execution(task):
             "### User:\n"+
             "Please describe the achieved progress and the remaining goals.\n"+
             "### Assistant:\n"+
-            "The progress is ['An orange block and a pink block are in the brown box']. The remaining goal is ['Put orange block, cyan block, orange block, and pink block in the brown box'].\n"+
+            "Progress: ['An orange block and a pink block are in the brown box']. Remaining goals: ['Put orange block, cyan block, orange block, and pink block in the brown box'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
@@ -624,7 +613,7 @@ def get_normal_execution(task):
             "### User:\n"+
             "Please describe the achieved progress and the remaining goals.\n"+
             "### Assistant:\n"+
-            "The progress is ['Orange block, pink block, and orange block are in the brown box']. The remaining goal is ['Put cyan block, orange block, and pink block in the brown box'].\n"+
+            "Progress: ['Orange block, pink block, and orange block are in the brown box']. Remaining goals: ['Put cyan block, orange block, and pink block in the brown box'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
@@ -634,7 +623,7 @@ def get_normal_execution(task):
             "### User:\n"+
             "Please describe the achieved progress and the remaining goals.\n"+
             "### Assistant:\n"+
-            "The progress is ['Orange block, pink block, orange block, and cyan block are in the brown box']. The remaining goal is ['Put orange block and pink block in the brown box'].\n"+
+            "Progress: ['Orange block, pink block, orange block, and cyan block are in the brown box']. Remaining goals: ['Put orange block and pink block in the brown box'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
@@ -644,7 +633,7 @@ def get_normal_execution(task):
             "### User:\n"+
             "Please describe the achieved progress and the remaining goals.\n"+
             "### Assistant:\n"+
-            "The progress is ['Orange block, pink block, orange block, cyan block, and orange block are in the brown box']. The remaining goal is ['Put the pink block in the brown box'].\n"+
+            "Progress: ['Orange block, pink block, orange block, cyan block, and orange block are in the brown box']. Remaining goals: ['Put the pink block in the brown box'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
@@ -654,19 +643,18 @@ def get_normal_execution(task):
             "### User:\n"+
             "Please describe the achieved progress and the remaining goals.\n"+
             "### Assistant:\n"+
-            "The progress is ['Orange block, pink block, orange block, cyan block, orange block, and pink block are in the brown box']. All goals are completed.\n"+
+            "Progress: ['Orange block, pink block, orange block, cyan block, orange block, and pink block are in the brown box']. All goals are completed.\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
             "done.\n")
-
         
         episode_3=("### User:\n"+
-            "In the initial state, there are blue, gray, blue, green, white, and yellow blocks; there is a brown box and a trash can.\n"+
+            "In the initial state, there are blue, gray, blue, green, white, and yellow blocks; there is a brown box and a trash can. The instruction is 'please put all blue, gray and green blocks in the brown box'.\n"+
             ##"{please_help}\n"+            
             "What is the final goal state?\n"+
             "### Assistant:\n"+
-            "The final goal state is ['Blue block, gray block, blue block, brown block, white block, and yellow block are in the brown box'].\n"+
+            "The final goal state is ['Blue block, gray block, blue block, and green block are in the brown box'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
@@ -676,7 +664,7 @@ def get_normal_execution(task):
             "### User:\n"+
             "Please describe the achieved progress and the remaining goals.\n"+
             "### Assistant:\n"+
-            "The progress is ['A blue block is in the brown box']. The remaining goal is ['Put gray block, blue block, brown block, white block, and yellow block in the brown box'].\n"+
+            "Progress: ['A blue block is in the brown box']. Remaining goals: ['Put gray block, blue block, and green block in the brown box'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
@@ -686,7 +674,7 @@ def get_normal_execution(task):
             "### User:\n"+
             "Please describe the achieved progress and the remaining goals.\n"+
             "### Assistant:\n"+
-            "The progress is ['A blue block and a gray block are in the brown box']. The remaining goal is ['Put blue block, brown block, white block, and yellow block in the brown box'].\n"+
+            "Progress: ['A blue block and a gray block are in the brown box']. Remaining goals: ['Put blue block and green block in the brown box'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
@@ -696,7 +684,7 @@ def get_normal_execution(task):
             "### User:\n"+
             "Please describe the achieved progress and the remaining goals.\n"+
             "### Assistant:\n"+
-            "The progress is ['Blue block, gray block, and blue block are in the brown box']. The remaining goal is ['Put green block, white block, and yellow block in the brown box'].\n"+
+            "Progress: ['Blue block, gray block, and blue block are in the brown box']. Remaining goals: ['Put green block in the brown box'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
@@ -706,38 +694,18 @@ def get_normal_execution(task):
             "### User:\n"+
             "Please describe the achieved progress and the remaining goals.\n"+
             "### Assistant:\n"+
-            "The progress is ['Blue block, gray block, blue block, and green block are in the brown box']. The remaining goal is ['Put white block and yellow block in the brown box'].\n"+
-            "### User:\n"+
-            "What is your plan for the next step?\n"+
-            "### Assistant:\n"+
-            "put a white block in the brown box.\n"+
-            "### User:\n"+
-            "The action succeeded, and no anomaly happened.\n"+
-            "### User:\n"+
-            "Please describe the achieved progress and the remaining goals.\n"+
-            "### Assistant:\n"+
-            "The progress is ['Blue block, gray block, blue block, brown block, and a white block are in the brown box']. The remaining goal is ['Put the yellow block in the brown box'].\n"+
-            "### User:\n"+
-            "What is your plan for the next step?\n"+
-            "### Assistant:\n"+
-            "put the yellow block in the brown box.\n"+
-            "### User:\n"+
-            "The action succeeded, and no anomaly happened.\n"+
-            "### User:\n"+
-            "Please describe the achieved progress and the remaining goals.\n"+
-            "### Assistant:\n"+
-            "The progress is ['Blue block, gray block, blue block, brown block, white block, and yellow block are in the brown box']. All goals are completed.\n"+
+            "Progress: ['Blue block, gray block, blue block, and green block are in the brown box']. All goals are completed.\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
             "done.\n")
 
         episode_4=("### User:\n"+
-            "In the initial state, there are red, blue, green, yellow, orange, and purple blocks; there is a brown box and a trash can.\n"+
+            "In the initial state, there are red, red, green, gray, green, and purple blocks; there is a brown box and a trash can. The instruction is 'Please put all red, green, and gray blocks in the brown box'.\n"+
             ##"{please_help}\n"+            
             "What is the final goal state?\n"+
             "### Assistant:\n"+
-            "The final goal state is ['Red block, blue block, green block, yellow block, orange block, and purple block are in the brown box'].\n"+
+            "The final goal state is ['Red block, red block, green block, gray block, and green block are in the brown box'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
@@ -747,17 +715,17 @@ def get_normal_execution(task):
             "### User:\n"+
             "Please describe the achieved progress and the remaining goals.\n"+
             "### Assistant:\n"+
-            "The progress is ['A red block is in the brown box']. The remaining goal is ['Put blue block, green block, yellow block, orange block, and purple block in the brown box'].\n"+
+            "Progress: ['A red block is in the brown box']. Remaining goals: ['Put blue block, green block, yellow block, orange block, and purple block in the brown box'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
-            "put the blue block in the brown box.\n"+
+            "put the red block in the brown box.\n"+
             "### User:\n"+
             "The action succeeded, and no anomaly happened.\n"+
             "### User:\n"+
             "Please describe the achieved progress and the remaining goals.\n"+
             "### Assistant:\n"+
-            "The progress is ['A red block and a blue block are in the brown box']. The remaining goal is ['Put green block, yellow block, orange block, and purple block in the brown box'].\n"+
+            "Progress: ['Two red blocks are in the brown box']. Remaining goals: ['Put green block, gray block and green block in the brown box'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
@@ -767,37 +735,27 @@ def get_normal_execution(task):
             "### User:\n"+
             "Please describe the achieved progress and the remaining goals.\n"+
             "### Assistant:\n"+
-            "The progress is ['Red block, blue block, and green block are in the brown box']. The remaining goal is ['Put yellow block, orange block, and purple block in the brown box'].\n"+
+            "Progress: ['Two red blocks and green block are in the brown box']. Remaining goals: ['Put gray block and green block in the brown box'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
-            "put the yellow block in the brown box.\n"+
+            "put the gray block in the brown box.\n"+
             "### User:\n"+
             "The action succeeded, and no anomaly happened.\n"+
             "### User:\n"+
             "Please describe the achieved progress and the remaining goals.\n"+
             "### Assistant:\n"+
-            "The progress is ['Red block, blue block, green block, and yellow block are in the brown box']. The remaining goal is ['Put orange block and purple block in the brown box'].\n"+
+            "Progress: ['Two red blocks, green block and gray block are in the brown box']. Remaining goals: ['Put the green block in the brown box'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
-            "put the orange block in the brown box.\n"+
+            "put the green block in the brown box.\n"+
             "### User:\n"+
             "The action succeeded, and no anomaly happened.\n"+
             "### User:\n"+
             "Please describe the achieved progress and the remaining goals.\n"+
             "### Assistant:\n"+
-            "The progress is ['Red block, blue block, green block, yellow block, and orange block are in the brown box']. The remaining goal is ['Put purple block in the brown box'].\n"+
-            "### User:\n"+
-            "What is your plan for the next step?\n"+
-            "### Assistant:\n"+
-            "put the purple block in the brown box.\n"+
-            "### User:\n"+
-            "The action succeeded, and no anomaly happened.\n"+
-            "### User:\n"+
-            "Please describe the achieved progress and the remaining goals.\n"+
-            "### Assistant:\n"+
-            "The progress is ['Red block, blue block, green block, yellow block, orange block, and purple block are in the brown box']. All goals are completed.\n"+
+            "Progress: ['Red block, red block, green block, gray block, and green block are in the brown box']. All goals are completed.\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
@@ -2831,10 +2789,10 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
         if anomaly_type=="addition":
             episode_1=(
                 "### User:\n"+
-                "In the initial state, there are red, blue, green, yellow, and orange blocks; there is a brown box and a trash can.\n"+
+                "In the initial state, there are red, red, green, yellow, orange, gray, and purple blocks; there is a brown box and a trash can. The instruction is 'please put all red, green, yellow, and orange blocks in the brown box'.\n"+
                 "What is the final goal state?\n"+
                 "### Assistant:\n"+
-                "The final goal state is ['Red block, blue block, green block, yellow block, and orange block are in the brown box'].\n"+
+                "The final goal state is ['Red block, red block, green block, yellow block, and orange block are in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -2844,17 +2802,17 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['A red block is in the brown box']. The remaining goal is ['Put blue block, green block, yellow block, and orange block in the brown box'].\n"+
+                "Progress: ['A red block is in the brown box']. Remaining goals: ['Put the red block, green block, yellow block, and orange block in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
-                "put the blue block in the brown box.\n"+
+                "put the red block in the brown box.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen yellow block appears at the top left.\n"+
                 "### User:\n"+
                 "Analyze the effect of the anomaly [a never-seen yellow block appears at the top left] on the task regarding progress and feasibility.\n"+
                 "### Assistant:\n"+
-                "The progress ['A red block and a blue block are in the brown box'] is unaffected; the task feasibility is unaffected since the remaining target objects [green block, yellow block, orange block] are still available.\n"+
+                "The progress ['two red blocks are in the brown box'] is unaffected; the task feasibility is unaffected since the remaining target objects [green block, yellow block, orange block] are still available.\n"+
                 "### User:\n"+
                 "Analyze the effect of the anomaly on future actions.\n"+
                 "### Assistant:\n"+
@@ -2872,7 +2830,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The anomaly has been addressed. The progress is ['A red block and a blue block are in the brown box']. The remaining goal is ['Put the green block, yellow block, orange block in the brown box'].\n"+
+                "The anomaly has been addressed. Progress: ['two red blocks are in the brown box']. Remaining goals: ['Put the green block, yellow block, orange block in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -2882,7 +2840,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['Red block, blue block, and green block are in the brown box']. The remaining goal is ['Put yellow block and orange block in the brown box'].\n"+
+                "Progress: ['two red blocks and one green block are in the brown box']. Remaining goals: ['Put the yellow block and orange block in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -2892,7 +2850,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Analyze the effect of the anomaly [a never-seen pink block appears at the top right] on the task regarding progress and feasibility.\n"+
                 "### Assistant:\n"+
-                "The progress ['Red block, blue block, green block, and yellow block are in the brown box'] is unaffected; the task feasibility is unaffected since the remaining target objects [orange block] are still available.\n"+
+                "The progress ['two red blocks, a green block, and a yellow block are in the brown box'] is unaffected; the task feasibility is unaffected since the remaining target objects [orange block] are still available.\n"+
                 "### User:\n"+
                 "Analyze the effect of the anomaly on future actions.\n"+
                 "### Assistant:\n"+
@@ -2910,7 +2868,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['Red block, blue block, green block, yellow block, and orange block are in the brown box']. All goals are completed.\n"+
+                "Progress: ['Red block, red block, green block, yellow block, and orange block are in the brown box']. All goals are completed.\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -2918,10 +2876,10 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
 
             episode_2=(
                 "### User:\n"+
-                "In the initial state, there are cyan, gray, white, pink, and green blocks; there is a brown box and a trash can.\n"+
+                "In the initial state, there are cyan, pink, cyan, pink, white, red, yellow, and orange blocks; there is a brown box and a trash can. The instruction is 'please put all cyan, pink, and white blocks in the brown box'.\n"+
                 "What is the final goal state?\n"+
                 "### Assistant:\n"+
-                "The final goal state is ['Cyan block, gray block, white block, pink block, and green block are in the brown box'].\n"+
+                "The final goal state is ['Cyan block, pink block, cyan block, pink block, and white block are in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -2931,27 +2889,27 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['A cyan block is in the brown box']. The remaining goal is ['Put gray block, white block, pink block, and green block in the brown box'].\n"+
+                "Progress: ['A cyan block is in the brown box']. Remaining Goals: ['Put the pink block, cyan block, pink block, and white block in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
-                "put the gray block in the brown box.\n"+
+                "put the pink block in the brown box.\n"+
                 "### User:\n"+
                 "The action succeeded, and no anomaly happened.\n"+
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['A cyan block and a gray block are in the brown box']. The remaining goal is ['Put white block, pink block, and green block in the brown box'].\n"+
+                "Progress: ['A cyan block and a pink block are in the brown box']. Remaining Goals: ['Put the cyan block, pink block, and white block in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
-                "put the white block in the brown box.\n"+
+                "put the cyan block in the brown box.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen yellow block appears in the brown box.\n"+
                 "### User:\n"+
                 "Analyze the effect of the anomaly [a never-seen yellow block appears in the brown box] on the task regarding progress and feasibility.\n"+
                 "### Assistant:\n"+
-                "The progress ['Cyan block, gray block, and white block are in the brown box'] is unaffected; the task feasibility is unaffected since the remaining target objects [pink block, green block] are still available.\n"+
+                "The progress ['Cyan block, pink block, and cyan block are in the brown box'] is unaffected; the task feasibility is unaffected since the remaining target objects [pink block, white block] are still available.\n"+
                 "### User:\n"+
                 "Analyze the effect of the anomaly on future actions.\n"+
                 "### Assistant:\n"+
@@ -2969,7 +2927,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The anomaly has been addressed. The remaining goal is ['Put pink and green blocks in the brown box'].\n"+
+                "The anomaly has been addressed. Remaining Goals: ['Put pink and white blocks in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -2979,17 +2937,17 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['Cyan block, gray block, white block, and pink block are in the brown box']. The remaining goal is ['Put the green block in the brown box'].\n"+
+                "Progress: ['Cyan block, pink block, cyan block, and pink block are in the brown box']. Remaining Goals: ['Put the white block in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
-                "put the green block in the brown box.\n"+
+                "put the white block in the brown box.\n"+
                 "### User:\n"+
                 "The action succeeded, and no anomaly happened.\n"+
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['Cyan block, gray block, white block, pink block, and green block are in the brown box']. All goals are completed.\n"+
+                "Progress: ['Cyan block, pink block, cyan block, pink block, and white block are in the brown box']. All goals are completed.\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -2997,10 +2955,10 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
             
             episode_3=(
                 "### User:\n"+
-                "In the initial state, there are orange, purple, cyan, and white blocks; there is a brown box and a trash can.\n"+
+                "In the initial state, there are orange, purple, white, white, gray, pink, and green blocks; there is a brown box and a trash can. The instruction is 'please put all orange, purple, and white blocks in the brown box'.\n"+
                 "What is the final goal state?\n"+
                 "### Assistant:\n"+
-                "The final goal state is ['Orange block, purple block, cyan block, and white block are in the brown box'].\n"+
+                "The final goal state is ['Orange block, purple block, white block, and white block are in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -3010,7 +2968,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['An orange block is in the brown box']. The remaining goal is ['Put purple block, cyan block, and white block in the brown box'].\n"+
+                "Progress: ['An orange block is in the brown box']. Remaining Goals: ['Put the purple block, white block, and white block in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -3038,17 +2996,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The anomaly has been addressed. The remaining goal is ['Put cyan and white blocks in the brown box'].\n"+
-                "### User:\n"+
-                "What is your plan for the next step?\n"+
-                "### Assistant:\n"+
-                "put the cyan block in the brown box.\n"+
-                "### User:\n"+
-                "The action succeeded, and no anomaly happened.\n"+
-                "### User:\n"+
-                "Please describe the achieved progress and the remaining goals.\n"+
-                "### Assistant:\n"+
-                "The progress is ['Orange block, purple block, and cyan block are in the brown box']. The remaining goal is ['Put the white block in the brown box'].\n"+
+                "The anomaly has been addressed. Remaining Goals: ['Put the white and white blocks in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -3058,7 +3006,17 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['Orange block, purple block, cyan block, and white block are in the brown box']. All goals are completed.\n"+
+                "Progress: ['Orange block, purple block, and white block are in the brown box']. Remaining Goals: ['Put the white block in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the white block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['Orange block, purple block, white block, and white block are in the brown box']. All goals are completed.\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -3067,20 +3025,20 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
 
             episode_4=(
                 "### User:\n"+
-                "In the initial state, there are pink, blue, gray, cyan, and green blocks; there is a brown box and a trash can.\n"+
+                "In the initial state, there are gray, blue, gray, cyan, cyan, orange, yellow, and red blocks; there is a brown box and a trash can. The instruction is 'Please put all gray, blue, and cyan blocks in the brown box'.\n"+
                 "What is the final goal state?\n"+
                 "### Assistant:\n"+
-                "The final goal state is ['Pink block, blue block, gray block, cyan block, and green block are in the brown box'].\n"+
+                "The final goal state is ['Gray block, blue block, gray block, cyan block, and cyan block are in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
-                "put the pink block in the brown box.\n"+
+                "put the gray block in the brown box.\n"+
                 "### User:\n"+
                 "The action succeeded, and no anomaly happened.\n"+
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['A pink block is in the brown box']. The remaining goal is ['Put blue block, gray block, cyan block, and green block in the brown box'].\n"+
+                "Progress: ['A gray block is in the brown box']. Remaining goals: ['Put the blue block, gray block, cyan block, and cyan block in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -3090,7 +3048,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['A pink block and a blue block are in the brown box']. The remaining goal is ['Put gray block, cyan block, and green block in the brown box'].\n"+
+                "Progress: ['A gray block and a blue block are in the brown box']. Remaining goals: ['Put the gray block, cyan block, and cyan block in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -3100,7 +3058,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Analyze the effect of the anomaly [a never-seen brown box appears at the bottom right] on the task regarding progress and feasibility.\n"+
                 "### Assistant:\n"+
-                "The progress ['Pink block, blue block, and gray block are in the brown box'] is unaffected; the task feasibility is unaffected since the remaining target objects [cyan block, green block] are still available.\n"+
+                "The progress ['Gray block, blue block, and gray block are in the brown box'] is unaffected; the task feasibility is unaffected since the remaining target objects [cyan block, cyan block] are still available.\n"+
                 "### User:\n"+
                 "Analyze the effect of the anomaly on future actions.\n"+
                 "### Assistant:\n"+
@@ -3118,7 +3076,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The anomaly has been addressed. The remaining goal is ['Put cyan and green blocks in the brown box'].\n"+
+                "The anomaly has been addressed. Remaining goals: ['Put the cyan and cyan blocks in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -3128,17 +3086,17 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['Pink block, blue block, gray block, and cyan block are in the brown box']. The remaining goal is ['Put the green block in the brown box'].\n"+
+                "Progress: ['Gray block, blue block, gray block, and cyan block are in the brown box']. Remaining goals: ['Put the cyan block in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
-                "put the green block in the brown box.\n"+
+                "put the cyan block in the brown box.\n"+
                 "### User:\n"+
                 "The action succeeded, and no anomaly happened.\n"+
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['Pink block, blue block, gray block, cyan block, and green block are in the brown box']. All goals are completed.\n"+
+                "Progress: ['Gray block, blue block, gray block, cyan block, and cyan block are in the brown box']. All goals are completed.\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -3148,10 +3106,10 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
         elif anomaly_type=="displacement":
             episode_1=(
                 "### User:\n"+
-                "In the initial state, there are yellow, red, orange, blue, and green blocks; there is a brown box and a trash can.\n"+
+                "In the initial state, there are yellow, red, red, blue, yellow, purple, and gray blocks; there is a brown box and a trash can. The instruction is 'please put all yellow, red, and blue blocks in the brown box'.\n"+
                 "What is the final goal state?\n"+
                 "### Assistant:\n"+
-                "The final goal state is ['Yellow block, red block, orange block, blue block, and green block are in the brown box'].\n"+
+                "The final goal state is ['Yellow block, red block, red block, blue block, and yellow block are in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -3161,7 +3119,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['A yellow block is in the brown box']. The remaining goal is ['Put red block, orange block, blue block, and green block in the brown box'].\n"+
+                "Progress: ['A yellow block is in the brown box']. Remaining goals: ['Put the red block, red block, blue block, and yellow block in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -3171,17 +3129,17 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['A yellow block and a red block are in the brown box']. The remaining goal is ['Put orange block, blue block, and green block in the brown box'].\n"+
+                "Progress: ['A yellow block and a red block are in the brown box']. Remaining goals: ['Put the red block, blue block, and yellow block in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
-                "put the orange block in the brown box.\n"+
+                "put the red block in the brown box.\n"+
                 "### User:\n"+
                 "The action succeeded, and the yellow and red blocks in the brown box are moved to other positions on the table.\n"+
                 "### User:\n"+
                 "Analyze the effect of the anomaly [the yellow and red blocks in the brown box are moved to other positions on the table] on the task regarding progress and feasibility.\n"+
                 "### Assistant:\n"+
-                "The progress is disrupted, and the yellow and red blocks are not in the brown box; the current progress is ['The orange block is in the brown box']. The task feasibility is unaffected since the remaining target objects [yellow block, red block, blue block, green block] are still available.\n"+
+                "Progress: disrupted, and the yellow and red blocks are not in the brown box; the current progress is ['A red block is in the brown box']. The task feasibility is unaffected since the remaining target objects [yellow block, red block, blue block, yellow block] are still available.\n"+
                 "### User:\n"+
                 "Analyze the effect of the anomaly on future actions.\n"+
                 "### Assistant:\n"+
@@ -3199,7 +3157,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['A yellow block and an orange block are in the brown box']. The remaining goal is ['Put the red block in the brown box'].\n"+
+                "Progress: ['A yellow block and a red block are in the brown box']. Remaining goals: ['Put the red block in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -3209,7 +3167,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The anomaly has been addressed. The progress is ['Yellow block, red block, and orange block are in the brown box']. The remaining goal is ['Put blue and green blocks in the brown box'].\n"+
+                "The anomaly has been addressed. Progress: ['Yellow block, red block, and red block are in the brown box']. Remaining goals: ['Put the blue and yellow blocks in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -3219,17 +3177,17 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['Yellow block, red block, orange block, and blue block are in the brown box']. The remaining goal is ['Put the green block in the brown box'].\n"+
+                "Progress: ['Yellow block, red block, orange block, and blue block are in the brown box']. Remaining goals: ['Put the yellow block in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
-                "put the green block in the brown box.\n"+
+                "put the yellow block in the brown box.\n"+
                 "### User:\n"+
                 "The action succeeded, and no anomaly happened.\n"+
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['Yellow block, red block, orange block, blue block, and green block are in the brown box']. All goals are completed.\n"+
+                "Progress: ['Yellow block, red block, red block, blue block, and yellow block are in the brown box']. All goals are completed.\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -3237,10 +3195,10 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 )
             episode_2=(
                 "### User:\n"+
-                "In the initial state, there are pink, blue, gray, cyan, and green blocks; there is a brown box and a trash can.\n"+
+                "In the initial state, there are pink, gray, gray, cyan, gray, red, and yellow blocks; there is a brown box and a trash can. The instruction is 'please put all pink, gray, and cyan blocks in the brown box'.\n"+
                 "What is the final goal state?\n"+
                 "### Assistant:\n"+
-                "The final goal state is ['Pink block, blue block, gray block, cyan block, and green block are in the brown box'].\n"+
+                "The final goal state is ['Pink block, gray block, gray block, cyan block, and gray block are in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -3250,27 +3208,27 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['A pink block is in the brown box']. The remaining goal is ['Put blue block, gray block, cyan block, and green block in the brown box'].\n"+
-                "### User:\n"+
-                "What is your plan for the next step?\n"+
-                "### Assistant:\n"+
-                "put the blue block in the brown box.\n"+
-                "### User:\n"+
-                "The action succeeded, and no anomaly happened.\n"+
-                "### User:\n"+
-                "Please describe the achieved progress and the remaining goals.\n"+
-                "### Assistant:\n"+
-                "The progress is ['A pink block and a blue block are in the brown box']. The remaining goal is ['Put gray block, cyan block, and green block in the brown box'].\n"+
+                "Progress: ['A pink block is in the brown box']. Remaining goals: ['Put the gray block, gray block, cyan block, and gray block in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
                 "put the gray block in the brown box.\n"+
                 "### User:\n"+
-                "The action succeeded, and the pink and blue blocks in the brown box are moved to other positions on the table.\n"+
+                "The action succeeded, and no anomaly happened.\n"+
                 "### User:\n"+
-                "Analyze the effect of the anomaly [the pink and blue blocks in the brown box are moved to other positions on the table] on the task regarding progress and feasibility.\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is disrupted, and the pink and blue blocks are not in the brown box; the current progress is ['The gray block is in the brown box']. The task feasibility is unaffected since the remaining target objects [pink block, blue block, cyan block, green block] are still available.\n"+
+                "Progress: ['A pink block and a gray block are in the brown box']. Remaining goals: ['Put the gray block, cyan block, and gray block in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the gray block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and the pink and gray blocks in the brown box are moved to other positions on the table.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly [the pink and gray blocks in the brown box are moved to other positions on the table] on the task regarding progress and feasibility.\n"+
+                "### Assistant:\n"+
+                "The progress is disrupted, and the pink and gray blocks are not in the brown box; the current progress is ['A gray block is in the brown box']. The task feasibility is unaffected since the remaining target objects [pink block, gray block, cyan block, gray block] are still available.\n"+
                 "### User:\n"+
                 "Analyze the effect of the anomaly on future actions.\n"+
                 "### Assistant:\n"+
@@ -3278,7 +3236,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
-                "Put the pink and blue blocks back in the brown box to resume progress.\n"+
+                "Put the pink and gray blocks back in the brown box to resume progress.\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -3288,27 +3246,27 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['A pink block and a gray block are in the brown box']. The remaining goal is ['Put the blue block in the brown box'].\n"+
+                "Progress: ['A pink block and a gray block are in the brown box']. To address the anomaly, the remaining goal is ['Put the gray block in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
-                "put the blue block in the brown box.\n"+
+                "put the gray block in the brown box.\n"+
                 "### User:\n"+
                 "The action succeeded, and no anomaly happened.\n"+
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The anomaly has been addressed. The progress is ['Pink block, blue block, and gray block are in the brown box']. The remaining goal is ['Put cyan and green blocks in the brown box'].\n"+
+                "The anomaly has been addressed. Progress: ['Pink block, gray block, and gray block are in the brown box']. Remaining goals: ['Put cyan and gray blocks in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
                 "put the cyan block in the brown box.\n"+
                 "### User:\n"+
-                "The action succeeded, and the pink, blue, and gray blocks in the brown box are moved to other positions on the table.\n"+
+                "The action succeeded, and the pink, gray, and gray blocks in the brown box are moved to other positions on the table.\n"+
                 "### User:\n"+
-                "Analyze the effect of the anomaly [the pink, blue, and gray blocks in the brown box are moved to other positions on the table] on the task regarding progress and feasibility.\n"+
+                "Analyze the effect of the anomaly [the pink, gray, and gray blocks in the brown box are moved to other positions on the table] on the task regarding progress and feasibility.\n"+
                 "### Assistant:\n"+
-                "The progress is disrupted, and the pink, blue, and gray blocks are not in the brown box; the current progress is ['The cyan block is in the brown box']. The task feasibility is unaffected since the remaining target objects [pink block, blue block, gray block, green block] are still available.\n"+
+                "The progress is disrupted, and the pink, gray, and gray blocks are not in the brown box; the current progress is ['A cyan block is in the brown box']. The task feasibility is unaffected since the remaining target objects [pink block, gray block, gray block, gray block] are still available.\n"+
                 "### User:\n"+
                 "Analyze the effect of the anomaly on future actions.\n"+
                 "### Assistant:\n"+
@@ -3316,7 +3274,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
-                "Put the pink, blue, and gray blocks back in the brown box to resume progress.\n"+
+                "Put the pink, gray, and gray blocks back in the brown box to resume progress.\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -3326,17 +3284,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['A pink block and a cyan block are in the brown box']. The remaining goal is ['Put the blue block in the brown box'].\n"+
-                "### User:\n"+
-                "What is your plan for the next step?\n"+
-                "### Assistant:\n"+
-                "put the blue block in the brown box.\n"+
-                "### User:\n"+
-                "The action succeeded, and no anomaly happened.\n"+
-                "### User:\n"+
-                "Please describe the achieved progress and the remaining goals.\n"+
-                "### Assistant:\n"+
-                "The progress is ['Pink block, blue block, and cyan block are in the brown box']. The remaining goal is ['Put gray and green blocks in the brown box'].\n"+
+                "Progress: ['A pink block and a cyan block are in the brown box']. To address the anomaly, the remaining goal is ['Put the gray and gray blocks in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -3346,17 +3294,27 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The anomaly has been addressed. The current progress is ['Pink block, blue block, gray block, and cyan block are in the brown box']. The remaining goal is ['Put the green block in the brown box'].\n"+
+                "Progress: ['Pink block, gray block, and cyan block are in the brown box']. To address the anomaly, the remaining goal is ['Put the gray block in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
-                "put the green block in the brown box.\n"+
+                "put the gray block in the brown box.\n"+
                 "### User:\n"+
                 "The action succeeded, and no anomaly happened.\n"+
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['Pink block, blue block, gray block, cyan block, and green block are in the brown box']. All goals are completed.\n"+
+                "The anomaly has been addressed. Progress: ['Pink block, gray block, gray block, and cyan block are in the brown box']. Remaining goals: ['Put the gray block in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the gray block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['Pink block, gray block, gray block, cyan block, and gray block are in the brown box']. All goals are completed.\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -3365,10 +3323,10 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
 
             episode_3=(
                 "### User:\n"+
-                "In the initial state, there are orange, purple, red, blue, and yellow blocks; there is a brown box and a trash can.\n"+
+                "In the initial state, there are orange, purple, orange, red, red, purple, and yellow blocks; there is a brown box and a trash can. The instruction is 'please put all orange, red, and purple blocks in the brown box'.\n"+
                 "What is the final goal state?\n"+
                 "### Assistant:\n"+
-                "The final goal state is ['Orange block, purple block, red block, blue block, and yellow block are in the brown box'].\n"+
+                "The final goal state is ['Orange block, purple block, orange block, red block, red, and purple block are in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -3378,7 +3336,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['An orange block is in the brown box']. The remaining goal is ['Put purple block, red block, blue block, and yellow block in the brown box'].\n"+
+                "Progress: ['An orange block is in the brown box']. Remaining goals: ['Put the purple block, orange block, red block, red block, and purple block in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -3388,17 +3346,17 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['An orange block and a purple block are in the brown box']. The remaining goal is ['Put red block, blue block, and yellow block in the brown box'].\n"+
+                "Progress: ['An orange block and a purple block are in the brown box']. Remaining goals: ['Put the orange block, red block, red block, and purple block in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
-                "put the red block in the brown box.\n"+
+                "put the orange block in the brown box.\n"+
                 "### User:\n"+
                 "The action succeeded, and the orange and purple blocks in the brown box are moved to other positions on the table.\n"+
                 "### User:\n"+
                 "Analyze the effect of the anomaly [the orange and purple blocks in the brown box are moved to other positions on the table] on the task regarding progress and feasibility.\n"+
                 "### Assistant:\n"+
-                "The progress is disrupted, and the orange and purple blocks are not in the brown box; the current progress is ['The red block is in the brown box']. The task feasibility is unaffected since the remaining target objects [orange block, purple block, blue block, yellow block] are still available.\n"+
+                "The progress is disrupted, and the orange and purple blocks are not in the brown box; the current progress is ['An orange block is in the brown box']. The task feasibility is unaffected since the remaining target objects [orange block, purple block, red block, red block, purple block] are still available.\n"+
                 "### User:\n"+
                 "Analyze the effect of the anomaly on future actions.\n"+
                 "### Assistant:\n"+
@@ -3416,7 +3374,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['An orange block and a red block are in the brown box']. The remaining goal is ['Put the purple block in the brown box'].\n"+
+                "Progress: ['two orange blocks are in the brown box']. To address the anomaly, the remaining goal is ['Put the purple block in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -3426,17 +3384,17 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The anomaly has been addressed. The current progress is ['Orange block, purple block, and red block are in the brown box']. The remaining goal is ['Put blue and yellow blocks in the brown box'].\n"+
+                "The anomaly has been addressed. Progress: ['Orange block, purple block, and orange block are in the brown box']. Remaining goals: ['Put the red block, red block, and purple blocks in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
-                "put the blue block in the brown box.\n"+
+                "put the red block in the brown box.\n"+
                 "### User:\n"+
-                "The action succeeded, and the orange, purple, and red blocks in the brown box are moved to other positions on the table.\n"+
+                "The action succeeded, and the orange, purple, and orange blocks in the brown box are moved to other positions on the table.\n"+
                 "### User:\n"+
-                "Analyze the effect of the anomaly [the orange, purple, and red blocks in the brown box are moved to other positions on the table] on the task regarding progress and feasibility.\n"+
+                "Analyze the effect of the anomaly [the orange, purple, and orange blocks in the brown box are moved to other positions on the table] on the task regarding progress and feasibility.\n"+
                 "### Assistant:\n"+
-                "The progress is disrupted, and the orange, purple, and red blocks are not in the brown box; the current progress is ['The blue block is in the brown box']. The task feasibility is unaffected since the remaining target objects [orange block, purple block, red block, yellow block] are still available.\n"+
+                "The progress is disrupted, and the orange, purple, and orange blocks are not in the brown box; the current progress is ['A red block is in the brown box']. The task feasibility is unaffected since the remaining target objects [orange block, purple block, orange block, red block, purple block] are still available.\n"+
                 "### User:\n"+
                 "Analyze the effect of the anomaly on future actions.\n"+
                 "### Assistant:\n"+
@@ -3444,7 +3402,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
-                "Put the orange, purple, and red blocks back in the brown box to resume progress.\n"+
+                "Put the orange, purple, and orange blocks back in the brown box to resume progress.\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -3454,7 +3412,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['An orange block and a blue block are in the brown box']. The remaining goal is ['Put the purple block in the brown box'].\n"+
+                "Progress: ['An orange block and a red block are in the brown box']. To address the anomaly, the remaining goal is ['Put the purple and orange block in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -3464,7 +3422,17 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['Orange block, purple block, and blue block are in the brown box']. The remaining goal is ['Put red and yellow blocks in the brown box'].\n"+
+                "Progress: ['Orange block, purple block, and red block are in the brown box']. To address the anomaly, the remaining goal is ['Put the orange block in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the orange block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "The anomaly has been addressed. Progress: ['Orange block, purple block, orange block, and red block are in the brown box']. Remaining goals: ['Put the red block and purple block in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -3474,17 +3442,17 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The anomaly has been addressed. The current progress is ['Orange block, purple block, red block, and blue block are in the brown box']. The remaining goal is ['Put the yellow block in the brown box'].\n"+
+                "Progress: ['Orange block, purple block, orange block, red block, and red block are in the brown box']. Remaining goals: ['Put the purple block in the brown box']\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
-                "### Assistant:\n"+
-                "put the yellow block in the brown box.\n"+
-                "### User:\n"+
+				"### Assistant:\n"+
+                "put the purple block in the brown box.\n"+
+				"### User:\n"+
                 "The action succeeded, and no anomaly happened.\n"+
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
-                "### Assistant:\n"+
-                "The progress is ['Orange block, blue block, purple block, red block, and yellow block are in the brown box']. All goals are completed.\n"+
+				"### Assistant:\n"+
+                "Progress: ['Orange block, purple block, orange block, red block, red block,and purple blocks are in the brown box']. All goals are completed\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -3494,10 +3462,10 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
         elif anomaly_type=="removal":
             episode_1=(
                 "### User:\n"+
-                "In the initial state, there are cyan, pink, gray, white, and green blocks; there is a brown box and a trash can.\n"+
+                "In the initial state, there are cyan, pink, cyan, red, red, pink, yellow, and purple blocks; there is a brown box and a trash can. The instruction is 'please put all cyan, pink, and red blocks in the brown box'.\n"+
                 "What is the final goal state?\n"+
                 "### Assistant:\n"+
-                "The final goal state is ['Cyan block, pink block, gray block, white block, and green block are in the brown box'].\n"+
+                "The final goal state is ['Cyan block, pink block, cyan block, red block, red block, and pink block are in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -3507,17 +3475,17 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['A cyan block is in the brown box']. The remaining goal is ['Put pink block, gray block, white block, and green block in the brown box'].\n"+
+                "Progress: ['A cyan block is in the brown box']. Remaining goals: ['Put the pink block, cyan block, red block, red block, and pink block in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
                 "put the pink block in the brown box.\n"
                 "### User:\n"+
-                "The action succeeded, and the white block on the table disappeared.\n"+
+                "The action succeeded, and a red block on the table disappeared.\n"+
                 "### User:\n"+
-                "Analyze the effect of the anomaly [the white block on the table disappeared] on the task regarding progress and feasibility.\n"+
+                "Analyze the effect of the anomaly [a red block on the table disappeared] on the task regarding progress and feasibility.\n"+
                 "### Assistant:\n"+
-                "The progress ['A cyan block and a pink block are in the brown box'] is unaffected; the task feasibility is affected since the disappeared white block is among the remaining target objects [gray block, white block, green block].\n" +
+                "The progress ['A cyan block and a pink block are in the brown box'] is unaffected; the task feasibility is affected since the disappeared red block is among the remaining target objects [cyan block, red block, red block, pink block].\n" +
                 "### User:\n" +
                 "Analyze the effect of the anomaly on future actions.\n" +
                 "### Assistant:\n" +
@@ -3533,10 +3501,10 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
             
             episode_2=(
                 "### User:\n"+
-                "In the initial state, there are cyan, pink, gray, white, and green blocks; there is a brown box and a trash can.\n"+
+                "In the initial state, there are cyan, pink, pink, white, gray, and green blocks; there is a brown box and a trash can. The instruction is 'please put all cyan, pink, and white blocks in the brown box'.\n"+
                 "What is the final goal state?\n"+
                 "### Assistant:\n"+
-                "The final goal state is ['Cyan block, pink block, gray block, white block, and green block are in the brown box'].\n"+
+                "The final goal state is ['Cyan block, pink block, pink block, and white block are in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -3546,17 +3514,94 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
-                "The progress is ['A cyan block is in the brown box']. The remaining goal is ['Put pink block, gray block, white block, and green block in the brown box'].\n"+
+                "Progress: ['A cyan block is in the brown box']. Remaining goals: ['Put the pink block, pink block, and white block in the brown box'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
                 "put the pink block in the brown box.\n"+
                 "### User:\n"+
-                "The action succeeded, and the white block on the table disappeared.\n"+
+                "The action succeeded, and a green block on the table disappeared.\n"+
                 "### User:\n"+
-                "Analyze the effect of the anomaly [the white block on the table disappeared] on the task regarding progress and feasibility.\n"+
+                "Analyze the effect of the anomaly [a green block on the table disappeared] on the task regarding progress and feasibility.\n"+
                 "### Assistant:\n"+
-                "The progress ['A cyan block and a pink block are in the brown box'] is unaffected; the task feasibility is affected since the disappeared white block is among the remaining target objects [gray block, white block, green block].\n"+
+                "The progress ['A cyan block and a pink block are in the brown box'] is unaffected; the task feasibility is unaffected since the disappeared green block is not among the remaining target objects [pink block, white block].\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly on future actions.\n"+
+                "### Assistant:\n"+
+                "The robot will not be affected.\n"+
+                "### User:\n"+
+                "How to handle this anomaly?\n"+
+                "### Assistant:\n" +
+                "No action needed\n" +
+                "### User:\n" +
+                "What is your plan for the next step?\n" +
+                "### Assistant:\n"+
+                "put the pink block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+				"### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['cyan block, pink block, and pink block are in the brown box']. Remaining goals: ['Put the white block in the brown box'].\n"+
+                "### User:\n" +
+                "What is your plan for the next step?\n" +
+                "### Assistant:\n"+
+                "put the white block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+				"### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+				"### Assistant:\n"+
+                "Progress: ['cyan block, pink block, pink block, and white block are in the brown box']. All goals are completed.\n"+
+                "### User:\n" +
+                "What is your plan for the next step?\n" +
+				"### Assistant:\n"+
+                "done.\n")
+
+            episode_3=(
+                "### User:\n"+
+                "In the initial state, there are blue, pink, red, cyan, orange, and white blocks; there is a brown box and a trash can. The instruction is 'please put all blue, pink, red, and cyan blocks in the brown box'.\n"+
+                "What is the final goal state?\n"+
+                "### Assistant:\n"+
+                "The final goal state is ['Blue block, pink block, red block, and cyan block are in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the blue block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and no anomaly happened.\n"+
+                "### User:\n"+
+                "Please describe the achieved progress and the remaining goals.\n"+
+                "### Assistant:\n"+
+                "Progress: ['A blue block is in the brown box']. Remaining goals: ['Put the pink block, red block, and cyan block in the brown box'].\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the pink block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and an orange block on the table disappeared.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly [an orange block on the table disappeared] on the task regarding progress and feasibility.\n"+
+                "### Assistant:\n"+
+                "The progress ['A blue block and a pink block are in the brown box'] is unaffected; the task feasibility is unaffected since the disappeared orange block is not among the remaining target objects [red block, cyan block].\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly on future actions.\n"+
+                "### Assistant:\n"+
+                "The robot will not be affected.\n"+
+                "### User:\n"+
+                "How to handle this anomaly?\n"+
+                "### Assistant:\n"+
+                "No action needed.\n"+
+                "### User:\n"+
+                "What is your plan for the next step?\n"+
+                "### Assistant:\n"+
+                "put the red block in the brown box.\n"+
+                "### User:\n"+
+                "The action succeeded, and a cyan block on the table disappeared.\n"+
+                "### User:\n"+
+                "Analyze the effect of the anomaly [a cyan block on the table disappeared] on the task regarding progress and feasibility.\n"+
+                "### Assistant:\n"+
+                "The progress ['blue block, pink block, and red block are in the brown box'] is unaffected; the task feasibility is affected since the disappeared cyan block is among the remaining target objects [cyan block].\n"+
                 "### User:\n"+
                 "Analyze the effect of the anomaly on future actions.\n"+
                 "### Assistant:\n"+
@@ -3571,7 +3616,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "alert.\n"
             )
 
-            anomaly_episode_list=[episode_1,episode_2]
+            anomaly_episode_list=[episode_1,episode_2,episode_3]
     elif "pyramid" in task:
         if  anomaly_type=="addition":
             episode_1=(

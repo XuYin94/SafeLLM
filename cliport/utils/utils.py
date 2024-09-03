@@ -609,18 +609,30 @@ class ImageRotator:
 # -----------------------------------------------------------------------------
 
 
-def determine_region(pose):
-    xyz_coord,__=pose
-    if xyz_coord[0] < 0.5:
-        if xyz_coord[1] < 0:
-            return "bottom left"
-        else:
-            return "top left"
-    else:
-        if xyz_coord[1] < 0:
-            return "bottom right"
-        else:
-            return "top right"
+def determine_region(pose,task):
+    obj_pos,__=pose
+    obj_center = obj_pos[:2]
+    def calculate_distance(point1, region):
+        point2=[(region['x_start']+region['x_end'])/2,(region['y_start']+region['y_end'])/2]
+        return np.linalg.norm(np.array(point1) - np.array(point2))
+    distance_to_top_left = calculate_distance(obj_center, task.area_boundary['top left'])
+    distance_to_top_right = calculate_distance(obj_center, task.area_boundary['top right'])
+    distance_to_bottom_left = calculate_distance(obj_center, task.area_boundary['bottom left'])
+    distance_to_bottom_right = calculate_distance(obj_center,task.area_boundary['bottom right'])
+
+    min_distance = min(distance_to_top_left, distance_to_top_right, distance_to_bottom_left, distance_to_bottom_right)
+
+    if min_distance == distance_to_top_left:
+        region = "top left"
+    elif min_distance == distance_to_top_right:
+        region = "top right"
+    elif min_distance == distance_to_bottom_left:
+        region = "bottom left"
+    elif min_distance == distance_to_bottom_right:
+        region = "bottom right"
+
+    return region
+
 # Colors (Tableau palette).
 COLORS = {
     'blue': [078.0 / 255.0, 121.0 / 255.0, 167.0 / 255.0],
@@ -742,12 +754,13 @@ def anomaly_generator_for_primitive(env,output_queue,task=None,perturbation="mis
             __, __, size = env.info[obj]
             pose = task.get_random_pose(env, size)
             p.resetBasePositionAndOrientation(obj, pose[0],pose[1])
-            if i>0:        
-                if i<affected_progress-1 and affected_progress>2:
-                    affected_obj+=", "
-                if i ==affected_progress-1 and affected_progress>1:
-                    affected_obj += " and "
-            affected_obj+=color_lists[i]
+
+            if i == 0:
+                affected_obj+= color_lists[i]
+            elif i == len(obj_ids) - 1:
+                affected_obj += f", and {color_lists[i]}"
+            else:
+                affected_obj  += f", {color_lists[i]}"
         anomaly=affected_obj+con
 
     output_queue.put((2,anomaly))
@@ -758,7 +771,6 @@ def anomaly_generator(env,output_queue,task=None,perturbation="pick",step=0,type
     elif "packing" in task.task_name:
         box_packing_anomaly_generator(env,output_queue,task,perturbation,step,type)
     else:
-        print(progress)
         stack_block_pyramid_anomaly_generator(env,output_queue,task,perturbation,progress,type)
 
 
@@ -769,7 +781,7 @@ def box_packing_anomaly_generator(env,output_queue,task=None,perturbation="pick"
 
         if case in ["pick","place"]: ## add blocks
             sample_idx=random.randint(step+1,task.gt_step-1)
-            obj_id,addition_obj_color,___=task.target_block_info[sample_idx] ## the obj_info of the addition
+            obj_id,addition_obj_color,___=task.block_info[sample_idx] ## the obj_info of the addition
             addition_color_value=COLORS[addition_obj_color]
             object_template = 'box/box-template.urdf'
             obj_size=(0.05,0.05,0.05)
@@ -778,10 +790,10 @@ def box_packing_anomaly_generator(env,output_queue,task=None,perturbation="pick"
                 #sleep(random.randint(5,10))
                 i=0
                 current_pose = p.getBasePositionAndOrientation(obj_id)
-                goal_region=determine_region(current_pose)
-                goal_region=random.choice(list(set(rel_pos)-set(goal_region)))
+                goal_region=determine_region(current_pose,task)
+                aviailble_pos=list(set(rel_pos)-set(goal_region))
                 while i<20:
-                    position=random.choice(rel_pos)  ## make sure the added block is in different region
+                    position=random.choice(aviailble_pos)  ## make sure the added block is in different region
                     block_pose = task.get_random_pose(env, obj_size,zone=position)
                     block_id = env.add_object(obj_urdf, block_pose)
                     #print(block_id)
@@ -795,7 +807,7 @@ def box_packing_anomaly_generator(env,output_queue,task=None,perturbation="pick"
                 else:
                     return None
             else: ## the perturbation block (random color) occurs in the brown box
-                __,__,place_pose= task.target_block_info[-1]
+                __,__,place_pose= task.block_info[-1]
                 addition_obj_id=env.add_object(obj_urdf, place_pose)
                 p.changeVisualShape(addition_obj_id, -1, rgbaColor=addition_color_value + [1])
                 anomaly="a never-seen {color} block appears in brown box.".format(color=addition_obj_color)
@@ -828,7 +840,7 @@ def box_packing_anomaly_generator(env,output_queue,task=None,perturbation="pick"
         anomaly = "the {obj_color} block on the table disappeared.".format(obj_info=obj_color)
     else: ## displacement pertubations, we assume that each action executes successfully
         affected_progress = 1 if step == 1 else random.randint(1, step)
-        affected_objs=task.target_block_info[:affected_progress]
+        affected_objs=task.block_info[:affected_progress]
         if affected_progress>1:
             con=" blocks in the box are"
         else:
@@ -866,13 +878,13 @@ def matching_bowls_anomaly_generator(env,output_queue,task=None,perturbation="pi
                 if addition_type=="container":
                     obj_template='bowl/bowl.urdf'
                     anomaly="a never-seen {addition_color} bowl appears at the {position} zone."
-                    goal_region=determine_region(target_obj_pose)
+                    goal_region=determine_region(target_obj_pose,task)
                 else:
                     obj_template='stacking/block.urdf'
                     if addition_type=="pick":
                         obj_id,__,target_obj_pose=task.block_info[sample_idx]
                         __,__,obj_size=env.info[obj_id]
-                        goal_region=determine_region(target_obj_pose)
+                        goal_region=determine_region(target_obj_pose,task)
                         anomaly="a never-seen {addition_color} block appears at the {position} zone."
                     else:
                         anomaly="a never-seen {addition_color} block apppears in the {position} bowl."
@@ -1001,12 +1013,12 @@ def stack_block_pyramid_anomaly_generator(env,output_queue,task,perturbation,ste
             if addition_type == "container":
                 obj_template = 'stacking/stand.urdf'
                 anomaly = "a never-seen stand appears at the {position} zone."
-                goal_region = determine_region(task.container_info[1])
+                goal_region = determine_region(task.container_info[1],task)
             else:
                 obj_template = 'stacking/block.urdf'
                 if addition_type == "pick":
                     pose1,pose2, obj_size = env.info[obj_id]
-                    goal_region = determine_region((pose1,pose2))
+                    goal_region = determine_region((pose1,pose2),task)
                     anomaly = "a never-seen {addition_color} block appears at the {position} zone."
                 else:
                     obj_id, addition_obj_color, target_place_pose, place_desciption = task.block_info[step+1]

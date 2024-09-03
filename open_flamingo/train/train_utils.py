@@ -74,6 +74,8 @@ def train_one_epoch(
     endofchunk_token_id = tokenizer("<|endofchunk|>", add_special_tokens=False)[
         "input_ids"
     ][-1]
+    print(cast_dtype)
+    model.to(cast_dtype)
     model.train()
 
     # setup logging
@@ -401,6 +403,7 @@ def train_one_epoch_with_robot(
     endofchunk_token_id = tokenizer("<|endofchunk|>", add_special_tokens=False)[
         "input_ids"
     ][-1]
+    #model.to(cast_dtype)
     model.train()
 
     # setup logging
