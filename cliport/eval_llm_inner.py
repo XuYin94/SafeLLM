@@ -10,7 +10,7 @@ from sklearn.metrics import confusion_matrix
 import numpy as np
 import torch
 from matplotlib import pyplot as plt
-from prompt import get_cot_prompt
+from prompt_inner import get_inner_prompt
 from cliport import agents
 from cliport import dataset
 from cliport import tasks
@@ -83,8 +83,6 @@ def one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,
     print("Ground-truth feedback: "+anomaly)
     rgb, depth = env.multi_view_render()
     rgb_list.append(rgb)
-    #img_rgb = cv2.cvtColor(np.uint8(rgb[0]) , cv2.COLOR_BGR2RGB)
-    #cv2.imwrite(os.path.join('./', str(1) + ".png"), img_rgb)
     
     if not use_vlm: ## use the gt feedback from Pybullet
         #if reward>0:
@@ -112,16 +110,7 @@ def one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,
         episode_message+=header+'\n'+state_of_progree_future+'\n'
 
         return episode_message,lang_inst,reward,obs,info,rgb_list, step
-    else:## start to reason the anomaly ascene
-        episode_message+="### User:\nAnalyze the effect of the anomaly ['{anomaly}'] on the task regarding progress and feasibility.\n".format(anomaly=anomaly_desc)
-        #print(episode_message)
-        header, reply=get_legal_LLM_feedback(history_message=episode_message,return_prompt = True,llm_args= llm_args,feedback=None)
-        #print(reply)
-        episode_message+=header+'\n'+reply
-        episode_message+="\n"+"### User:\nAnalyze the effect of the anomaly on future actions.\n"
-        header, reply=get_legal_LLM_feedback(history_message=episode_message,return_prompt = True,llm_args= llm_args,feedback=None)
-        #print(reply)
-        episode_message+=header+'\n'+reply
+    else:## without comprehensive analysis
         episode_message+="\n"+"### User:\nHow to handle this anomaly?\n"
         header, reply=get_legal_LLM_feedback(history_message=episode_message,return_prompt = True,llm_args= llm_args,feedback=None)
         #print(reply)
@@ -435,7 +424,7 @@ def list_ckpts_to_eval(vcfg, existing_results):
 
 
 def get_prompt(task:str,anomaly_type:str):
-    requirment,prompt, system_info=get_cot_prompt(task=task,anomaly_type=anomaly_type)
+    requirment,prompt, system_info=get_inner_prompt(task=task,anomaly_type=anomaly_type)
     prompt="### System: "+system_info+"\n"+prompt
     return prompt, requirment
 

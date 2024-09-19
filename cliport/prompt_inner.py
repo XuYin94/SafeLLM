@@ -21,14 +21,14 @@ def get_help_infomation(task):
     return please_help
 
 
-def get_cot_prompt(task, anomaly_type="pick"):
+def get_inner_prompt(task, anomaly_type="pick"):
     please_help=get_help_infomation(task)
    
     if anomaly_type=="None":
         episode_list=get_normal_execution(task=task)[:5]
     else:
         episode_list=get_normal_execution(task=task)
-        episode_list+=get_cot_handling_prompt(task=task,anomaly_type=anomaly_type)
+        episode_list+=get_handling_prompt(task=task,anomaly_type=anomaly_type)
     
     random.shuffle(episode_list)
     print(len(episode_list))
@@ -42,6 +42,7 @@ def get_cot_prompt(task, anomaly_type="pick"):
 
 
 
+
 def get_normal_execution(task):
     
     if "-matching-bowl" in task:
@@ -50,7 +51,7 @@ def get_normal_execution(task):
                     ##"{please_help}\n"+
                     "What is the final goal state?\n"+
                     "### Assistant:\n"+
-                    "The initial state contains the following pairs of blocks and matching bowls: Green block -> Green bowl, Red block -> Red bowl, Purple block -> Purple bowl. The yellow block does not have a corresponding bowl, and the cyan and blue bowls do not have corresponding blocks. The final goal state is ['Green, red, and purple blocks are in their corresponding bowls'].\n"+          
+                    "The final goal state is ['Green, red, and purple blocks are in their corresponding bowls'].\n"+          
                     "### User:\n"+
                     "What is your plan for the next step?\n" +
                     "### Assistant:\n"+
@@ -58,7 +59,7 @@ def get_normal_execution(task):
                     "### User:\n"+
                     'The action succeeded, and no anomaly happened.\n'+
                     "### User:\n"+
-                    'Please describe The progress and the remaining goals.\n'+
+                    'Please describe the progress and the remaining goals.\n'+
                     "### Assistant:\n"+
                     "The progress is ['the green block is in its corresponding bowl']. The remaining goal is ['put the red and purple blocks in their corresponding bowls'].\n" +
                     "### User:\n"+
@@ -92,7 +93,7 @@ def get_normal_execution(task):
                     #"{please_help}\n"+ 			
                     "What is the final goal state?\n"
                     "### Assistant:\n"+
-                    "The initial state contains the following pairs of blocks and matching bowls: Yellow block -> Yellow bowl, Blue block -> Blue bowl, Orange block -> Orange bowl. The green, cyan, and pink blocks do not have corresponding bowls. The final goal state is ['Yellow, blue, and orange blocks are in their corresponding bowls'].\n"+
+                    "The final goal state is ['Yellow, blue, and orange blocks are in their corresponding bowls'].\n"+
                     "### User:\n"+
                     "What is your plan for the next step?\n" +
                     "### Assistant:\n"+
@@ -133,7 +134,7 @@ def get_normal_execution(task):
                     #"{please_help}\n"+ 			
                     "What is the final goal state?\n"
                     "### Assistant:\n"+
-                    "The initial state contains the following pairs of blocks and matching bowls: White block -> White bowl, Red block -> Red bowl, Pink block -> Pink bowl. The green block does not have a corresponding bowl, and the yellow and cyan bowls do not have corresponding blocks. The goal state is ['White, red, and pink blocks are in the corresponding bowls'].\n"+
+                    "The goal state is ['White, red, and pink blocks are in the corresponding bowls'].\n"+
                     "### User:\n"+
                     "What is your plan for the next step?\n"+
                     "### Assistant:\n"+
@@ -173,7 +174,7 @@ def get_normal_execution(task):
                     #"{please_help}\n"+ 			
                     "What is the final goal state?\n"+
                     "### Assistant:\n"+
-                    "The initial state contains the following pairs of blocks and matching bowls: Yellow block -> Yellow bowl, Blue block -> Blue bowl, Orange block -> Orange bowl. The green, cyan, and pink blocks do not have corresponding bowls, and the red and white bowls do not have corresponding blocks. The final goal state is ['Yellow, blue, and orange blocks are in their corresponding bowls'].\n"+
+                    "The final goal state is ['Yellow, blue, and orange blocks are in their corresponding bowls'].\n"+
                     "### User:\n"+
                     "What is your plan for the next step?\n"+
                     "### Assistant:\n"+
@@ -213,7 +214,8 @@ def get_normal_execution(task):
                     "In the initial state, there are white, green, yellow, orange, blue, and pink blocks; there are white, green, yellow, orange, and purple bowls; and a trash can.\n"+
                     #"{please_help}\n"+
                     "What is the final goal state?\n"+
-                    "### Assistant:\n"+"The initial state contains the following pairs of blocks and matching bowls: White block -> White bowl, Green block -> Green bowl, Yellow block -> Yellow bowl, Orange block -> Orange bowl. The blue and pink blocks do not have corresponding bowls, and the bowls with purple color do not have corresponding blocks. The final goal state is ['White, green, yellow, and orange blocks are in their corresponding bowls'].\n"+                   
+                    "### Assistant:\n"+
+		            "The final goal state is ['White, green, yellow, and orange blocks are in their corresponding bowls'].\n"+                   
                     "### User:\n"+
                     "What is your plan for the next step?\n"+
                     "### Assistant:\n"+
@@ -264,7 +266,7 @@ def get_normal_execution(task):
             #"{please_help}\n"+
             "What is the final goal state?\n"+
             "### Assistant:\n"+
-            "The initial state contains the following pairs of blocks and matching bowls: White block -> White bowl, Blue block -> Blue bowl, Yellow block -> Yellow bowl. The green, pink, and red blocks do not have corresponding bowls, and the orange, cyan, and purple bowls do not have corresponding blocks. The final goal state is ['White, blue, and yellow blocks are in their corresponding bowls'].\n"+
+            "The final goal state is ['White, blue, and yellow blocks are in their corresponding bowls'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
@@ -307,7 +309,7 @@ def get_normal_execution(task):
             #"{please_help}\n"+
             "What is the final goal state?\n"+
             "### Assistant:\n"+
-            "The initial state contains the following pairs of blocks and matching bowls: Red block -> Red bowl, Green block -> Green bowl, Blue block -> Blue bowl, Cyan block -> Cyan bowl. The pink and orange blocks do not have corresponding bowls, and the yellow and purple bowls do not have corresponding blocks. The final goal state is ['Red, green, blue, and cyan blocks are in their corresponding bowls'].\n"+
+            "The final goal state is ['Red, green, blue, and cyan blocks are in their corresponding bowls'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
@@ -360,7 +362,7 @@ def get_normal_execution(task):
             #"{please_help}\n"+ 
             "What is the final goal state?\n"+
             "### Assistant:\n"+
-            "The initial state contains the following pairs of blocks and matching bowls: Purple block -> Purple bowl, Yellow block -> Yellow bowl, Green block -> Green bowl, Blue block -> Blue bowl. The white and red blocks do not have corresponding bowls, and the orange and pink bowls do not have corresponding blocks. The final goal state is ['Purple, yellow, green, and blue blocks are in their corresponding bowls'].\n"+
+            "The final goal state is ['Purple, yellow, green, and blue blocks are in their corresponding bowls'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
@@ -413,7 +415,7 @@ def get_normal_execution(task):
             #"{please_help}\n"+
             "What is the final goal state?\n"+
             "### Assistant:\n"+
-            "The initial state contains the following pairs of blocks and matching bowls: Orange block -> Orange bowl, Red block -> Red bowl, Green block -> Green bowl, Blue block -> Blue bowl. The pink and cyan blocks do not have corresponding bowls, and the purple and yellow bowls do not have corresponding blocks. The final goal state is ['Orange, red, green, and blue blocks are in their corresponding bowls'].\n"+
+            "The final goal state is ['Orange, red, green, and blue blocks are in their corresponding bowls'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
@@ -466,7 +468,7 @@ def get_normal_execution(task):
             #"{please_help}\n"+
             "What is the final goal state?\n"+
             "### Assistant:\n"+
-            "The initial state contains the following pairs of blocks and matching bowls: Yellow block -> Yellow bowl, Green block -> Green bowl, Red block -> Red bowl, Blue block -> Blue bowl. The orange and purple blocks do not have corresponding bowls, and the pink and cyan bowls do not have corresponding blocks. The final goal state is ['Yellow, green, red, and blue blocks are in their corresponding bowls'].\n"+
+            "The final goal state is ['Yellow, green, red, and blue blocks are in their corresponding bowls'].\n"+
             "### User:\n"+
             "What is your plan for the next step?\n"+
             "### Assistant:\n"+
@@ -1123,7 +1125,7 @@ def get_normal_execution(task):
     return episode_list 
     
     
-def get_cot_handling_prompt(task, anomaly_type="pick"):
+def get_handling_prompt(task, anomaly_type="pick"):
     if "-matching-bowl" in task:
         if anomaly_type=="removal":
             episode_1=(
@@ -1132,23 +1134,15 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 #"{please_help}\n"+ 
                 "What is the final goal state?\n" +
                 "### Assistant:\n" +
-                "The initial state contains the following pairs of blocks and matching bowls: Gray block -> Gray bowl, Red block -> Red bowl, Blue block -> Blue bowl. The brown and white blocks do not have corresponding bowls, and the yellow bowl does not have a corresponding block. The final goal state is ['Gray, red, and blue blocks are in their corresponding bowls'].\n" +
+                "The final goal state is ['Gray, red, and blue blocks are in their corresponding bowls'].\n" +
                 "### User:\n" +
                 "What is your plan for the next step?\n" +
                 "### Assistant:\n" +
                 "put the gray block in the gray bowl.\n" +
                 "### User:\n" +
                 "The action succeeded, and the white block on the table disappears.\n" +
-                "### User:\n" +
-                "Analyze the effect of the anomaly [the white block on the table disappears] on the task regarding progress and feasibility.\n" +
-                "### Assistant:\n" +
-                "The progress ['The gray block is in its corresponding bowl'] is unaffected; the task feasibility is unaffected since the disappeared white block is not among the remaining target objects [red block, red bowl, blue block, blue bowl].\n" +
-                "### User:\n" +
-                "Analyze the effect of the anomaly on future actions.\n" +
-                "### Assistant:\n" +
-                "The robot will not be affected.\n" +
-                "### User:\n" +
-                "How to handle this anomaly?\n" +
+                "### User:\n"+
+                "How to handle this anomaly?\n"+
                 "### Assistant:\n" +
                 "No action needed\n" +
                 "### User:\n" +
@@ -1157,16 +1151,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the red block in the red bowl.\n" +
                 "### User:\n" +
                 "The action succeeded, and the blue block on the table disappears.\n" +
-                "### User:\n" +
-                "Analyze the effect of the anomaly [the blue block on the table disappeared] on the task regarding progress and feasibility.\n" +
-                "### Assistant:\n" +
-                "The progress ['The gray and red blocks are in their corresponding bowls'] is unaffected; the task feasibility is affected since the disappeared blue block is among the remaining target objects [blue block, blue bowl].\n" +
-                "### User:\n" +
-                "Analyze the effect of the anomaly on future actions.\n" +
-                "### Assistant:\n" +
-                "The robot will not be affected.\n" +
-                "### User:\n" +
-                "How to handle this anomaly?\n" +
                 "### Assistant:\n" +
                 "The task feasibility is affected.\n" +
                 "### User:\n" +
@@ -1180,23 +1164,15 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 #"{please_help}\n"+ 
                 "What is the final goal state?\n" +
                 "### Assistant:\n" +
-                "The initial state contains the following pairs of blocks and matching bowls: Pink block -> Pink bowl, Cyan block -> Cyan bowl, Yellow block -> Yellow bowl, Blue block -> Blue bowl. The gray and red blocks do not have corresponding bowls, and the green and brown bowls do not have corresponding blocks. The final goal state is ['Pink, cyan, yellow, and blue blocks are in their corresponding bowls'].\n" +
+                "The final goal state is ['Pink, cyan, yellow, and blue blocks are in their corresponding bowls'].\n" +
                 "### User:\n" +
                 "What is your plan for the next step?\n" +
                 "### Assistant:\n" +
                 "put the pink block in the pink bowl.\n" +
                 "### User:\n" +
                 "The action succeeded, and the brown bowl on the table disappears.\n" +
-                "### User:\n" +
-                "Analyze the effect of the anomaly [the brown bowl on the table disappears] on the task regarding progress and feasibility.\n" +
-                "### Assistant:\n" +
-                "The progress ['The pink block is in its corresponding bowl'] is unaffected; the task feasibility is unaffected since the disappeared brown bowl is not among the remaining target objects [cyan block, cyan bowl, yellow block, yellow bowl, blue block, blue bowl].\n" +
-                "### User:\n" +
-                "Analyze the effect of the anomaly on future actions.\n" +
-                "### Assistant:\n" +
-                "The robot will not be affected.\n" +
-                "### User:\n" +
-                "How to handle this anomaly?\n" +
+                "### User:\n"+
+                "How to handle this anomaly?\n"+
                 "### Assistant:\n" +
                 "No action needed\n" +
                 "### User:\n" +
@@ -1205,16 +1181,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the cyan block in the cyan bowl.\n" +
                 "### User:\n" +
                 "The action succeeded, and the blue bowl on the table disappears.\n" +
-                "### User:\n" +
-                "Analyze the effect of the anomaly [the blue bowl on the table disappears] on the task regarding progress and feasibility.\n" +
-                "### Assistant:\n" +
-                "The progress ['The pink and cyan blocks are in their corresponding bowls'] is unaffected; the task feasibility is affected since the disappeared blue bowl is among the target object list [yellow block, yellow bowl, blue block, blue bowl].\n" +
-                "### User:\n" +
-                "Analyze the effect of the anomaly on future actions.\n" +
-                "### Assistant:\n" +
-                "The robot will not be affected.\n" +
-                "### User:\n" +
-                "How to handle this anomaly?\n" +
                 "### Assistant:\n" +
                 "The task feasibility is affected.\n" +
                 "### User:\n" +
@@ -1229,23 +1195,13 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 #"{please_help}\n"+ 
                 "What is the final goal state?\n" +
                 "### Assistant:\n" +
-                "The initial state contains the following pairs of blocks and matching bowls: Blue block -> Blue bowl, Green block -> Green bowl, Red block -> Red bowl, Yellow block -> Yellow bowl. The white and brown blocks do not have corresponding bowls, and the purple bowl does not have a corresponding block. The final goal state is ['Blue, green, red, and yellow blocks are in their corresponding bowls'].\n" +
+                "The final goal state is ['Blue, green, red, and yellow blocks are in their corresponding bowls'].\n" +
                 "### User:\n" +
                 "What is your plan for the next step?\n" +
                 "### Assistant:\n" +
                 "put the blue block in the blue bowl.\n" +
                 "### User:\n" +
                 "The action succeeded, and the white block on the table disappears.\n" +
-                "### User:\n" +
-                "Analyze the effect of the anomaly [the white block on the table disappears] on the task regarding progress and feasibility.\n" +
-                "### Assistant:\n" +
-                "The progress ['The blue block is in its corresponding bowl'] is unaffected; the task feasibility is unaffected since the disappeared white block is not among the remaining target objects [green block, green bowl, red block, red bowl, yellow block, yellow bowl].\n" +
-                "### User:\n" +
-                "Analyze the effect of the anomaly on future actions.\n" +
-                "### Assistant:\n" +
-                "The robot will not be affected.\n" +
-                "### User:\n" +
-                "How to handle this anomaly?\n" +
                 "### Assistant:\n" +
                 "No action needed\n" +
                 "### User:\n" +
@@ -1254,16 +1210,8 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the green block in the green bowl.\n" +
                 "### User:\n" +
                 "The action succeeded, and the yellow bowl on the table disappears.\n" +
-                "### User:\n" +
-                "Analyze the effect of the anomaly [the yellow bowl on the table disappears] on the task regarding progress and feasibility.\n" +
-                "### Assistant:\n" +
-                "The progress ['The blue and green blocks are in their corresponding bowls'] is unaffected; the task feasibility is affected since the disappeared yellow bowl is among the target object list [red block, red bowl, yellow block, yellow bowl].\n" +
-                "### User:\n" +
-                "Analyze the effect of the anomaly on future actions.\n" +
-                "### Assistant:\n" +
-                "The robot will not be affected.\n" +
-                "### User:\n" +
-                "How to handle this anomaly?\n" +
+                "### User:\n"+
+                "How to handle this anomaly?\n"+
                 "### Assistant:\n" +
                 "The task feasibility is affected.\n" +
                 "### User:\n" +
@@ -1274,27 +1222,19 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
             
             episode_4=(
                 "### User:\n" +
-                "In the initial state, there are blue, green, red, yellow, purple,  white, and brown blocks; there are blue, green, red, yellow, orange, and pink bowls; and a trash can.\n" +
+                "In the initial state, there are blue, green, red, yellow, purple,  white, and brown blocks; there are blue, green, red, yellow, orange, and pink bowls; and a trash can.\n"+
                 #"{please_help}\n"+ 
                 "What is the final goal state?\n" +
                 "### Assistant:\n" +
-                "The initial state contains the following pairs of blocks and matching bowls: Blue block -> Blue bowl, Green block -> Green bowl, Red block -> Red bowl, Yellow block -> Yellow bowl. The purple, white, and brown blocks do not have corresponding bowls, and the orange and pink bowls do not have their corresponding blocks. The final goal state is ['Blue, green, red, and yellow blocks are in their corresponding bowls'].\n" +
+                "The final goal state is ['Blue, green, red, and yellow blocks are in their corresponding bowls'].\n" +
                 "### User:\n" +
                 "What is your plan for the next step?\n" +
                 "### Assistant:\n" +
                 "put the blue block in the blue bowl.\n" +
                 "### User:\n" +
                 "The action succeeded, and the purple block on the table disappears.\n" +
-                "### User:\n" +
-                "Analyze the effect of the anomaly [the purple block on the table disappears] on the task regarding progress and feasibility.\n" +
-                "### Assistant:\n" +
-                "The progress ['The blue block is in its corresponding bowl'] is unaffected; the task feasibility is unaffected since the disappeared purple block is not among the remaining target objects [green block, green bowl, red block, red bowl, yellow block, yellow bowl].\n" +
-                "### User:\n" +
-                "Analyze the effect of the anomaly on future actions.\n" +
-                "### Assistant:\n" +
-                "The robot will not be affected.\n" +
-                "### User:\n" +
-                "How to handle this anomaly?\n" +
+                "### User:\n"+
+                "How to handle this anomaly?\n"+
                 "### Assistant:\n" +
                 "No action needed\n" +
                 "### User:\n" +
@@ -1303,16 +1243,8 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the green block in the green bowl.\n" +
                 "### User:\n" +
                 "The action succeeded, and the pink bowl on the table disappears.\n" +
-                "### User:\n" +
-                "Analyze the effect of the anomaly [the pink bowl on the table disappears] on the task regarding progress and feasibility.\n" +
-                "### Assistant:\n" +
-                "The progress ['The blue and green blocks are in their corresponding bowls'] is unaffected; the task feasibility is unaffected since the disappeared pink bowl is not among the remaining target objects [red block, red bowl, yellow block, yellow bowl].\n" +
-                "### User:\n" +
-                "Analyze the effect of the anomaly on future actions.\n" +
-                "### Assistant:\n" +
-                "The robot will not be affected.\n" +
-                "### User:\n" +
-                "How to handle this anomaly?\n" +
+                "### User:\n"+
+                "How to handle this anomaly?\n"+
                 "### Assistant:\n" +
                 "No action needed\n" +
                 "### User:\n"+
@@ -1346,23 +1278,15 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "In the initial state, there are green, pink, yellow, blue, and red blocks; there are green, pink, yellow, and purple bowls; and a trash can.\n" +
                 "What is the final goal state?\n" +
                 "### Assistant:\n" +
-                "The initial state contains the following pairs of blocks and matching bowls: Green block -> Green bowl, Pink block -> Pink bowl, Yellow block -> Yellow bowl. The blue and red blocks do not have corresponding bowls, and the purple bowl does not have a corresponding block. The final goal state is ['Green, pink, and yellow blocks are in their corresponding bowls'].\n" +
+                "The final goal state is ['Green, pink, and yellow blocks are in their corresponding bowls'].\n" +
                 "### User:\n" +
                 "What is your plan for the next step?\n" +
                 "### Assistant:\n" +
                 "put the green block in the green bowl.\n" +
                 "### User:\n" +
                 "The action succeeded, and the yellow block on the table disappears.\n" +
-                "### User:\n" +
-                "Analyze the effect of the anomaly [the yellow block on the table disappears] on the task regarding progress and feasibility.\n" +
-                "### Assistant:\n" +
-                "The progress ['The green block is in its corresponding bowl'] is unaffected; the task feasibility is affected since the disappeared yellow block is among the target object list [pink block, pink bowl, yellow block, yellow bowl].\n" +
-                "### User:\n" +
-                "Analyze the effect of the anomaly on future actions.\n" +
-                "### Assistant:\n" +
-                "The robot will not be affected.\n" +
-                "### User:\n" +
-                "How to handle this anomaly?\n" +
+                "### User:\n"+
+                "How to handle this anomaly?\n"+
                 "### Assistant:\n" +
                 "The task feasibility is affected.\n" +
                 "### User:\n" +
@@ -1378,7 +1302,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "In the initial state, there are cyan, yellow, orange, blue, red, and purple blocks; there are cyan, yellow, orange, blue, brown, and white bowls; and a trash can.\n"+
                 "What is the final goal state?\n"+
                 "### Assistant:\n"+
-                "The initial state contains the following pairs of blocks and matching bowls: Cyan block -> Cyan bowl, Yellow block -> Yellow bowl, Orange block -> Orange bowl, Blue block -> Blue bowl. The red and purple blocks do not have corresponding bowls, and the brown and white bowls do not have their corresponding blocks. The final goal state is ['Cyan, yellow, orange, and blue blocks are in their corresponding bowls'].\n"+
+                "The final goal state is ['Cyan, yellow, orange, and blue blocks are in their corresponding bowls'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -1405,14 +1329,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the orange block in the orange bowl.\n"+
                 "### User:\n"+
                 "The action succeeded, and the cyan and yellow blocks in their corresponding bowls are moved to other positions on the table.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [the cyan and yellow blocks in their corresponding bowls are moved to other positions on the table] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress is disrupted, and the cyan and yellow blocks are not in their corresponding bowls; the current progress is ['the orange block is in its corresponding bowl']; the remaining target objects [cyan block, cyan bowl, yellow block, yellow bowl, blue block, blue bowl] are available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot will not be affected.\n"+
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
@@ -1458,7 +1374,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "In the initial state, there are yellow, blue, red, pink, gray, and green blocks; there are yellow, blue, red, pink, and purple bowls; and a trash can.\n"+
                 "What is the final goal state?\n"+
                 "### Assistant:\n"+
-                "The initial state contains the following pairs of blocks and matching bowls: Yellow block -> Yellow bowl, Blue block -> Blue bowl, Red block -> Red bowl, Pink block -> Pink bowl. The gray and green blocks do not have their corresponding bowls, and the purple bowl does not have a corresponding block. The final goal state is ['Yellow, blue, red, and pink blocks are in their corresponding bowls'].\n"+
+                "The final goal state is ['Yellow, blue, red, and pink blocks are in their corresponding bowls'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -1485,14 +1401,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the red block in the red bowl.\n"+
                 "### User:\n"+
                 "The action succeeded, and the yellow and blue blocks in their corresponding bowls are moved to other positions on the table.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [the yellow and blue blocks in their corresponding bowls are moved to other positions on the table] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress is disrupted, and the yellow and blue blocks are not in their corresponding bowls; the current progress is ['the red block is in its corresponding bowl']; the remaining target objects [yellow block, yellow bowl, blue block, blue bowl, pink block, pink bowl] are available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot will not be affected.\n"+
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
@@ -1537,7 +1445,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "In the initial state, there are red, green, blue, yellow, pink, and white blocks; there are red, green, blue, yellow, and orange bowls; and a trash can.\n"+
                 "What is the final goal state?\n"+
                 "### Assistant:\n"+
-                "The initial state contains the following pairs of blocks and matching bowls: Red block -> Red bowl, Green block -> Green bowl, Blue block -> Blue bowl, Yellow block -> Yellow bowl. The pink and white blocks do not have corresponding bowls, and the orange bowl does not have a corresponding block. The final goal state is ['Red, green, blue, and yellow blocks are in their corresponding bowls'].\n"+
+                "The final goal state is ['Red, green, blue, and yellow blocks are in their corresponding bowls'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -1554,14 +1462,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the green block in the green bowl.\n"+
                 "### User:\n"+
                 "The action succeeded, and the red block in its corresponding bowl is moved to another position on the table.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [the red block in its corresponding bowl is moved to another position on the table] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress is disrupted, and the red block is not in its corresponding bowl; the current progress is ['the green block is in its corresponding bowl']; the remaining target objects [red block, red bowl, blue block, blue bowl, yellow block, yellow bowl] are available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot will not be affected.\n"+
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
@@ -1607,7 +1507,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "In the initial state, there are green, blue, pink, orange, red, and purple blocks; there are green, blue, pink, yellow, and white bowls; and a trash can.\n"+
                 "What is the final goal state?\n"+
                 "### Assistant:\n"+
-                "The initial state contains the following pairs of blocks and matching bowls: Green block -> Green bowl, Blue block -> Blue bowl, Pink block -> Pink bowl. The orange, red, and purple blocks do not have corresponding bowls, and the yellow and white bowls do not have corresponding blocks. The final goal state is ['Green, blue, and pink blocks are in their corresponding bowls'].\n"+
+                "The final goal state is ['Green, blue, and pink blocks are in their corresponding bowls'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -1624,14 +1524,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the blue block in the blue bowl.\n"+
                 "### User:\n"+
                 "The action succeeded, and the green block in its corresponding bowl is moved to another position on the table.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [the green block in its corresponding bowl is moved to another position on the table] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress is disrupted, and the green block is not in its corresponding bowl; the current progress is ['the blue block is in its corresponding bowl']; the remaining target objects [green block, green bowl, pink block, pink bowl] are available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot will not be affected.\n"+
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
@@ -1666,7 +1558,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "In the initial state, there are brown, blue, green, red, yellow, and pink blocks; there are brown, blue, green, and purple bowls; and a trash can.\n"+
                 "What is the final goal state?\n"+
                 "### Assistant:\n"+
-                "The initial state contains the following pairs of blocks and matching bowls: Brown block -> Brown bowl, Blue block -> Blue bowl, Green block -> Green bowl. The red, yellow, and pink blocks do not have corresponding bowls, and the purple bowl does not have a corresponding block. The final goal state is ['Brown, blue, and green blocks are in their corresponding bowls'].\n"+
+                "The final goal state is ['Brown, blue, and green blocks are in their corresponding bowls'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -1694,11 +1586,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "The action succeeded, and the brown block in its corresponding bowl is moved to another position on the table.\n"+
                 "### User:\n"+
-                "Analyze the effect of the anomaly [the brown block in its corresponding bowl is moved to another position on the table] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress is disrupted, and the brown block is not in its corresponding bowl; the current progress is ['the blue and green blocks are in their corresponding bowls']; the remaining target objects [brown block, brown bowl] are available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
+                "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
                 "The robot will not be affected.\n"+
                 "### User:\n"+
@@ -1730,7 +1618,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                         #"{please_help}\n"+ 
                         "What is the final goal state?\n"+
                         "### Assistant:\n"+
-                        "The initial state contains the following pairs of blocks and matching bowls: Blue block -> Blue bowl, Pink block -> Pink bowl, Red block -> Red bowl, Purple block -> Purple bowl. The white block does not have a corresponding bowl, and the yellow and cyan bowls do not have corresponding blocks. The final goal state is ['Blue, pink, red, and purple blocks are in their corresponding bowls'].\n"+
+                        "The final goal state is ['Blue, pink, red, and purple blocks are in their corresponding bowls'].\n"+
                         "### User:\n"+
                         "What is your plan for the next step?\n"+
                         "### Assistant:\n"+
@@ -1747,16 +1635,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                         "put the pink block in the pink bowl.\n"+
                         "### User:\n"+
                         "The action succeeded, and a never-seen orange block appears at the bottom right.\n"+
-                        "### User:\n"+
-                        "Analyze the effect of the anomaly [a never-seen orange block appears at the bottom right] on the task regarding progress and feasibility.\n"+
-                        "### Assistant:\n"+
-                        "The progress ['The blue and pink blocks are in their corresponding bowls'] is unaffected; the task feasibility is unaffected since the remaining target objects [red block, red bowl, purple block, purple bowl] are still available.\n"+
-                        "### User:\n"+
-                        "Analyze the effect of the anomaly on future actions.\n"+
-                        "### Assistant:\n"+
-                        "The robot will not be affected since the anomaly block [orange block at the bottom right] is not a target object and has a different color from any target blocks.\n"+
-                        "### User:\n"+
-                        "How to handle this anomaly?\n"+
                         "### Assistant:\n"+
                         "No action needed\n"+
                         "### User:\n"+
@@ -1765,16 +1643,8 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                         "put the red block in the red bowl.\n"+
                         "### User:\n"+
                         "The action succeeded, and a never-seen purple block appears at the top right.\n"+
-                        "### User:\n"+
-                        "Analyze the effect of the anomaly [a never-seen purple block appears at the top right] on the task regarding progress and feasibility.\n"+
-                        "### Assistant:\n"+
-                        "The progress ['The blue, pink, and red blocks are in their corresponding bowls'] is unaffected; the task feasibility is unaffected since the remaining target objects [purple block, purple bowl] are still available.\n"+
-                        "### User:\n"+
-                        "Analyze the effect of the anomaly on future actions.\n"+
-                        "### Assistant:\n"+
-                        "The robot may mistake the anomaly block [purple block at the top right] for the target purple block since they have the same color. To avoid confusion, the anomaly block should be removed.\n"+
-                        "### User:\n"+
-                        "How to handle this anomaly?\n"+
+                	"### User:\n"+
+                	"How to handle this anomaly?\n"+
                         "### Assistant:\n"+
                         "Remove the anomaly block to prevent confusion.\n"+
                         "### User:\n"+
@@ -1808,23 +1678,15 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                         #"{please_help}\n"+ 
                         "What is the final goal state?\n" +
                         "### Assistant:\n" +
-                        "The initial state contains the following pairs of blocks and matching bowls: Green block -> Green bowl, Yellow block -> Yellow bowl, Red block -> Red bowl, Blue block -> Blue bowl. The white and cyan blocks do not have corresponding bowls, and the orange bowl does not have a corresponding block. The final goal state is ['Green, yellow, red, and blue blocks are in their corresponding bowls'].\n" +
+                        "The final goal state is ['Green, yellow, red, and blue blocks are in their corresponding bowls'].\n" +
                         "### User:\n" +
                         "What is your plan for the next step?\n" +
                         "### Assistant:\n" +
                         "put the green block in the green bowl.\n" +
                         "### User:\n" +
                         "The action succeeded, and a never-seen white block appears at the bottom left.\n" +
-                        "### User:\n" +
-                        "Analyze the effect of the anomaly [a never-seen white block appears at the bottom left] on the task regarding progress and feasibility.\n" +
-                        "### Assistant:\n" +
-                        "The progress ['The green block is in its corresponding bowl'] is unaffected; the task feasibility is unaffected since the remaining target objects [yellow block, yellow bowl, red block, red bowl, blue block, blue bowl] are still available.\n" +
-                        "### User:\n" +
-                        "Analyze the effect of the anomaly on future actions.\n" +
-                        "### Assistant:\n" +
-                        "The robot will not be affected since the anomaly block [white block at the bottom left] is not a target object and has a different color from any target blocks.\n" +
-                        "### User:\n" +
-                        "How to handle this anomaly?\n" +
+                	"### User:\n"+
+                	"How to handle this anomaly?\n"+
                         "### Assistant:\n" +
                         "No action needed\n" +
                         "### User:\n" +
@@ -1833,16 +1695,8 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                         "put the yellow block in the yellow bowl.\n" +
                         "### User:\n" +
                         "The action succeeded, and a never-seen blue block appears at the top right" +
-                        "### User:\n" +
-                        "Analyze the effect of the anomaly [a never-seen blue block appears at the top right] on the task regarding progress and feasibility.\n" +
-                        "### Assistant:\n" +
-                        "The progress ['The green, yellow blocks are in their corresponding bowls'] is unaffected; the task feasibility is unaffected since the remaining target objects [red block, red bowl, blue block, blue bowl] are still available.\n" +
-                        "### User:\n" +
-                        "Analyze the effect of the anomaly on future actions.\n" +
-                        "### Assistant:\n" +
-                        "The robot may mistake the anomaly block [blue block at the top right] for the target blue block since they have the same color. To avoid confusion, the anomaly block should be removed.\n"+
-                        "### User:\n"+
-                        "How to handle this anomaly?\n"+
+                	"### User:\n"+
+                	"How to handle this anomaly?\n"+
                         "### Assistant:\n"+
                         "Remove the anomaly block to prevent confusion.\n"+
                         "### User:\n"+
@@ -1861,16 +1715,8 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                         "put the red block in the red bowl.\n" +
                         "### User:\n" +
                         "The action succeeded, and a never-seen cyan block appears at the bottom left.\n" +
-                        "### User:\n" +
-                        "Analyze the effect of the anomaly [a never-seen cyan block appears at the bottom left] on the task regarding progress and feasibility.\n" +
-                        "### Assistant:\n" +
-                        "The progress ['The green, yellow, and red blocks are in their corresponding bowls'] is unaffected; the task feasibility is unaffected since the remaining target objects [blue block, blue bowl] are still available.\n" +
-                        "### User:\n" +
-                        "Analyze the effect of the anomaly on future actions.\n" +
-                        "### Assistant:\n" +
-                        "The robot will not be affected since the anomaly block [cyan block at the top right] is not a target object and has a different color from any target blocks.\n" +
-                        "### User:\n" +
-                        "How to handle this anomaly?\n" +
+                	"### User:\n"+
+                	"How to handle this anomaly?\n"+
                         "### Assistant:\n" +
                         "No action needed\n" +
                         "### User:\n" +
@@ -1895,7 +1741,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                         #"{please_help}\n"+ 
                         "What is the final goal state?\n" +
                         "### Assistant:\n"
-                        "The initial state contains the following pairs of blocks and matching bowls: White block -> White bowl, Red block -> Red bowl, Blue block -> Blue bowl, Pink block -> Pink bowl. The green and cyan blocks do not have corresponding bowls, and the yellow bowl does not have a corresponding block. The final goal state is ['White, red, blue, and pink blocks are in their corresponding bowls'].\n" +
+                        "The final goal state is ['White, red, blue, and pink blocks are in their corresponding bowls'].\n" +
                         "### User:\n"
                         "What is your plan for the next step?\n" +
                         "### Assistant:\n"
@@ -1912,16 +1758,8 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                         "put the red block in the red bowl.\n" +
                         "### User:\n"
                         "The action succeeded, and a never-seen blue block appears at the top right.\n" +
-                        "### User:\n"
-                        "Analyze the effect of the anomaly [a never-seen blue block appears at the top right] on the task regarding progress and feasibility.\n" +
-                        "### Assistant:\n"
-                        "The progress ['The white and red blocks are in their corresponding bowls'] is unaffected; the task feasibility is unaffected since the remaining target objects [blue block, blue bowl, pink block, pink bowl] are still available.\n" +
-                        "### User:\n"
-                        "Analyze the effect of the anomaly on future actions.\n" +
-                        "### Assistant:\n"
-                        "The robot may mistake the anomaly block [blue block at the top right] for the target blue block since they have the same color. To avoid confusion, the anomaly block should be removed.\n" +
-                        "### User:\n"
-                        "How to handle this anomaly?\n" +
+                	"### User:\n"+
+                	"How to handle this anomaly?\n"+
                         "### Assistant:\n"
                         "Remove the anomaly block to prevent confusion.\n" +
                         "### User:\n"
@@ -1940,16 +1778,8 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                         "put the blue block in the blue bowl.\n" +
                         "### User:\n"
                         "The action succeeded, and a never-seen green block appears at the top left.\n" +
-                        "### User:\n"
-                        "Analyze the effect of the anomaly [a never-seen green block appears at the top left] on the task regarding progress and feasibility.\n" +
-                        "### Assistant:\n"
-                        "The progress ['The white, red, and blue blocks are in their corresponding bowls'] is unaffected; the task feasibility is unaffected since the remaining target objects [pink block, pink bowl] are still available.\n" +
-                        "### User:\n"
-                        "Analyze the effect of the anomaly on future actions.\n" +
-                        "### Assistant:\n" +
-                        "The robot will not be affected since the anomaly block [green block at the top left] is not a target object and has a different color from any target blocks.\n" +
-                        "### User:\n" +
-                        "How to handle this anomaly?\n" +
+                	"### User:\n"+
+                	"How to handle this anomaly?\n"+
                         "### Assistant:\n" +
                         "No action needed\n" +
                         "### User:\n" +
@@ -1983,23 +1813,15 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                         #"{please_help}\n"+
                         "What is the final goal state?\n"+
                         "### Assistant:\n"+
-                        "The initial state contains the following pairs of blocks and matching bowls: Green block -> Green bowl, Gray block -> Gray bowl, Orange block -> Orange bowl, Pink block -> Pink bowl. The red and blue blocks do not have corresponding bowls, and the purple bowl does not have a corresponding block. The final goal state is ['Green, gray, orange, and pink blocks are in their corresponding bowls'].\n"+
+                        "The final goal state is ['Green, gray, orange, and pink blocks are in their corresponding bowls'].\n"+
                         "### User:\n"+
                         "What is your plan for the next step?\n"+
                         "### Assistant:\n"+
                         "put the green block in the green bowl.\n"+
                         "### User:\n"+
                         "The action succeeded, and a never-seen pink block appears at the bottom right.\n"+
-                        "### User:\n"+
-                        "Analyze the effect of the anomaly [a never-seen pink block appears at the bottom right] on the task regarding progress and feasibility.\n"+
-                        "### Assistant:\n"+
-                        "The progress ['The green block is in its corresponding bowl'] is unaffected; the task feasibility is unaffected since the remaining target objects [gray block, gray bowl, orange block, orange bowl, pink block, pink bowl] are still available.\n"+
-                        "### User:\n"+
-                        "Analyze the effect of the anomaly on future actions.\n"+
-                        "### Assistant:\n"+
-                        "The robot may mistake the anomaly block [pink block at the bottom right] for the target pink block since they have the same color. To avoid confusion, the anomaly block should be removed.\n"+
-                        "### User:\n"+
-                        "How to handle this anomaly?\n"+
+                	"### User:\n"+
+                	"How to handle this anomaly?\n"+
                         "### Assistant:\n"+
                         "Remove the anomaly block to prevent confusion.\n"+
                         "### User:\n"+
@@ -2038,16 +1860,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                         "put the pink block in the pink bowl.\n"+
                         "### User:\n"+
                         "The action succeeded, and a never-seen cyan block appears at the top left.\n"+
-                        "### User:\n"+
-                        "Analyze the effect of the anomaly [a never-seen cyan block appears at the top left] on the task regarding progress and feasibility.\n"+
-                        "### Assistant:\n"+
-                        "The progress ['The green, gray, orange, and pink blocks are in their corresponding bowls'] is unaffected; all goals are completed.\n"+
-                        "### User:\n"+
-                        "Analyze the effect of the anomaly on future actions.\n"+
-                        "### Assistant:\n"+
-                        "The robot will not be affected since the anomaly block [cyan block at the top left] is not a target object and has a different color from any target blocks.\n"+
-                        "### User:\n"+
-                        "How to handle this anomaly?\n"+
                         "### Assistant:\n"+
                         "No action needed\n"+
                         "### User:\n"+
@@ -2062,7 +1874,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 #"{please_help}\n"+ 
                 "What is the final goal state?\n"+
                 "### Assistant:\n"+
-                "The initial state contains the following pairs of blocks and matching bowls: Green block -> Green bowl, Yellow block -> Yellow bowl, Cyan block -> Cyan bowl, Purple block -> Purple bowl. The pink block does not have corresponding bowls, and the blue bowl does not have corresponding blocks. The final goal state is ['Green, yellow, cyan, and purple blocks are in their corresponding bowls'].\n"+
+                "The final goal state is ['Green, yellow, cyan, and purple blocks are in their corresponding bowls'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -2080,15 +1892,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "The action succeeded, and a never-seen pink block appears at the bottom right.\n"+
                 "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen pink block appears at the bottom right] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['The green and yellow blocks are in their corresponding bowls'] is unaffected; the remaining target objects [cyan block, cyan bowl, purple block, purple bowl] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot will not be affected since the anomaly block [pink block at the bottom right] is not a target object and has a different color from any target blocks.\n" +
-                "### User:\n" +
-                "How to handle this anomaly?\n" +
+                "How to handle this anomaly?\n"+
                 "### Assistant:\n" +
                 "No action needed\n" +
                 "What is your plan for the next step?\n"+
@@ -2096,14 +1900,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the cyan block in the cyan bowl.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen purple block appears at the bottom left.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen purple block appears at the bottom left] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['The green, yellow, and cyan blocks are in their corresponding bowls'] is unaffected; the task feasibility is unaffected since the remaining target objects [purple block, purple bowl] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot may mistake the anomaly block [purple block at the bottom left] for the target purple block since they have the same color. To avoid confusion, the anomaly block should be removed.\n"+
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
@@ -2139,21 +1935,13 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 #"{please_help}\n"+ 
                 "What is the final goal state?\n"+
                 "### Assistant:\n"+
-                "The initial state contains the following pairs of blocks and matching bowls: Orange block -> Orange bowl, White block -> White bowl, Cyan block -> Cyan bowl. The green and yellow blocks do not have corresponding bowls, and the gray bowl does not have a corresponding block. The final goal state is ['Orange, cyan, and white blocks are in their corresponding bowls'].\n"+
+                "The final goal state is ['Orange, cyan, and white blocks are in their corresponding bowls'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
                 "put the orange block in the orange bowl.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen red block is placed into the white bowl.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen red block is placed in the white bowl] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['The orange block is in its corresponding bowl'] is unaffected; the task feasibility is unaffected since the remaining target objects [cyan block, cyan bowl, white block, white bowl] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The anomaly block [red block in the white bowl] takes the free space of the target white bowl, and the robot may not find a space to put the target white block.\n"+
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
@@ -2174,14 +1962,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the white block in the white bowl.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen pink block is placed into the gray bowl.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen pink block is placed in the gray bowl] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['The orange and white blocks are in their corresponding bowls'] is unaffected; the task feasibility is unaffected since the remaining target objects [cyan block, cyan bowl] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot will not be affected since the anomaly block [pink block in the gray bowl] is not placed into any target bowl.\n"+
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
@@ -2208,21 +1988,13 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 #"{please_help}\n"+ 
                 "What is the final goal state?\n"+
                 "### Assistant:\n"+
-                "The initial state contains the following pairs of blocks and matching bowls: Yellow block -> Yellow bowl, Red block -> Red bowl, Blue block -> Blue bowl. The green and orange blocks do not have corresponding bowls, and the purple and cyan bowls do not have corresponding blocks. The final goal state is ['Yellow, red, and blue blocks are in their corresponding bowls'].\n"+
+                "The final goal state is ['Yellow, red, and blue blocks are in their corresponding bowls'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
                 "put the yellow block in the yellow bowl.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen cyan block is placed into the purple bowl.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen cyan block is placed in the purple bowl] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['The yellow block is in its corresponding bowl'] is unaffected; the task feasibility is unaffected since the remaining target objects [red block, red bowl, blue block, blue bowl] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot will not be affected since the anomaly block [cyan block in the purple bowl] is not placed into any target bowl.\n"+
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
@@ -2233,14 +2005,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the red block in the red bowl.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen green block appears in the blue bowl.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen green block appears in the blue bowl] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['The yellow and red blocks are in their corresponding bowls'] is unaffected; the task feasibility is unaffected since the remaining target objects [blue block, blue bowl] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The anomaly block [green block in the blue bowl] takes the free space of the blue bowl, and the robot may not find a space to put the target blue block.\n"+
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
@@ -2277,7 +2041,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 #"{please_help}\n"+     
                 "What is the final goal state?\n"+
                 "### Assistant:\n"+
-                "The initial state contains the following pairs of blocks and matching bowls: Pink block -> Pink bowl, Blue block -> Blue bowl, Gray block -> Gray bowl. The green and red blocks do not have corresponding bowls, and the yellow and cyan bowls do not have corresponding blocks. The final goal state is ['Pink, blue, and gray blocks are in their corresponding bowls'].\n"+
+                "The final goal state is ['Pink, blue, and gray blocks are in their corresponding bowls'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -2294,15 +2058,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the blue block in the blue bowl.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen red block appears in the gray bowl.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen red block appears in the gray bowl] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['The pink and blue blocks are in their corresponding bowls'] is unaffected; the task feasibility is unaffected since the remaining target objects [gray block, gray bowl] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The anomaly block [red block in the gray bowl] takes the free space of the gray bowl, and the robot may not find a space to put the target gray block.\n"+
-                "### User:\n"+
+		"### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
                 "Remove the anomaly block to prevent confusion.\n"+
@@ -2337,21 +2093,13 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "In the initial state, there are red, blue, green, pink, and yellow blocks; there are bowls with red, blue, green, and purple bowls; and a trash can.\n"+
                 "What is the final goal state?\n"+
                 "### Assistant:\n"+
-                "The initial state contains the following pairs of blocks and matching bowls: Red block -> Red bowl, Blue block -> Blue bowl, Green block -> Green bowl. The pink and yellow blocks do not have corresponding bowls, and the purple bowl does not have a corresponding block. The final goal state is ['Red, blue, and green blocks are in their corresponding bowls'].\n"+
+                "The final goal state is ['Red, blue, and green blocks are in their corresponding bowls'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
                 "put the red block in the red bowl.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen yellow block is placed into the blue bowl.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen yellow block is placed in the blue bowl] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['The red block is in its corresponding bowl'] is unaffected; the task feasibility is unaffected since the remaining target objects [blue block, blue bowl, green block, green bowl] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The anomaly block [yellow block in the blue bowl] takes the free space of the target blue bowl, and the robot may not find a space to put the target blue block.\n"+
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
@@ -2372,15 +2120,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the blue block in the blue bowl.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen pink block is placed into the green bowl.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen pink block is placed in the green bowl] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['The red and blue blocks are in their corresponding bowls'] is unaffected; the task feasibility is unaffected since the remaining target objects [green block, green bowl] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The anomaly block [pink block in the green bowl] takes the free space of the target green bowl, and the robot may not find a space to put the target green block.\n"+
-                "### User:\n"+
+		"### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
                 "Remove the anomaly block to prevent confusion.\n"+
@@ -2416,21 +2156,13 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 #"{please_help}\n"+ 
                 "What is the final goal state?\n"+
                 "### Assistant:\n"+
-                "The initial state contains the following pairs of blocks and matching bowls: Green block -> Green bowl, Pink block -> Pink bowl, Gray block -> Gray bowl. The red, blue, and cyan blocks do not have corresponding bowls, and the orange bowl does not have a corresponding block. The final goal state is ['Green, pink, and gray blocks are in their corresponding bowls'].\n"+
+                "The final goal state is ['Green, pink, and gray blocks are in their corresponding bowls'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
                 "put the green block in the green bowl.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen gray bowl appears at the bottom right.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen gray bowl appears at the bottom right] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['The green block is in its corresponding bowl'] is unaffected; the task feasibility is unaffected since the remaining target objects [pink block, pink bowl, gray block, gray bowl] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot may mistake the anomaly bowl [gray bowl at the bottom right] for the target gray bowl since they have the same color. To avoid confusion, the anomaly bowl should be removed.\n"+
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
@@ -2451,15 +2183,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the pink block in the pink bowl.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen blue bowl appears at the bottom left.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen blue bowl appears at the bottom left] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['The green and pink blocks are in their corresponding bowls'] is unaffected; the task feasibility is unaffected since the remaining target objects [gray block, gray bowl] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot will not be affected since the anomaly bowl [blue bowl at the bottom left] is not a target object and has a different color from any target bowls.\n"+
-                "### User:\n"+
+		"### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
                 "No action needed\n"+
@@ -2485,7 +2209,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 #"{please_help}\n"+         
                 "What is the final goal state?\n"+
                 "### Assistant:\n"+
-                "The initial state contains the following pairs of blocks and matching bowls: Yellow block -> Yellow bowl, Blue block -> Blue bowl, Red block -> Red bowl, Pink block -> Pink bowl. The gray and green blocks do not have their corresponding bowls, and the purple bowl does not have a corresponding block. The final goal state is ['Yellow, blue, red, and pink blocks are in their corresponding bowls'].\n"+
+                "The final goal state is ['Yellow, blue, red, and pink blocks are in their corresponding bowls'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -2502,33 +2226,17 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the blue block in the blue bowl.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen green bowl appears at the bottom left.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen green bowl appears at the bottom left] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['The yellow and blue blocks are in their corresponding bowls'] is unaffected; the task feasibility is unaffected since the remaining target objects [red block, red bowl, pink block, pink bowl] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot will not be affected since the anomaly bowl [green bowl at the bottom left] is not a target object and has a different color from any target bowls.\n"+
-                "### User:\n"+
+		"### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
                 "No action needed\n"+
-				"### User:\n"+
+		"### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
                 "put the red block in the red bowl.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen gray bowl appears at the bottom right.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen gray bowl appears at the bottom right] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['The yellow, blue, and red blocks are in their corresponding bowls'] is unaffected; the task feasibility is unaffected since the remaining target objects [pink block, pink bowl] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot will not be affected since the anomaly bowl [gray bowl at the bottom right] is not a target object and has a different color from any target bowls.\n"+
-                "### User:\n"+
+		"### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
                 "No action needed\n"+
@@ -2554,21 +2262,13 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 #"{please_help}\n"+      
                 "What is the final goal state?\n"+
                 "### Assistant:\n"+
-                "The initial state contains the following pairs of blocks and matching bowls: Green block -> Green bowl, Gray block -> Gray bowl, Orange block -> Orange bowl, Pink block -> Pink bowl. The red, blue, and cyan blocks do not have corresponding bowls, and the yellow bowl does not have a corresponding block. The final goal state is ['Green, gray, orange, and pink blocks are in their corresponding bowls'].\n"+
+                "The final goal state is ['Green, gray, orange, and pink blocks are in their corresponding bowls'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
                 "put the green block in the green bowl.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen gray bowl appears at the top right.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen gray bowl appears at the top right] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['The green block is in the green bowl'] is unaffected; the task feasibility is unaffected since the remaining target objects [gray block, gray bowl, orange block, orange bowl, pink block, pink bowl] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot may mistake the anomaly bowl [gray bowl at the top right] for the target gray bowl since they have the same color.\n"+
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
@@ -2589,12 +2289,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the gray block in the gray bowl.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen pink bowl appears at the bottom left.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen pink bowl appears at the bottom left] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['The green and gray blocks are in their corresponding bowls'] is unaffected; the task feasibility is unaffected since the remaining target objects [orange block, orange bowl, pink block, pink bowl] are still available.\n"+
-                "### Assistant:\n"+
-                "The robot may mistake the anomaly bowl [pink bowl at the bottom left] for the target pink bowl since they have the same color. To avoid confusion, the anomaly bowl should be removed.\n"+
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
@@ -2641,7 +2335,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 #"{please_help}\n"+ 
                 "What is the final goal state?\n"+
                 "### Assistant:\n"+
-                "The initial state contains the following pairs of blocks and matching bowls: White block -> White bowl, Red block -> Red bowl, Green block -> Green bowl, Blue block -> Blue bowl. The yellow and purple blocks do not have corresponding bowls, and the pink bowl does not have a corresponding block. The final goal state is ['White, red, green, and blue blocks are in their corresponding bowls'].\n"+
+                "The final goal state is ['White, red, green, and blue blocks are in their corresponding bowls'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -2658,13 +2352,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the red block in the red bowl.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen yellow bowl appears at the top right.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen yellow bowl appears at the top right] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['The white and red blocks are in their corresponding bowls'] is unaffected; the task feasibility is unaffected since the remaining target objects [green block, green bowl, blue block, blue bowl] are still available.\n"+
-                "### Assistant:\n"+
-                "The robot will not be affected since the anomaly bowl [yellow bowl at the top right] is not a target object and has a different color from any target bowls.\n"+
-                "### User:\n"+
+		"### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
                 "No action needed\n"+
@@ -2674,15 +2362,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the green block in the green bowl.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen purple bowl appears at the bottom left.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen purple bowl appears at the bottom left] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['The white, red, and green blocks are in their corresponding bowls'] is unaffected; the task feasibility is unaffected since the remaining target objects [blue block, blue bowl] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot will not be affected since the anomaly bowl [purple bowl at the bottom left] is not a target object and has a different color from any target bowls.\n"+
-                "### User:\n"+
+		"### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
                 "No action needed\n"+
@@ -2708,7 +2388,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 #"{please_help}\n"+ 
                 "What is the final goal state?\n"+
                 "### Assistant:\n"+
-                "The initial state contains the following pairs of blocks and matching bowls: Orange block -> Orange bowl, Cyan block -> Cyan bowl, Green block -> Green bowl, Blue block -> Blue bowl. The pink and red blocks do not have corresponding bowls. The final goal state is ['Orange, cyan, green, and blue blocks are in their corresponding bowls'].\n"+
+                "The final goal state is ['Orange, cyan, green, and blue blocks are in their corresponding bowls'].\n"+
                 "### User:\n"+
                 "What is your plan for the next step?\n"+
                 "### Assistant:\n"+
@@ -2725,14 +2405,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the cyan block in the cyan bowl.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen blue bowl appears at the bottom left.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen blue bowl appears at the bottom left] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['The orange and cyan blocks are in their corresponding bowls'] is unaffected; the task feasibility is unaffected since the remaining target objects [green block, green bowl, blue block, blue bowl] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot may mistake the anomaly bowl [blue bowl at the bottom left] for the target blue bowl since they have the same color. To avoid confusion, the anomaly bowl should be removed.\n"+
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
@@ -2753,15 +2425,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the green block in the green bowl.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen red bowl appears at the top right.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen red bowl appears at the top right] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['The orange, cyan, and green blocks are in their corresponding bowls'] is unaffected; the task feasibility is unaffected since the remaining target objects [blue block, blue bowl] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot will not be affected since the anomaly bowl [red bowl at the top right] is not a target object and has a different color from any target bowls.\n"+
-                "### User:\n"+
+		"### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
                 "No action needed\n"+
@@ -2807,14 +2471,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "The action succeeded, and a never-seen yellow block appears at the top left.\n"+
                 "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen yellow block appears at the top left] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['two red blocks are in the brown box'] is unaffected; the task feasibility is unaffected since the remaining target objects [green block, yellow block, orange block] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot may mistake the anomaly block [yellow block appears at the top left] for the target yellow block since they have the same color. To avoid confusion, the anomaly block should be removed.\n"+
-                "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
                 "Remove the anomaly block to prevent confusion.\n"+
@@ -2844,14 +2500,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the yellow block in the brown box.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen pink block appears at the top right.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen pink block appears at the top right] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['two red blocks, a green block, and a yellow block are in the brown box'] is unaffected; the task feasibility is unaffected since the remaining target objects [orange block] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot will not be affected since the anomaly block [pink block at the top right] has a different color from any target blocks.\n"+
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
@@ -2903,14 +2551,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the cyan block in the brown box.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen yellow block appears in the brown box.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen yellow block appears in the brown box] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['Cyan block, pink block, and cyan block are in the brown box'] is unaffected; the task feasibility is unaffected since the remaining target objects [pink block, white block] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The anomaly block [yellow block in the brown box] takes the free space of the brown box, and the robot may not find a space to put the target block.\n"+
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
@@ -2972,15 +2612,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the purple block in the brown box.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen yellow block appears in the brown box.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen yellow block appears in the brown box] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['Orange block and purple block are in the brown box'] is unaffected; the task feasibility is unaffected since the remaining target objects [cyan block, white block] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The anomaly block [yellow block in the brown box] takes the free space of the brown box, and the robot may not find a space to put the target block.\n"+
-                "### User:\n"+
+		"### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
                 "Remove the anomaly block to prevent confusion.\n"+
@@ -3052,14 +2684,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the gray block in the brown box.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen brown box appears at the bottom right.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen brown box appears at the bottom right] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['Gray block, blue block, and gray block are in the brown box'] is unaffected; the task feasibility is unaffected since the remaining target objects [cyan block, cyan block] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot may mistake the anomaly box [brown box at the bottom right] as the target brown box since they have the same color.\n"+
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
@@ -3133,14 +2757,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the red block in the brown box.\n"+
                 "### User:\n"+
                 "The action succeeded, and the yellow and red blocks in the brown box are moved to other positions on the table.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [the yellow and red blocks in the brown box are moved to other positions on the table] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "Progress: disrupted, and the yellow and red blocks are not in the brown box; the current progress is ['A red block is in the brown box']. The task feasibility is unaffected since the remaining target objects [yellow block, red block, blue block, yellow block] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot will not be affected.\n"+
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
@@ -3223,14 +2839,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "The action succeeded, and the pink and gray blocks in the brown box are moved to other positions on the table.\n"+
                 "### User:\n"+
-                "Analyze the effect of the anomaly [the pink and gray blocks in the brown box are moved to other positions on the table] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress is disrupted, and the pink and gray blocks are not in the brown box; the current progress is ['A gray block is in the brown box']. The task feasibility is unaffected since the remaining target objects [pink block, gray block, cyan block, gray block] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot will not be affected.\n"+
-                "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
                 "Put the pink and gray blocks back in the brown box to resume progress.\n"+
@@ -3260,14 +2868,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the cyan block in the brown box.\n"+
                 "### User:\n"+
                 "The action succeeded, and the pink, gray, and gray blocks in the brown box are moved to other positions on the table.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [the pink, gray, and gray blocks in the brown box are moved to other positions on the table] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress is disrupted, and the pink, gray, and gray blocks are not in the brown box; the current progress is ['A cyan block is in the brown box']. The task feasibility is unaffected since the remaining target objects [pink block, gray block, gray block, gray block] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot will not be affected.\n"+
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
@@ -3351,14 +2951,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "The action succeeded, and the orange and purple blocks in the brown box are moved to other positions on the table.\n"+
                 "### User:\n"+
-                "Analyze the effect of the anomaly [the orange and purple blocks in the brown box are moved to other positions on the table] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress is disrupted, and the orange and purple blocks are not in the brown box; the current progress is ['An orange block is in the brown box']. The task feasibility is unaffected since the remaining target objects [orange block, purple block, red block, red block, purple block] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot will not be affected.\n"+
-                "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
                 "Put the orange and purple blocks back in the brown box to resume progress.\n"+
@@ -3388,14 +2980,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the red block in the brown box.\n"+
                 "### User:\n"+
                 "The action succeeded, and the orange, purple, and orange blocks in the brown box are moved to other positions on the table.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [the orange, purple, and orange blocks in the brown box are moved to other positions on the table] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress is disrupted, and the orange, purple, and orange blocks are not in the brown box; the current progress is ['A red block is in the brown box']. The task feasibility is unaffected since the remaining target objects [orange block, purple block, orange block, red block, purple block] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot will not be affected.\n"+
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
@@ -3479,14 +3063,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the pink block in the brown box.\n"
                 "### User:\n"+
                 "The action succeeded, and a red block on the table disappeared.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [a red block on the table disappeared] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['A cyan block and a pink block are in the brown box'] is unaffected; the task feasibility is affected since the disappeared red block is among the remaining target objects [cyan block, red block, red block, pink block].\n" +
-                "### User:\n" +
-                "Analyze the effect of the anomaly on future actions.\n" +
-                "### Assistant:\n" +
-                "The robot will not be affected.\n" +
                 "### User:\n" +
                 "How to handle this anomaly?\n" +
                 "### Assistant:\n" +
@@ -3519,14 +3095,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "The action succeeded, and a green block on the table disappeared.\n"+
                 "### User:\n"+
-                "Analyze the effect of the anomaly [a green block on the table disappeared] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['A cyan block and a pink block are in the brown box'] is unaffected; the task feasibility is unaffected since the disappeared green block is not among the remaining target objects [pink block, white block].\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot will not be affected.\n"+
-                "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n" +
                 "No action needed\n" +
@@ -3536,7 +3104,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the pink block in the brown box.\n"+
                 "### User:\n"+
                 "The action succeeded, and no anomaly happened.\n"+
-				"### User:\n"+
+		"### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
                 "### Assistant:\n"+
                 "Progress: ['cyan block, pink block, and pink block are in the brown box']. Remaining goals: ['Put the white block in the brown box'].\n"+
@@ -3546,13 +3114,13 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the white block in the brown box.\n"+
                 "### User:\n"+
                 "The action succeeded, and no anomaly happened.\n"+
-				"### User:\n"+
+		"### User:\n"+
                 "Please describe the achieved progress and the remaining goals.\n"+
-				"### Assistant:\n"+
+		"### Assistant:\n"+
                 "Progress: ['cyan block, pink block, pink block, and white block are in the brown box']. All goals are completed.\n"+
                 "### User:\n" +
                 "What is your plan for the next step?\n" +
-				"### Assistant:\n"+
+		"### Assistant:\n"+
                 "done.\n")
 
             episode_3=(
@@ -3578,14 +3146,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "The action succeeded, and an orange block on the table disappeared.\n"+
                 "### User:\n"+
-                "Analyze the effect of the anomaly [an orange block on the table disappeared] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['A blue block and a pink block are in the brown box'] is unaffected; the task feasibility is unaffected since the disappeared orange block is not among the remaining target objects [red block, cyan block].\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot will not be affected.\n"+
-                "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
                 "No action needed.\n"+
@@ -3595,14 +3155,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the red block in the brown box.\n"+
                 "### User:\n"+
                 "The action succeeded, and a cyan block on the table disappeared.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [a cyan block on the table disappeared] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['blue block, pink block, and red block are in the brown box'] is unaffected; the task feasibility is affected since the disappeared cyan block is among the remaining target objects [cyan block].\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot will not be affected.\n"+
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
@@ -3638,15 +3190,7 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the blue block on the middle brown block of the stand.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen purple block appears at the top right.\n"+
-                "### User:\n"
-                "Analyze the effect of the anomaly [a never-seen purple block appears at the top right] on the task regarding progress and feasibility.\n" +
-                "### Assistant:\n"
-                "The progress ['The red and blue blocks are on the stand'] is unaffected; the task feasibility is unaffected since the remaining target objects [red block, red block, blue block, pink block] are still available.\n" +
-                "### User:\n"
-                "Analyze the effect of the anomaly on future actions.\n" +
-                "### Assistant:\n"
-                "The robot will not be affected since the anomaly block [purple block at the top right] is not a target object and has a different color from any target blocks.\n" +
-                "### User:\n" +
+		"### User:\n" +
                 "How to handle this anomaly?\n" +
                 "### Assistant:\n" +
                 "No action needed\n" +
@@ -3666,14 +3210,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the red block on the red and blue blocks.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen pink block appears at the bottom left.\n"+
-                "### User:\n"
-                "Analyze the effect of the anomaly [a never-seen pink block appears at the bottom left] on the task regarding progress and feasibility.\n" +
-                "### Assistant:\n"
-                "The progress ['The bottom row (red, blue, and red blocks) is built, and the red block is on top of the bottom row'] is unaffected; the task feasibility is unaffected since the remaining target objects [blue block, pink bowl] are still available.\n" +
-                "### User:\n"
-                "Analyze the effect of the anomaly on future actions.\n" +
-                "### Assistant:\n"
-                "The robot may mistake the anomaly block [pink block at the bottom left] for the target pink block since they have the same color.\n" +
                 "### User:\n"
                 "How to handle this anomaly?\n" +
                 "### Assistant:\n"
@@ -3704,13 +3240,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the pink block on the red and blue blocks.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen gray block appears at the top right.\n"+
-                "### User:\n"
-                "Analyze the effect of the anomaly [a never-seen gray block appears at the top right] on the task regarding progress and feasibility.\n" +
-                "### Assistant:\n"
-                "The progress ['The bottom row (red, blue, and red blocks), the middle row (red and blue blocks), and the top row (the pink block) are built'] is unaffected; the task feasibility is unaffected since there is no target object left and all goals are completed.\n"
-                "Analyze the effect of the anomaly on future actions.\n" +
-                "### Assistant:\n" +
-                "The robot will not be affected since the anomaly block [gray block appears at the top right] is not a target object and all goals are completed.\n" +
                 "### User:\n" +
                 "How to handle this anomaly?\n" +
                 "### Assistant:\n" +
@@ -3733,14 +3262,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "The action succeeded, and a never-seen gray block appears at the top left.\n"+
                 "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen gray block appears at the top left] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['a blue block is on the stand'] is unaffected; the task feasibility is unaffected since the remaining target objects [green block, blue block, green block, orange block, orange block] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot will not be affected since the anomaly block [gray block at the top left] is not a target object and has a different color from any target blocks.\n"+
-                "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
                 "No action needed\n"+
@@ -3761,14 +3282,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "The action succeeded, and a never-seen green block appears at the bottom right.\n"+
                 "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen green block appears at the bottom right] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['The bottom row (blue, green, and blue blocks) is built'] is unaffected; the task feasibility is unaffected since the remaining target objects [green block, orange block, orange block] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot may mistake the anomaly block [green block at the bottom right] for the target green block since they have the same color.\n"+
-                "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
                 "Remove the anomaly block to prevent confusion.\n"+
@@ -3788,14 +3301,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the green block on the blue and green blocks.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen orange block appears at the top right.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen orange block appears at the top right] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['The bottom row (blue, green, and blue blocks) is built, and the green block is on top of the bottom row'] is unaffected; the task feasibility is unaffected since the remaining target objects [orange block, orange block] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot may mistake the anomaly block [orange block at the top right] for the target orange block since they have the same color.\n"+
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
@@ -3859,14 +3364,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "The action succeeded, and a never-seen cyan block appears in the darkest brown block of the stand.\n"+
                 "### User:\n"
-                "Analyze the effect of the anomaly [a never-seen cyan block appears in the darkest brown block of the stand] on the task regarding progress and feasibility.\n" +
-                "### Assistant:\n"
-                "The progress ['The yellow and blue blocks are on the stand'] is unaffected; the task feasibility is unaffected since the remaining target objects [red block, red block, red block, blue block] are still available.\n" +
-                "### User:\n"
-                "Analyze the effect of the anomaly on future actions.\n" +
-                "### Assistant:\n"
-                "The anomaly block [cyan block on the darkest brown block of the stand] takes the expected position of the target red block, and the robot may not find a space to put the target red block to make the bottom row.\n"+
-                "### User:\n"
                 "How to handle this anomaly?\n" +
                 "### Assistant:\n"
                 "Remove the anomaly block to prevent confusion.\n" +
@@ -3896,14 +3393,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the red block on the yellow and blue blocks.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen pink block is placed on the blue and red blocks.\n"+
-                "### User:\n"
-                "Analyze the effect of the anomaly [a never-seen pink block is placed on the blue and red blocks] on the task regarding progress and feasibility.\n" +
-                "### Assistant:\n"
-                "The progress ['The red block is on top of the built bottom row (yellow, blue, and red blocks)'] is unaffected; the task feasibility is unaffected since the remaining target objects [red block, blue block] are still available.\n" +
-                "### User:\n"
-                "Analyze the effect of the anomaly on future actions.\n" +
-                "### Assistant:\n"
-                "The anomaly block [pink block on the blue and red blocks] takes the expected position of the target red block, and the robot may not find a space to put the target red block to make the middle row.\n"+
                 "### User:\n"
                 "How to handle this anomaly?\n" +
                 "### Assistant:\n"
@@ -3958,14 +3447,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "The action succeeded, and a never-seen purple block appears on the middle brown block of the stand.\n"+
                 "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen purple block appears on the middle brown block of the stand] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['a red block is on the stand'] is unaffected; the task feasibility is affected since the remaining target objects [blue block, blue block, yellow block, red block, blue block] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The anomaly block [purple block on the middle brown block of the stand] takes the expected position of the target blue block, and the robot may not find a space to put the target blue block to make the bottom row.\n"+
-                "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
                 "Remove the anomaly block to prevent confusion.\n"+
@@ -3996,14 +3477,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "The action succeeded, and a never-seen red block is placed on the red and blue blocks.\n"+
                 "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen red block is placed on the red and blue blocks] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['The bottom row (red, blue, and blue blocks) is built'] is unaffected; the task feasibility is unaffected since the remaining target objects [yellow block, red block, blue block] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The anomaly block [red block on the red and blue blocks] takes the expected position of the target yellow block, and the robot may not find a space to put the target yellow block to make the middle row.\n"+
-                "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
                 "Remove the anomaly block to prevent confusion.\n"+
@@ -4023,14 +3496,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the yellow block on the red and blue blocks.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen blue block is placed on the blue and blue blocks.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen blue block appears on the blue and blue blocks] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['The yellow block is on top of the built bottom row (red, blue, and blue blocks)'] is unaffected; the task feasibility is unaffected since the remaining target objects [red block, blue block] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The anomaly block [blue block on the blue and blue blocks] takes the expected position of the target red block, and the robot may not find a space to put the target red block to make the middle row.\n"+
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
@@ -4103,14 +3568,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the cyan block on the darkest brown block of the stand.\n"+
                 "### User:\n"+
                 "The action succeeded, and a never-seen stand appears at the top right.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [a never-seen stand appears at the top right] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "The progress ['The bottom row (cyan, pink, and cyan blocks) is built'] is unaffected; the task feasibility is unaffected since the remaining target objects [white block, white block, orange block] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot may mistake the anomaly stand [stand at the top right] as the target stand since they have the same color.\n"+
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
@@ -4186,14 +3643,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n" +
                 "The action succeeded, and the orange block on the table disappears.\n" +
                 "### User:\n" +
-                "Analyze the effect of the anomaly [the orange block on the table disappears] on the task regarding progress and feasibility.\n" +
-                "### Assistant:\n" +
-                "The progress ['The red and green blocks are on the stand'] is unaffected; the task feasibility is unaffected since the disappeared orange block is among the remaining target objects [red block, red block, orange block, orange block].\n" 
-                "### User:\n" +
-                "Analyze the effect of the anomaly on future actions.\n" +
-                "### Assistant:\n" +
-                "The robot will not be affected.\n" +
-                "### User:\n" +
                 "How to handle this anomaly?\n" +
                 "### Assistant:\n" +
                 "Need to alert since the task feasibility is affected.\n" +
@@ -4224,14 +3673,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the blue block on the middle brown block of the stand.\n" +
                 "### User:\n" +
                 "The action succeeded, and the orange block on the table disappears.\n" +
-                "### User:\n" +
-                "Analyze the effect of the anomaly [the orange block on the table disappears] on the task regarding progress and feasibility.\n" +
-                "### Assistant:\n" +
-                "The progress ['A blue block and a blue block are on the stand'] is unaffected; the task feasibility is unaffected since the disappeagreen orange block is not among the remaining target objects [green block, green block, purple block, pink block].\n" +
-                "### User:\n" +
-                "Analyze the effect of the anomaly on future actions.\n" +
-                "### Assistant:\n" +
-                "The robot will not be affected.\n" +
                 "### User:\n" +
                 "How to handle this anomaly?\n" +
                 "### Assistant:\n" +
@@ -4305,14 +3746,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n" +
                 "The action succeeded, and the yellow block on the table disappears.\n" +
                 "### User:\n" +
-                "Analyze the effect of the anomaly [the yellow block on the table disappears] on the task regarding progress and feasibility.\n" +
-                "### Assistant:\n" +
-                "The progress ['A cyan block and a white block are on the stand'] is unaffected; the task feasibility is unaffected since the disappeared yellow block is not among the remaining target objects [cyan block, red block, red block, white block].\n" +
-                "### User:\n" +
-                "Analyze the effect of the anomaly on future actions.\n" +
-                "### Assistant:\n" +
-                "The robot will not be affected.\n" +
-                "### User:\n" +
                 "How to handle this anomaly?\n" +
                 "### Assistant:\n" +
                 "No action needed.\n" +
@@ -4360,14 +3793,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "### User:\n"+
                 "The action succeeded, and the blue block on the stand is amoved to another position on the table.\n"+
                 "### User:\n"+
-                "Analyze the effect of the anomaly [the blue block on the stand amoved to another position on the table.] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "Progress is disrupted, and the blue block used to make the bottom row is moved to another position on the table. The current progress is ['the blue block is on the middle brown block of the stand']; the task feasibility is unaffected since the remaining target objects [blue block, green block, red block, red block, green block] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot will not be affected.\n"+
-                "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
                 "Put the blue block back to the stand to resume the progress.\n"+
@@ -4397,14 +3822,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the red block on the blue and blue blocks.\n"+
                 "### User:\n"+
                 "The action succeeded, and the green block on the stand is amoved to another position on the table.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [the green block on the stand is amoved to another position on the table.] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "Progress is disrupted, and the green block used to make the bottom row is moved to another position on the table. The current progress is ['the blue and blue blocks are on the stand']; the task feasibility is unaffected since the remaining target objects [green block, red block, green block] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot will not be affected.\n"+
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+
@@ -4476,14 +3893,6 @@ def get_cot_handling_prompt(task, anomaly_type="pick"):
                 "put the yellow block on the darkest brown block of the stand.\n"+
                 "### User:\n"+
                 "The action succeeded, and the blue and yellow blocks on the stand are moved to other positions of the table.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly [the blue and yellow blocks on the stand are moved to other positions of the table] on the task regarding progress and feasibility.\n"+
-                "### Assistant:\n"+
-                "Progress is disrupted, and the blue and yellow blocks used to make the bottom row are moved to other positions. The current progress is ['A yellow block is on the stand']; the task feasibility is unaffected since the remaining target objects [blue block, yellow block, red block, red block, blue block] are still available.\n"+
-                "### User:\n"+
-                "Analyze the effect of the anomaly on future actions.\n"+
-                "### Assistant:\n"+
-                "The robot will not be affected.\n"+
                 "### User:\n"+
                 "How to handle this anomaly?\n"+
                 "### Assistant:\n"+

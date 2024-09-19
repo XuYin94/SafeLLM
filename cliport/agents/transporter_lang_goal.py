@@ -40,7 +40,6 @@ class TwoStreamClipLingUNetTransporterAgent(TransporterAgent):
     def attn_forward(self, inp, softmax=True):
         inp_img = inp['inp_img']
         lang_goal = inp['lang_goal']
-
         out = self.attention.forward(inp_img, lang_goal, softmax=softmax)
         return out
 

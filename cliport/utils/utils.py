@@ -578,6 +578,7 @@ class ImageRotator:
         else:
             assert all([pivot.shape[0] == B for pivot in pivot_list])
         rot_x_list = []
+        tensor_type=torch.get_default_dtype()
         for i, angle in enumerate(self.angles):
             x = x_list[i]  # B, C, H, W
             pivot = pivot_list[i]  # B, 2
@@ -587,8 +588,7 @@ class ImageRotator:
             angle: torch.tensor = torch.ones(B).to(x.device) * alpha
 
             # define the rotation center
-            center = torch.stack([pivot[:, 1], pivot[:, 0]], dim=1).float()  # B, 2
-
+            center = torch.stack([pivot[:, 1], pivot[:, 0]], dim=1).to(tensor_type)  # B, 2
             # define the scale factor
             scale: torch.tensor = torch.ones(B, 2).to(x.device)
 
@@ -597,7 +597,7 @@ class ImageRotator:
 
             # apply the transformation to original image
             _, _, h, w = x.shape
-            x_warped: torch.tensor = kornia.geometry.warp_affine(x.float(), M.to(x.device), dsize=(h, w))
+            x_warped: torch.tensor = kornia.geometry.warp_affine(x.to(tensor_type), M.to(x.device), dsize=(h, w))
             x_warped = x_warped
             rot_x_list.append(x_warped)
 
@@ -765,11 +765,12 @@ def anomaly_generator_for_primitive(env,output_queue,task=None,perturbation="mis
 
     output_queue.put((2,anomaly))
 
-def anomaly_generator(env,output_queue,task=None,perturbation="pick",step=0,type="None",progress=None):
+def anomaly_generator(env,output_queue,task=None,perturbation="pick",type="None",progress=None):
     if "matching" in task.task_name:
-        matching_bowls_anomaly_generator(env,output_queue,task,perturbation,step,type,progress)
+        
+        matching_bowls_anomaly_generator(env,output_queue,task,perturbation,progress,type)
     elif "packing" in task.task_name:
-        box_packing_anomaly_generator(env,output_queue,task,perturbation,step,type)
+        box_packing_anomaly_generator(env,output_queue,task,perturbation,progress,type)
     else:
         stack_block_pyramid_anomaly_generator(env,output_queue,task,perturbation,progress,type)
 
@@ -863,18 +864,22 @@ def box_packing_anomaly_generator(env,output_queue,task=None,perturbation="pick"
 
 
 
-def matching_bowls_anomaly_generator(env,output_queue,task=None,perturbation="pick",step=0,type="None",progress=None): # to generate the anomaly data for VLM training
+def matching_bowls_anomaly_generator(env,output_queue,task=None,perturbation="pick",step=0,type="None"): # to generate the anomaly data for VLM training
     assert perturbation in ["addition","removal","displacement"]
     if perturbation=="addition":
         if type=="None":## randomly add a task-related object in the zone
+            
             if step>=task.gt_step-1:
                 return None
             sample_idx=random.randint(step+1,task.gt_step-1)
             obj_id,addition_obj_color,target_obj_pose=task.bowl_info[sample_idx] ## the obj_info of the addition
             addition_color_value=COLORS[addition_obj_color]
             __,__,obj_size=env.info[obj_id]
-            while True:
+            idx=0
+            while idx<10:
+                
                 addition_type=random.choice(["pick","place","container"])
+                print(addition_type)
                 if addition_type=="container":
                     obj_template='bowl/bowl.urdf'
                     anomaly="a never-seen {addition_color} bowl appears at the {position} zone."
@@ -887,11 +892,12 @@ def matching_bowls_anomaly_generator(env,output_queue,task=None,perturbation="pi
                         goal_region=determine_region(target_obj_pose,task)
                         anomaly="a never-seen {addition_color} block appears at the {position} zone."
                     else:
+                        #goal_region=None
                         anomaly="a never-seen {addition_color} block apppears in the {position} bowl."
                 obj_urdf = task.fill_template(obj_template, {'DIM': obj_size})
                 if addition_type!="place":
                     i=0
-                    while i<=20:
+                    while i<=10:
                         position=random.choice(list(set(rel_pos)-set(goal_region)))  ## make sure the added block is in different region
                         #print(position)
                         addition_pose = task.get_random_pose(env, obj_size,zone=position)
@@ -900,8 +906,8 @@ def matching_bowls_anomaly_generator(env,output_queue,task=None,perturbation="pi
                             p.changeVisualShape(addition_id, -1, rgbaColor=addition_color_value + [1])
                             break
                         i+=1
-                    #print(addition_id)
                     if addition_id==None:
+                        idx+=1
                         continue
                 else:
                     position=addition_obj_color
@@ -909,14 +915,16 @@ def matching_bowls_anomaly_generator(env,output_queue,task=None,perturbation="pi
                     block_color_value=COLORS[block_color]
                     pose1, pose2 = target_obj_pose
                     pose1 = list(pose1)
-                    pose1[2] = 0.020
+                    pose1[2] = 0.030
                     pose1 = tuple(pose1)
                     target_obj_pose=(pose1,pose2)
                     addition_id = env.add_object(obj_urdf, target_obj_pose)
                     p.changeVisualShape(addition_id , -1, rgbaColor=block_color_value + [1])
                     addition_obj_color=block_color
-                anomaly=anomaly.format(addition_color=addition_obj_color,position=position)
-                break
+                    break
+            if addition_id==None:
+                return None
+            anomaly=anomaly.format(addition_color=addition_obj_color,position=position)
 
         else: ## add distracting block/bowl that may incur redundant action
             distractor_list=[color+" block" for __,color,__ in task.block_info[task.gt_step:]]
@@ -950,6 +958,7 @@ def matching_bowls_anomaly_generator(env,output_queue,task=None,perturbation="pi
 
     elif perturbation=="removal":
         obj_type=random.choice(["block","bowl"])
+        print(step)
         if obj_type=="block":
             obj_list=task.block_info
             category="rigid"
@@ -966,17 +975,13 @@ def matching_bowls_anomaly_generator(env,output_queue,task=None,perturbation="pi
         anomaly = "the {obj_info} on the table disappeared.".format(obj_info=obj_info)
 
     else:  ## displacement
-        if progress!=None:
-            if len(progress)>1:
-                affected_progress = random.randint(1,len(progress))
-            else:
-                affected_progress=1
-            obj_info = random.sample(progress,affected_progress)
-        else:
-            affected_progress = random.randint(1, step)
-            obj_info = [(info[1],info[0]) for info in task.block_info[:affected_progress]]
-        if len(obj_info)==0:
+        if step==0:
             return None
+        if step>1:
+            affected_progress = random.randint(1,step)
+        else:
+            affected_progress=1
+        obj_info = [(info[1],info[0]) for info in task.block_info[:affected_progress]]
         if affected_progress>1:
             con="blocks in their corresponding bowls are moved to other positions on the table."
         else:

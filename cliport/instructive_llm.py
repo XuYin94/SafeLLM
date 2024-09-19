@@ -45,9 +45,76 @@ def load_llm(llm_name: str):
         model.resize_token_embeddings(len(tokenizer))
     return tokenizer, model, streamer
 
+def get_next_LLM_feedback(history_message: str,return_prompt: bool = False,llm_args: Dict = None,feedback: str=None,length=96): 
+    
+    tokenizer, model,streamer= llm_args["tokenizer"], llm_args["model"],llm_args["streamer"]
+    inputs = tokenizer(history_message, return_tensors="pt").to(model.device)
+        # del inputs["token_type_ids"]
+    #print(history_message)
+    ori_len=len(history_message)
+    output = model.generate(
+        **inputs,
+        pad_token_id = tokenizer.eos_token_id,
+        use_cache=True,
+        max_new_tokens=length
+    )
+    decoded_output = tokenizer.decode(output[0], skip_special_tokens=True)
+    #print(decoded_output)
+    decoded_output=decoded_output[ori_len:]
+    response = text_parsing(decoded_output)
+    #print(response)
+    header_type,response=response[0],response[1]
+    response=response.split('###')[0].strip()
+    return header_type,response
+
+def get_legal_LLM_feedback(history_message: str,return_prompt: bool = False,llm_args: Dict = None,feedback: str=None):
+    while True:
+        header_type,response=get_next_LLM_feedback(history_message,False,llm_args,feedback)
+        #print(header_type)
+        if "### Assistant:" == header_type:
+            break
+    return header_type,response
 
 
-def get_next_LLM_feedback(history_message: str,return_prompt: bool = False,llm_args: Dict = None,feedback: str=None,length=64): 
+
+def llama_skill_generation_scoring(query, skill_set,generator,length=16,batch_size=8,option_start='\n'):
+    scores={}
+    prompt_list=[query+"### Assistant:\n"+skill['name']+'\n' for skill in skill_set]
+    for i in range(0, len(prompt_list), batch_size):
+        prompt_input= prompt_list[i:i + batch_size]
+        skills=skill_set[i:i + batch_size]
+        results = generator.text_completion(
+                prompt_input,
+                max_gen_len=length,
+                temperature=0.6,
+                top_p=0.9,
+                logprobs=True
+            )
+        
+        for skill, generation in zip(skills, results):
+            inst=skill['name']
+            #print(generation['generation'])
+            token_logprobs = generation['logprobs']
+            text_output=generation['tokens']
+            # if inst=="done.":
+            #     print(generation['generation'])
+            
+            total_logprob = 0
+            assert len(text_output)==len(token_logprobs)
+            for token, token_logprob in zip(reversed(text_output), reversed(token_logprobs)):
+
+                if option_start==token:
+                    #print("fuck")
+                    break
+                if token_logprob is not None:
+                    total_logprob += token_logprob
+            #print(inst)
+            scores[inst] = total_logprob
+    assert len(scores.keys())==len(skill_set)
+    return scores
+
+
+def get_next_LLM_feedback(history_message: str,return_prompt: bool = False,llm_args: Dict = None,feedback: str=None,length=96): 
     
     tokenizer, model,streamer= llm_args["tokenizer"], llm_args["model"],llm_args["streamer"]
     inputs = tokenizer(history_message, return_tensors="pt").to(model.device)

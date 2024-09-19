@@ -188,19 +188,15 @@ class RavensDataset(Dataset):
 
     def get_image(self, obs, cam_config=None):
         """Stack color and height images image."""
-
-        # if self.use_goal_image:
-        #   colormap_g, heightmap_g = utils.get_fused_heightmap(goal, configs)
-        #   goal_image = self.concatenate_c_h(colormap_g, heightmap_g)
-        #   input_image = np.concatenate((input_image, goal_image), axis=2)
-        #   assert input_image.shape[2] == 12, input_image.shape
-
         if cam_config is None:
             cam_config = self.cam_config
-
+        obs['color']=obs['color'][:3]
+        obs['depth']=obs['depth'][:3]
         # Get color and height maps from RGB-D images.
         cmap, hmap = utils.get_fused_heightmap(
             obs, cam_config, self.bounds, self.pix_size)
+        #color=cv2.cvtColor(np.uint8(cmap), cv2.COLOR_RGB2BGR)
+        #cv2.imwrite('/home/zhang/workspace/yinxu/LoHo-Ravens/cliport/0.png',color)
         img = np.concatenate((cmap,
                               hmap[Ellipsis, None],
                               hmap[Ellipsis, None],
@@ -212,7 +208,8 @@ class RavensDataset(Dataset):
         # Get training labels from data sample.
         (obs, act, _, info) = datum
         img = self.get_image(obs)
-
+        # color=cv2.cvtColor(np.uint8(img)[:,:,:3], cv2.COLOR_RGB2BGR)
+        # cv2.imwrite('/home/zhang/workspace/yinxu/LoHo-Ravens/cliport/0.png',color)
         p0, p1 = None, None
         p0_theta, p1_theta = None, None
         perturb_params = None
@@ -319,26 +316,26 @@ class RavensMultiTaskDataset(RavensDataset):
         # all tasks
         'multi-all': {
             'train': [
-                'pick-and-place-primitive',
-                'pick-and-place-primitive-relative-pick-position',
-                # 'pack-box-primitive-relative-pick-position',
-                # 'pack-box-primitive'
+                #'pick-and-place-primitive',
+                #'pick-and-place-primitive-relative-pick-position',
+                'pack-box-primitive-relative-pick-position',
+                'pack-box-primitive'
                 # 'stack-block-pyramid-seq-seen-colors-primitive',
                 # 'stack-block-pyramid-seq-seen-colors-relative-position'
             ],
             'val': [
-                'pick-and-place-primitive',
-                'pick-and-place-primitive-relative-pick-position',
-                # 'pack-box-primitive-relative-pick-position',
-                # 'pack-box-primitive'
+                #'pick-and-place-primitive',
+                #'pick-and-place-primitive-relative-pick-position',
+                'pack-box-primitive-relative-pick-position',
+                'pack-box-primitive'
                 # 'stack-block-pyramid-seq-seen-colors-primitive',
                 # 'stack-block-pyramid-seq-seen-colors-relative-position'
             ],
             'test': [
-                'pick-and-place-primitive',
-                'pick-and-place-primitive-relative-pick-position',
-                # 'pack-box-primitive-relative-pick-position',
-                # 'pack-box-primitive'
+                #'pick-and-place-primitive',
+                #'pick-and-place-primitive-relative-pick-position',
+                'pack-box-primitive-relative-pick-position',
+                'pack-box-primitive'
                 # 'stack-block-pyramid-seq-seen-colors-primitive',
                 # 'stack-block-pyramid-seq-seen-colors-relative-position'
             ],
@@ -433,6 +430,8 @@ class RavensMultiTaskDataset(RavensDataset):
 
         # Process sample
         sample = self.process_sample(sample, augment=self.augment)
+
+        #cv2.imwrite('/home/zhang/workspace/yinxu/LoHo-Ravens/cliport/0.png',color)
         goal = self.process_goal(goal, perturb_params=sample['perturb_params'])
 
         return sample, goal

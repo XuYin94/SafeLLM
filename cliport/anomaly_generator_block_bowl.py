@@ -70,7 +70,7 @@ def one_episode_execution(agent,env,task,add_anomaly=False,action_error=False,re
                     perturbation_type=random.choice(perturbation_list)
                     type=random.choice(["distractor","None"])
                     anomaly_generation = threading.Thread(target=anomaly_generator,
-                                                          args=(env, output_queue, task, perturbation_type,step,type,processed_objs))
+                                                          args=(env, output_queue, task, perturbation_type,type,len(processed_objs)))
                     thread_list.append(anomaly_generation)
             for thread in thread_list:
                 thread.start()

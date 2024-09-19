@@ -267,26 +267,30 @@ class PackBoxwithRelativePickPosition(Task):
                 p.changeVisualShape(box_id, -1, rgbaColor=colors[icolor] + [1])
                 object_colors[box_id] = color_names[icolor]
 
+
             self.un_finished_goal_poses = {}
             # Randomly select object in box and save ground truth pose.
             nbr_outside_boxes = random.randint(1, len(object_ids))
             outside_boxes_objs = object_ids[-nbr_outside_boxes:]
-
+            #print(len(outside_boxes_objs))
             for object_id, _ in outside_boxes_objs:
                 true_pose = p.getBasePositionAndOrientation(object_id)
                 object_size = p.getVisualShapeData(object_id)[0][3]
                 self.un_finished_goal_poses[object_id]=(true_pose,object_size)
-
                 pose = self.get_random_pose(env, object_size)
+                if None in pose:
+                    return None
                 p.resetBasePositionAndOrientation(object_id, pose[0], pose[1])
-
+                #print("fuck")
             break
+        #print("fuck")
         ## add confusing container
         if target=="brown box":
             i=0
             while i<50:
                 zone_size = (0.08,0.08,0.05)
                 adv_zone_pose = self.get_random_pose(env, zone_size, container_pos[1])
+
                 container_template = 'container/container-template.urdf'
                 half = np.float32(zone_size) / 2
                 replace = {'DIM': zone_size, 'HALF': half}
@@ -339,7 +343,7 @@ class PackBoxwithRelativePickPosition(Task):
     def add_adv_object(self,obj_id, urdf,object_size,env):
         #print(self.get_object_points(obj_id))
         true_pose = p.getBasePositionAndOrientation(obj_id)
-        current_pos=utils.determine_region(true_pose)
+        current_pos=utils.determine_region(true_pose,self)
         i=0
         rel_pos = ['top left', 'top right', 'bottom left', 'bottom right']
         rel_pos.remove(current_pos)

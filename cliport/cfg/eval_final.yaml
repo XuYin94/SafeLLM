@@ -17,9 +17,9 @@ n_repeats: 1 # number of repeats
 gpu: [0]
 save_results: True # write results to json
 update_results: False # overwrite existing json results?
-checkpoint_type: 'steps=48751'
-anomaly_type:  None ##[None, addition, removal, displacement]
-use_vlm: True ## True: use openflamigo. False: use the GT feedback from the simulator 
+checkpoint_type: 'steps=26251'
+anomaly_type:  addition ##[None, addition, removal, displacement]
+use_vlm: False ## True: use openflamigo. False: use the GT feedback from the simulator 
 vlm_device: cuda:1
 prompt_type: 'cot'
 

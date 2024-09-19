@@ -5,7 +5,7 @@ import torch.nn.functional as F
 import cliport.utils.utils as utils
 
 from cliport.models.resnet import ConvBlock, IdentityBlock
-
+tensor_type=torch.get_default_dtype()
 class ResNet45_10s(nn.Module):
     def __init__(self, input_shape, output_dim, cfg, device, preprocess):
         super(ResNet45_10s, self).__init__()
@@ -91,6 +91,9 @@ class ResNet45_10s(nn.Module):
             IdentityBlock(self.output_dim, [16, 16, self.output_dim], kernel_size=3, stride=1,
                           final_relu=False, batchnorm=self.batchnorm)
         )
+        
+        #print(tensor_type)
+        #for module in [self.conv1, self.layer1, self.layer2, self.layer3, self.layer4, self.layer5]:
 
     def forward(self, x):
         x = self.preprocess(x, dist='transporter')
@@ -98,6 +101,9 @@ class ResNet45_10s(nn.Module):
 
         # encoder
         for layer in [self.conv1, self.layer1, self.layer2, self.layer3, self.layer4, self.layer5]:
+            # for __,module in layer.named_children():
+            #     if hasattr(module, 'bias'):
+            #         module.bias=module.bias.to(tensor_type)
             x = layer(x)
 
         # decoder

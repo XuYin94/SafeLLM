@@ -66,12 +66,6 @@ def main(cfg):
         record_cfg=cfg['record']
     )
     for name in ["stack-block-pyramid-seq-seen-colors"]:
-        if "bowl" in name:
-            n_sample_episode=1
-            minimum_steps=3
-        else:
-            minimum_steps = 4
-            n_sample_episode=random.randint(2, 3)
         task = tasks.names[name]()
         task.mode = cfg['mode']
         record = cfg['record']['save_video']

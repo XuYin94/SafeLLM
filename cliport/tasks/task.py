@@ -189,7 +189,6 @@ class Task:
 
             # Trigger task reset if no object is visible.
             if pick_mask is None or np.sum(pick_mask) == 0:
-                print("fuck")
                 self.goals = []
                 self.lang_goals = []
                 self.question_list = []
@@ -428,7 +427,7 @@ class Task:
                 if ((pos[0]<=x_end) & (pos[0]>=x_start)) and ((pos[1]<=y_end) & (pos[1]>=y_start)):
                     break
                 i+=1
-                if i>=10:
+                if i>=20:
                     return None, None
         theta = np.random.rand() * 2 * np.pi
         rot = utils.eulerXYZ_to_quatXYZW((0, 0, theta))

@@ -7,7 +7,7 @@ from PIL import Image
 from huggingface_hub import hf_hub_download
 from open_flamingo import create_model_and_transforms
 from torchvision import transforms
-
+import random
 model_name={
 
 "OpenFlamingo-3B-vitl-mpt1b":{
@@ -46,7 +46,7 @@ def load_vlm(vlm_name: str, device: Union[torch.device, str]):
     )
     vlm.to(device)
     #state_dict = torch.load(hf_hub_download("openflamingo/OpenFlamingo-3B-vitl-mpt1b", "checkpoint.pt"))
-    state_dict=torch.load('/mnt/bear1/users/zhangkang/yinxu/Workfolder/exp/OpenFlamingo-3B-vitl-mpt1b-dolly/single/checkpoint_4.pt')['model_state_dict']
+    state_dict=torch.load('/mnt/bear1/users/zhangkang/yinxu/Workfolder/exp/OpenFlamingo-3B-vitl-mpt1b-dolly/multi/checkpoint_4.pt')['model_state_dict']
     state_dict = {k.replace("module.", ""): v for k, v in state_dict.items()}
     vlm.load_state_dict(state_dict,strict=False)
 
@@ -94,7 +94,7 @@ def get_vlm_feedback(
         vision_x=vision_x,
         lang_x=lang_x["input_ids"],
         attention_mask=lang_x["attention_mask"],
-        max_new_tokens=64,
+        max_new_tokens=32,
         num_beams=3,
         pad_token_id=50277)   
         generated_text=tokenizer.decode(generated_text[0])
@@ -142,9 +142,9 @@ if __name__=="__main__":
     }
     inst="put the blue block in the blue bowl"
     img_list=[Image.open(os.path.join(input_path,img)).convert("RGB") for img in os.listdir(input_path)]
-    feedback=get_vlm_feedback(vlm_args,img_list,inst,device,configuration="single")
+    input_list=[img_list[0]] + random.sample(img_list[1:-1], 2) + [img_list[-1]]
+    input_path="/mnt/bear1/users/zhangkang/yinxu/Workfolder/data/vlm/put-block-in-matching-bowl-train/failure_pertubation/view_3/000000-0"
+    img_list_2=[Image.open(os.path.join(input_path,img)).convert("RGB") for img in os.listdir(input_path)]
+    input_list_2=[img_list_2[0]] + random.sample(img_list_2[1:-1], 2) + [img_list_2[-1]]
+    feedback=get_vlm_feedback(vlm_args,[img_list,img_list_2],inst,device,configuration="multi")
     print(feedback)
-    # input_path="/mnt/bear1/users/zhangkang/yinxu/Workfolder/data/vlm/put-block-in-matching-bowl-train/failure_pertubation/view_3/000000-0"
-    # img_list_2=[Image.open(os.path.join(input_path,img)).convert("RGB") for img in os.listdir(input_path)]
-    # feedback=get_vlm_feedback(vlm_args,[img_list,img_list_2],inst,device,configuration="multi")
-    # print(feedback)

@@ -350,7 +350,6 @@ class TransporterAgent(LightningModule):
         self.load_state_dict(torch.load(model_path)['state_dict'])
         self.to(device=self.device_type)
 
-
 class OriginalTransporterAgent(TransporterAgent):
 
     def __init__(self, name, cfg, train_ds, test_ds):

@@ -265,7 +265,7 @@ class StackBlockPyramidSeqUnseenColors(Task):
         info = "In the initial state, there are "
         for color in initial_objects[:-1]:
             info+=color+', '
-        info+="and "+str(initial_objects[-1])+" blocks; there is a stand and a trash can. The instruction is 'Please stack a pyramid with the '.\n"
+        info+="and "+str(initial_objects[-1])+" blocks; there is a stand and a trash can. The instruction is 'Please stack a pyramid with the "
         for color in target_color[:-1]:
             info += color + ', '
         info+="and "+str(target_color[-1])+" blocks'."
@@ -663,7 +663,7 @@ class StackBlockPyramidSeqUnseenColorswithrelativepickposition(Task):
 
             ## Add adv stand obj
             true_pose = p.getBasePositionAndOrientation(base_id)
-            current_pos = utils.determine_region(true_pose)
+            current_pos = utils.determine_region(true_pose,self)
             i = 0
             rel_pos= ['top left', 'top right', 'bottom left', 'bottom right']
             rel_pos.remove(current_pos)

@@ -10,8 +10,6 @@ class RealSenseD415():
     # Mimic RealSense D415 RGB-D camera parameters.
     image_size = (480, 640)
     intrinsics = (450., 0, 320., 0, 450., 240., 0, 0, 1)
-    # top_intrinsics = (64e4 // 2.55, 0, 320.0, 0, 63e4, 240.0, 0, 0, 1)
-    top_intrinsics = (450. // 1.42, 0, 320., 0, 450., 240., 0, 0, 1)
 
     # Set default camera poses.
     front_position = (1., 0, 0.75)
@@ -23,10 +21,6 @@ class RealSenseD415():
     right_position = (0, -0.5, 0.75)
     right_rotation = (np.pi / 4.5, np.pi, 3 * np.pi / 4)
     right_rotation = p.getQuaternionFromEuler(right_rotation)
-    # top_position = (0.5, 0, 800.0)
-    top_position = (0.5, 0, 0.55)
-    top_rotation = (0, np.pi, -np.pi / 2)
-    top_rotation = p.getQuaternionFromEuler(top_rotation)
 
     # Default camera configs.
     CONFIG = [{
@@ -50,17 +44,7 @@ class RealSenseD415():
         'rotation': right_rotation,
         'zrange': (0.01, 10.),
         'noise': False
-    }, {
-        "image_size": image_size,
-        "intrinsics": top_intrinsics,
-        "position": top_position,
-        "rotation": top_rotation,
-        # "zrange": (999.7, 1001.0),
-        # "zrange": (900, 1001.0),
-        'zrange': (0.01, 10.),
-        "noise": False,
-    },
-    ]
+    }]
 
 
 class Oracle():
@@ -107,7 +91,7 @@ class KinectFranka():
     """Kinect Franka Camera"""
 
     # Near-orthographic projection.
-    image_size = (424, 512)
+    image_size = (424,512)
     intrinsics = (365.57489013671875, 0.0, 257.5205078125, 0.0, 365.57489013671875, 205.26710510253906, 0.0, 0.0, 1.0)
     position = (1.082, -0.041, 1.027)
     rotation = p.getQuaternionFromEuler((-2.611, 0.010, 1.553))
