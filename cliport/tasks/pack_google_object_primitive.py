@@ -74,22 +74,21 @@ class PackingGoogleObjectsPrimitive(Task):
         self.task_name="pack-google-object-primitive"
         self.task_completed_desc = "done packing google objects."
         self.answer_template = "The action is executed successfully."
-        self.lang_template = "pick up the {pick_obj} and place it in the {place_obj}"
-        self.question_template = "Did the robot successfully execute the action 'place the {pick_obj} into the {place_obj}', and did any anomaly happen?"
+        self.lang_template = "put the {pick_obj} in the brown box"
+        self.question_template = "Did the robot successfully execute the action 'put the {pick_obj} in the brown box', and did any anomaly happen?"
 
 
 
     def reset(self, env):
         super().reset(env)
 
-        target = random.choice(["brown box", "trash can"])
+        # target = random.choice(["brown box", "trash can"])
 
         # add trash can
         trashcan_pose = ((0.35, random.choice([-0.4, 0.4]), 0.05), (0.0, 0.0, 0.12, 0.1))
 
         container_template = 'trash_can/trashcan.urdf'
-        trashcan_id=env.add_object(container_template, trashcan_pose, 'fixed')
-        trashcan_size = p.getVisualShapeData(trashcan_id)[0][3]
+        #trashcan_id=env.add_object(container_template, trashcan_pose, 'fixed')
 
 
 
@@ -210,20 +209,13 @@ class PackingGoogleObjectsPrimitive(Task):
         ## always pick the fist google obj
         target_obj_id=object_ids[0][0]
         chosen_obj_pts = {target_obj_id: object_points[target_obj_id]}
-        if target=="brown box":
 
-
-            self.goals.append(([(target_obj_id, (0, None))], np.int32([[1]]), [zone_pose],
-                               False, True, 'zone',
-                               (chosen_obj_pts, [(zone_pose, zone_size)]),
-                               1))
-        else:
-            self.goals.append(([(target_obj_id, (0, None))], np.int32([[1]]), [trashcan_pose],
-                               False, False, 'trash',
-                               (chosen_obj_pts, [(trashcan_pose, trashcan_size)]),
-                               1))
-        self.lang_goals.append(self.lang_template.format(pick_obj=object_descs[0],place_obj=target))
-        self.question_list.append(self.question_template.format(pick_obj=object_descs[0],place_obj=target))
+        self.goals.append(([(target_obj_id, (0, None))], np.int32([[1]]), [zone_pose],
+                           False, True, 'zone',
+                           (chosen_obj_pts, [(zone_pose, zone_size)]),
+                           1))
+        self.lang_goals.append(self.lang_template.format(pick_obj=object_descs[0]))
+        self.question_list.append(self.question_template.format(pick_obj=object_descs[0]))
         self.answer_list.append(self.answer_template)
 
 
@@ -236,7 +228,7 @@ class PackingGoogleObjectsPrimitive(Task):
     def choose_objects(self, object_names, k):
         repeat_category = None
         return np.random.choice(object_names, k, replace=False), repeat_category
-
+rel_postion = ['top left', 'top right', 'bottom left', 'bottom right']
 
 class PackingGoogleObjectsRelativePrimitive(Task):
     """Packing Google Objects with position difference.
@@ -247,14 +239,14 @@ class PackingGoogleObjectsRelativePrimitive(Task):
         self.task_name="pack-google-object-primitive"
         self.task_completed_desc = "done packing google objects."
         self.answer_template = "The action is executed successfully."
-        self.lang_template = "pick up the {pick_obj} at the {pick_pos} and place it in the {place_obj}"
-        self.question_template = "Did the robot successfully execute the action 'place the {pick_obj} at the {pick_pos} in the {place_obj}', and did any anomaly happen?"
+        self.lang_template = "put the {pick_obj} at the {pick_pos} in the trashcan"
+        self.question_template = "Did the robot successfully execute the action 'put the {pick_obj} at the {pick_pos} in the trashcan', and did any anomaly happen?"
         #self.rel_pos=rel_postion
 
     def reset(self, env):
         super().reset(env)
 
-        target = random.choice(["brown box", "trash can"])
+        target = random.choice(["obj", "box"])
 
         # add trash can
         trashcan_pose = ((0.35, random.choice([-0.4, 0.4]), 0.05), (0.0, 0.0, 0.12, 0.1))
@@ -270,7 +262,7 @@ class PackingGoogleObjectsRelativePrimitive(Task):
         half = np.float32(zone_size) / 2
         replace = {'DIM': zone_size, 'HALF': half}
         container_urdf = self.fill_template(container_template, replace)
-        env.add_object(container_urdf, zone_pose, 'fixed')
+        container_id=env.add_object(container_urdf, zone_pose, 'fixed')
         if os.path.exists(container_urdf): os.remove(container_urdf)
 
         margin = 0.01
@@ -328,7 +320,8 @@ class PackingGoogleObjectsRelativePrimitive(Task):
         object_template = 'google/object-template.urdf'
         chosen_objs, repeat_category = self.choose_objects(object_names, len(bboxes))
         object_descs = []
-        adv_step=random.randint(0,len(bboxes)-2)
+        adv_step=2
+        adv_id=None
         for i, bbox in enumerate(bboxes):
             size = bbox[3:] - bbox[:3]
             max_size = size.max()
@@ -361,10 +354,14 @@ class PackingGoogleObjectsRelativePrimitive(Task):
                                'COLOR': (0.2, 0.2, 0.2)}
                     urdf = self.fill_template(object_template, replace)
                     box_id = env.add_object(urdf, ps)
-                    if i==adv_step:
+                    #print(target)
+                    if (target=="obj") and (i==adv_step):
                         adv_info=self.add_adv_google_object(box_id,urdf,size,env)
+                        #print("fuck")
+                        #print(adv_info)
                         if adv_info is None:
                             return None
+                        pick_obj_name=object_descs[0]
                         adv_id, adv_pos = adv_info
                         texture_id = p.loadTexture(texture_file)
                         p.changeVisualShape(adv_id, -1, textureUniqueId=texture_id)
@@ -385,30 +382,34 @@ class PackingGoogleObjectsRelativePrimitive(Task):
                     print("Failed to load Google Scanned Object in PyBullet")
                     print(object_name_with_underscore, mesh_file, texture_file)
                     print(f"Exception: {e}")
+                    return None
 
 
+        #print(target)
         ## always pick the fist google obj
-        target_obj_id=adv_id
+        if target=="box":
+            zone_size = self.get_random_size(0.05, 0.1, 0.05, 0.1, 0.05, 0.05)
+            half = np.float32(zone_size) / 2
+            replace = {'DIM': zone_size, 'HALF': half}
+            container_urdf = self.fill_template(container_template, replace)
+            adv_info = self.add_adv_google_object(container_id, container_urdf, zone_size, env)
+            if adv_info is None:
+                return None
+            adv_id, adv_pos = adv_info
+            pick_obj_name = "brown box"
+        if adv_id==None:
+            return None
+        chosen_obj_pts = {adv_id: self.get_object_points(adv_id)}
 
 
-        chosen_obj_pts = {target_obj_id: self.get_object_points(target_obj_id)}
 
 
-
-
-        if target=="brown box":
-
-            self.goals.append(([(target_obj_id, (0, None))], np.int32([[1]]), [zone_pose],
-                               False, True, 'zone',
-                               (chosen_obj_pts, [(zone_pose, zone_size)]),
-                               1))
-        else:
-            self.goals.append(([(target_obj_id, (0, None))], np.int32([[1]]), [trashcan_pose],
-                               False, False, 'trash',
-                               (chosen_obj_pts, [(trashcan_pose, trashcan_size)]),
-                               1))
-        self.lang_goals.append(self.lang_template.format(pick_obj=object_descs[0],pick_pos=adv_pos,place_obj=target))
-        self.question_list.append(self.question_template.format(pick_obj=object_descs[0],pick_pos=adv_pos,place_obj=target))
+        self.goals.append(([(adv_id, (0, None))], np.int32([[1]]), [trashcan_pose],
+                           False, False, 'trash',
+                           (chosen_obj_pts, [(trashcan_pose, trashcan_size)]),
+                           1))
+        self.lang_goals.append(self.lang_template.format(pick_obj=pick_obj_name,pick_pos=adv_pos))
+        self.question_list.append(self.question_template.format(pick_obj=pick_obj_name,pick_pos=adv_pos))
         self.answer_list.append(self.answer_template)
 
 
@@ -425,7 +426,7 @@ class PackingGoogleObjectsRelativePrimitive(Task):
     def add_adv_google_object(self,obj_id, urdf,object_size,env):
 
         true_pose = p.getBasePositionAndOrientation(obj_id)
-        current_pos=utils.determine_region(true_pose)
+        current_pos=self.determine_region(true_pose[0])
         i=0
         rel_pos = ['top left', 'top right', 'bottom left', 'bottom right']
         rel_pos.remove(current_pos)

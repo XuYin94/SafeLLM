@@ -1,0 +1,24 @@
+root_dir: ${env:CLIPORT_ROOT}
+tag: default
+debug: false
+data_dir: C:/Program Files/Git/mnt/bear1/users/zhangkang/yinxu/Workfolder/data/primitive
+assets_root: ./cliport/environments/assets/
+disp: true
+shared_memory: false
+task: pack-box-primitive-relative-pick-position
+mode: train
+'n': 3000
+save_data: true
+dataset:
+  type: single
+  images: true
+  cache: true
+  augment:
+    theta_sigma: 60
+record:
+  save_video: false
+  save_video_path: ./${task}-${mode}/videos/
+  add_text: false
+  fps: 20
+  video_height: 640
+  video_width: 720

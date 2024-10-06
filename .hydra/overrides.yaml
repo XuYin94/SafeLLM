@@ -1,0 +1,4 @@
+- task=pack-box-primitive-relative-pick-position
+- n=3000
+- mode=train
+- data_dir=C:/Program Files/Git/mnt/bear1/users/zhangkang/yinxu/Workfolder/data/primitive

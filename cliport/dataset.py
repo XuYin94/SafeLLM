@@ -87,6 +87,9 @@ class RavensDataset(Dataset):
             info.append(i)
 
         color = np.uint8(color)
+        #img=cv2.cvtColor(np.uint8(color[0][0]), cv2.COLOR_RGB2BGR)
+        #cv2.imwrite('/home/zhang/workspace/yinxu/LoHo-Ravens/cliport/0.png',img)
+        
         depth = np.float32(depth)
         def dump(data, field):
             field_path = os.path.join(self._path,field)
@@ -208,8 +211,8 @@ class RavensDataset(Dataset):
         # Get training labels from data sample.
         (obs, act, _, info) = datum
         img = self.get_image(obs)
-        # color=cv2.cvtColor(np.uint8(img)[:,:,:3], cv2.COLOR_RGB2BGR)
-        # cv2.imwrite('/home/zhang/workspace/yinxu/LoHo-Ravens/cliport/0.png',color)
+        #color=cv2.cvtColor(np.uint8(img)[:,:,:3], cv2.COLOR_RGB2BGR)
+        #cv2.imwrite('/home/zhang/workspace/yinxu/LoHo-Ravens/cliport/0.png',color)
         p0, p1 = None, None
         p0_theta, p1_theta = None, None
         perturb_params = None
@@ -318,26 +321,32 @@ class RavensMultiTaskDataset(RavensDataset):
             'train': [
                 #'pick-and-place-primitive',
                 #'pick-and-place-primitive-relative-pick-position',
-                'pack-box-primitive-relative-pick-position',
-                'pack-box-primitive'
+                # 'pack-box-primitive-relative-pick-position',
+                # 'pack-box-primitive'
                 # 'stack-block-pyramid-seq-seen-colors-primitive',
                 # 'stack-block-pyramid-seq-seen-colors-relative-position'
+                'pack-google-object-primitive',
+                'pack-google-object-relative-primitive'
             ],
             'val': [
                 #'pick-and-place-primitive',
                 #'pick-and-place-primitive-relative-pick-position',
-                'pack-box-primitive-relative-pick-position',
-                'pack-box-primitive'
+                # 'pack-box-primitive-relative-pick-position',
+                # 'pack-box-primitive'
                 # 'stack-block-pyramid-seq-seen-colors-primitive',
                 # 'stack-block-pyramid-seq-seen-colors-relative-position'
+                'pack-google-object-primitive',
+                'pack-google-object-relative-primitive'
             ],
             'test': [
                 #'pick-and-place-primitive',
                 #'pick-and-place-primitive-relative-pick-position',
-                'pack-box-primitive-relative-pick-position',
-                'pack-box-primitive'
+                # 'pack-box-primitive-relative-pick-position',
+                # 'pack-box-primitive'
                 # 'stack-block-pyramid-seq-seen-colors-primitive',
                 # 'stack-block-pyramid-seq-seen-colors-relative-position'
+                'pack-google-object-primitive',
+                'pack-google-object-relative-primitive'
             ],
         }
 

@@ -50,7 +50,6 @@ class Task:
         self.seed = 0
 
         self.generate_instruction_for_every_step = False
-        self.step_save_path = "/mounts/work/shengqiang/projects/2023/LoHoRavens/each_step_img_instruction/"
         self.task_name = None
         self.pick_obj_names, self.place_obj_names = [], []
 
@@ -271,22 +270,20 @@ class Task:
                 for obj_id in env.obj_ids['rigid']:
                     pts = self.get_object_points(obj_id)
                     obj_pose = p.getBasePositionAndOrientation(obj_id)
-                    # print("zone_pose", zone_pose)
+                    #print("zone_pose", zone_pose)
                     world_to_zone = utils.invert(zone_pose)
                     obj_to_zone = utils.multiply(world_to_zone, obj_pose)
                     pts = np.float32(utils.apply(obj_to_zone, pts))
+                    
                     if len(zone_size) > 1:
                         valid_pts = np.logical_and.reduce([
                             pts[0, :] > -zone_size[0] / 2, pts[0, :] < zone_size[0] / 2,
                             pts[1, :] > -zone_size[1] / 2, pts[1, :] < zone_size[1] / 2,
                             pts[2, :] < self.zone_bounds[2, 1]])
+
                     if obj_id in goal_object_ids:
                         zone_pts += np.sum(np.float32(valid_pts))
-                    else:
-                        total_pts += np.sum(np.float32(valid_pts))
-                    # if zone_idx == matches[obj_idx].argmax():
-                    ##zone_pts += np.sum(np.float32(valid_pts))
-                    total_pts += pts.shape[1]
+                        total_pts += pts.shape[1]
             step_reward = max_reward * (zone_pts / total_pts)
 
         elif metric == 'trash': ## we don't need to care about the obj pose in the trash can.
@@ -305,7 +302,7 @@ class Task:
                     pts[1, :] > -can_size[1] / 2, pts[1, :] < can_size[1] / 2,
                     pts[2, :] < self.zone_bounds[2, 1]])
                 #print(np.sum(valid_pts))
-                if 120>np.sum(valid_pts)>=6:
+                if np.sum(valid_pts)>=6:
                     step_reward=1
                 else:
                     step_reward=0
@@ -410,29 +407,24 @@ class Task:
         if np.sum(free) == 0:
             return None, None
 
+        
         pix = utils.sample_distribution(np.float32(free))
         pos = utils.pix_to_xyz(pix, hmap, self.bounds, self.pix_size)
         pos = (pos[0], pos[1], obj_size[2] / 2)
         if zone is not None:
-            zone_pos = self.area_boundary[zone]
-            x_start=zone_pos['x_start']
-            y_start = zone_pos['y_start']
-            x_end=zone_pos['x_end']
-            y_end = zone_pos['y_end']
             i=0
             while True:
+                if self.determine_region(pos)==zone:
+                    break
                 pix = utils.sample_distribution(np.float32(free))
                 pos = utils.pix_to_xyz(pix, hmap, self.bounds, self.pix_size)
                 pos = (pos[0], pos[1], obj_size[2] / 2)
-                if ((pos[0]<=x_end) & (pos[0]>=x_start)) and ((pos[1]<=y_end) & (pos[1]>=y_start)):
-                    break
                 i+=1
                 if i>=20:
                     return None, None
         theta = np.random.rand() * 2 * np.pi
         rot = utils.eulerXYZ_to_quatXYZW((0, 0, theta))
         return pos, rot
-
 
     def get_lang_goal(self):
         if len(self.lang_goals) == 0:
@@ -455,6 +447,29 @@ class Task:
     def get_reward(self):
         return float(self._rewards)
 
+
+    def determine_region(self,pose):
+        obj_center = pose[:2]
+        def calculate_distance(point1, region):
+            point2=[(region['x_start']+region['x_end'])/2,(region['y_start']+region['y_end'])/2]
+            return np.linalg.norm(np.array(point1) - np.array(point2))
+        distance_to_top_left = calculate_distance(obj_center, self.area_boundary['top left'])
+        distance_to_top_right = calculate_distance(obj_center, self.area_boundary['top right'])
+        distance_to_bottom_left = calculate_distance(obj_center, self.area_boundary['bottom left'])
+        distance_to_bottom_right = calculate_distance(obj_center,self.area_boundary['bottom right'])
+
+        min_distance = min(distance_to_top_left, distance_to_top_right, distance_to_bottom_left, distance_to_bottom_right)
+
+        if min_distance == distance_to_top_left:
+            region = "top left"
+        elif min_distance == distance_to_top_right:
+            region = "top right"
+        elif min_distance == distance_to_bottom_left:
+            region = "bottom left"
+        elif min_distance == distance_to_bottom_right:
+            region = "bottom right"
+
+        return region
     # -------------------------------------------------------------------------
     # Helper Functions
     # -------------------------------------------------------------------------

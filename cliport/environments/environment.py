@@ -5,7 +5,7 @@ import tempfile
 import time
 import cv2
 import imageio
-
+from time import sleep
 import gym
 import numpy as np
 from cliport.tasks import cameras
@@ -308,8 +308,18 @@ class Environment(gym.Env):
 
     def multi_view_render(self):
         color_list,depth_list=[],[]
-        for j,config in enumerate(self.agent_cams):
-            color, depth, _ = self.render_camera(config)
+        cam_configs=self.agent_cams+[{
+        "image_size": (480, 640),
+        "intrinsics": (450. // 1.42, 0, 320., 0, 450., 240., 0, 0, 1),
+        "position": (0.5, 0, 0.55),
+        "rotation": p.getQuaternionFromEuler((0, np.pi, -np.pi / 2)),
+        # "zrange": (999.7, 1001.0),
+        # "zrange": (900, 1001.0),
+        'zrange': (0.01, 10.),
+        "noise": False,
+    },]
+        for j,config in enumerate(cam_configs):
+            color, __, _ = self.render_camera(config)
             # img_rgb = cv2.cvtColor(np.uint8(color) , cv2.COLOR_BGR2RGB)
             # cv2.imwrite(os.path.join('./', str(j) + ".png"), img_rgb)
             color_list.append(color)
@@ -422,19 +432,19 @@ class Environment(gym.Env):
         p.setRealTimeSimulation(True)
         self.save_video = False
 
-    def add_video_frame(self,scene=None):
+    def add_video_frame(self,Text=None):
         # Render frame.
         config = self.agent_cams[0]
         image_size = (self.record_cfg['video_height'], self.record_cfg['video_width'])
-        color, depth, _ = self.render_camera(config, image_size, shadow=0)
+        color, __, _ = self.render_camera(config, image_size, shadow=0)
         color = np.array(color)
 
         # Add language instruction to video.
         if self.record_cfg['add_text']:
-            lang_goal = self.get_lang_goal()
-            # if scene is not None:
-            #     lang_goal=scene
-            reward = f"Success: {self.task.get_reward():.3f}"
+            if Text is None:
+                lang_goal = self.get_lang_goal()
+            else:
+                lang_goal=Text
 
             font = cv2.FONT_HERSHEY_DUPLEX
             font_scale = 0.65
@@ -454,7 +464,11 @@ class Environment(gym.Env):
             color = np.array(color)
 
         self.video_writer.append_data(color)
-
+        if Text is not None:
+            for _ in range(50): 
+                self.video_writer.append_data(color)
+                
+                
     def movep(self, pose, speed=0.01):
         """Move UR5 to target end effector pose."""
         targj = self.solve_ik(pose)

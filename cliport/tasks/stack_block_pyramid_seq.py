@@ -146,7 +146,7 @@ class StackBlockPyramidSeqUnseenColors(Task):
         container_template = 'trash_can/trashcan.urdf'
         env.add_object(container_template, trashcan_pose, 'fixed')
 
-        nbr_blocks=random.randint(7,9)
+        nbr_blocks=random.randint(7,8)
 
         # Add base.
         base_size = (0.06, 0.18, 0.005)
@@ -162,10 +162,11 @@ class StackBlockPyramidSeqUnseenColors(Task):
         colors = [utils.COLORS[c] for c in all_color_names]
 
         #relevant_color_names = all_color_names[:4]
-        target_block_seq =sorted(np.random.choice(range(4), 6, replace=True))
+        target_block_seq =sorted(np.random.choice(range(nbr_blocks), 6, replace=False))
         target_block_colors=[all_color_names[i] for i in target_block_seq]
         target_list=np.unique(target_block_seq)
         self.target_color=[all_color_names[i] for i in target_list]
+        #print(target_block_colors)
         # Add blocks.
         objs = []
         # sym = np.pi / 2
@@ -179,7 +180,7 @@ class StackBlockPyramidSeqUnseenColors(Task):
                 p.changeVisualShape(block_id, -1, rgbaColor=colors[target_block_seq[i]] + [1])
                 self.block_info.append((block_id, target_block_colors[i]))
             else:
-                icolor =np.random.choice(range(4,len(colors)), 1).squeeze()
+                icolor =np.random.choice(range(6,len(colors)), 1).squeeze()
                 p.changeVisualShape(block_id, -1, rgbaColor=colors[icolor] + [1])
                 self.block_info.append((block_id, all_color_names[icolor]))
             objs.append((block_id, (np.pi / 2, None)))
@@ -663,7 +664,7 @@ class StackBlockPyramidSeqUnseenColorswithrelativepickposition(Task):
 
             ## Add adv stand obj
             true_pose = p.getBasePositionAndOrientation(base_id)
-            current_pos = utils.determine_region(true_pose,self)
+            current_pos = self.determine_region(true_pose[0])
             i = 0
             rel_pos= ['top left', 'top right', 'bottom left', 'bottom right']
             rel_pos.remove(current_pos)
@@ -716,7 +717,7 @@ class StackBlockPyramidSeqUnseenColorswithrelativepickposition(Task):
                          (0, 0.025, 0.08), (0, 0, 0.13)]
             targs = [(utils.apply(base_pose, i), base_pose[1]) for i in place_pos]
             obj_points={trashcan_id:self.get_object_points(trashcan_id)}
-            nbr_blocks=random.randint(1,6)
+            nbr_blocks=random.randint(1,3)
 
             for i in range(nbr_blocks):
                 block_pose = targs[i]
@@ -744,37 +745,37 @@ class StackBlockPyramidSeqUnseenColorswithrelativepickposition(Task):
                 self.question_list.append(question_template)
                 
             else:
-                if nbr_blocks==6:
-                    # Goal: remove the top row.
-                    self.goals.append(([objs[5]], np.eye(1), [trashcan_pose],
-                                       False, False, 'trash', (obj_points, [(trashcan_pose, trashcan_size)]), 1))
-                    self.lang_goals.append(self.lang_template.format(pick=color_names[5] ,
-                                                                     position=f"on the {color_names[3]} and {color_names[4]} blocks"))
-                    self.question_list.append(self.question_template.format(pick=color_names[5] ,
-                                                                     position=f"on the {color_names[3]} and {color_names[4]} blocks"))
-                elif nbr_blocks==5:
-                    # Goal: remove the middle row.
-                    self.goals.append(([objs[4]], np.eye(1), [trashcan_pose],
-                                       False, False, 'trash', (obj_points, [(trashcan_pose, trashcan_size)]), 1))
-                    self.lang_goals.append(self.lang_template.format(pick=color_names[4],
-                                                                     position=f"on the {color_names[1]} and {color_names[2]} blocks"))
-                    self.question_list.append(self.question_template.format(pick=color_names[4],
-                                                                     position=f"on the {color_names[1]} and {color_names[2]} blocks"))
-                elif nbr_blocks == 4:
-                    self.goals.append(([objs[3]], np.eye(1), [trashcan_pose],
-                                       False, False, 'trash', (obj_points, [(trashcan_pose, trashcan_size)]), 1))
-                    self.lang_goals.append(self.lang_template.format(pick=color_names[3],
-                                                                     position=f"on the {color_names[0]} and {color_names[1]} blocks"))
-                    self.question_list.append(self.question_template.format(pick=color_names[2],
-                                                                     position=f"on the {color_names[0]} and {color_names[1]} blocks"))
-                elif nbr_blocks == 3:
+                # if nbr_blocks==6:
+                #     # Goal: remove the top row.
+                #     self.goals.append(([objs[5]], np.eye(1), [trashcan_pose],
+                #                        False, False, 'trash', (obj_points, [(trashcan_pose, trashcan_size)]), 1))
+                #     self.lang_goals.append(self.lang_template.format(pick=color_names[5] ,
+                #                                                      position=f"on the {color_names[3]} and {color_names[4]} blocks"))
+                #     self.question_list.append(self.question_template.format(pick=color_names[5] ,
+                #                                                      position=f"on the {color_names[3]} and {color_names[4]} blocks"))
+                # elif nbr_blocks==5:
+                #     # Goal: remove the middle row.
+                #     self.goals.append(([objs[4]], np.eye(1), [trashcan_pose],
+                #                        False, False, 'trash', (obj_points, [(trashcan_pose, trashcan_size)]), 1))
+                #     self.lang_goals.append(self.lang_template.format(pick=color_names[4],
+                #                                                      position=f"on the {color_names[1]} and {color_names[2]} blocks"))
+                #     self.question_list.append(self.question_template.format(pick=color_names[4],
+                #                                                      position=f"on the {color_names[1]} and {color_names[2]} blocks"))
+                # if nbr_blocks == 4:
+                #     self.goals.append(([objs[3]], np.eye(1), [trashcan_pose],
+                #                        False, False, 'trash', (obj_points, [(trashcan_pose, trashcan_size)]), 1))
+                #     self.lang_goals.append(self.lang_template.format(pick=color_names[3],
+                #                                                      position=f"on the {color_names[0]} and {color_names[1]} blocks"))
+                #     self.question_list.append(self.question_template.format(pick=color_names[2],
+                #                                                      position=f"on the {color_names[0]} and {color_names[1]} blocks"))
+                if nbr_blocks == 3:
                     # Goal: remove  the bottom row.
                     self.goals.append(([objs[2]], np.eye(1), [trashcan_pose],
                                        False, False, 'trash', (obj_points, [(trashcan_pose, trashcan_size)]), 1))
                     self.lang_goals.append(self.lang_template.format(pick=color_names[2],
                                                                      position=f"on the darkest brown block of the stand"))
                     self.question_list.append(self.question_template.format(pick=color_names[2],
-                                                                     position=f"on the darkest brown block of the stand"))
+                                                                     position=f"on the stand"))
 
                 elif nbr_blocks == 2:
                     self.goals.append(([objs[1]], np.eye(1), [trashcan_pose],

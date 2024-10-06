@@ -40,6 +40,8 @@ def affordance_scoring(skill_set, task):
         if "Stacking" in task.task_name:
             if not 'stand' in place:
                 place_info=pick_state
+            else:
+                place_info=place_state
         else:
             place_info=place_state
         if pick in pick_state:
@@ -61,9 +63,9 @@ def normalize_scores(scores):
   return normed_scores
 
 
-def execution(obs,info,event,agent,env,output_queue):
+def execution(obs,info,event,agent,env,action_error,output_queue):
     act=agent.act(obs,info)
-    obs,reward, __, info=env.step(act)
+    obs,reward, __, info=env.step(act,action_error=action_error)
     output_queue.put((1,obs,reward,info))
     event.set()
 def one_step_execution(env,task,agent,obs,info,step,lang_inst,anomaly,handling_type="None",state=None):
@@ -73,14 +75,17 @@ def one_step_execution(env,task,agent,obs,info,step,lang_inst,anomaly,handling_t
     if "done." in lang_inst or "alert." in lang_inst:
         env.add_video_frame()
         return 0.0
-    
+    action_error = False#random.choices([True, False], weights=[0.2, 0.8])[0]
+    if action_error:
+        action_result="The actionf failed, and "
+    else:
+        action_result="The actionf succeed, and "
     event = threading.Event()
     output_queue = queue.Queue()
-    actor = threading.Thread(target=execution,args=(obs,info,event,agent,env,output_queue))
+    actor = threading.Thread(target=execution,args=(obs,info,event,agent,env,action_error,output_queue))
     thread_list=[actor]
     
     if anomaly is not None:
-        #env,output_queue,task=None,perturbation="pick",step=0,type="None",progress=None
         gt_anomaly=threading.Thread(target=anomaly_generator,args=(env,output_queue,task,anomaly,handling_type,state))
         thread_list.append(gt_anomaly)
     
@@ -103,7 +108,7 @@ def one_step_execution(env,task,agent,obs,info,step,lang_inst,anomaly,handling_t
     else:
         __,obs,reward, info= results[0]
         anomaly="no anomaly happened."
-    print(anomaly)
+    print(action_result+anomaly)
     return reward
 
 
@@ -169,7 +174,7 @@ def main(vcfg):
     generator = Llama.build(
     ckpt_dir="/mnt/bear1/users/zhangkang/yinxu/LLM_models/Meta-Llama-3.1-8B-Instruct/original",
     tokenizer_path="/mnt/bear1/users/zhangkang/yinxu/LLM_models/Meta-Llama-3.1-8B-Instruct/original/tokenizer.model",
-    max_seq_len=1024,
+    max_seq_len=2048,
     max_batch_size=64,
 )
 
@@ -180,23 +185,26 @@ def main(vcfg):
     n_demos = vcfg['n_demos']
     
     eval_results=[]
-    for i in range(0, 100):
-        logging.info(f'Test: {i + 1}/{n_demos}')
+    test_demos=0
+    for i in range (0,200):
+        if test_demos>=100:
+            break
         episode, seed = ds.load(i)
         total_reward = 0
         total_nbr_action=0
-        np.random.seed(seed)
 
         # set task
-
         task = tasks.names[task_name]()
-        vlm_path=f"{vcfg['record']['vlm_path']}/episode_"+str(i)+""    
+        vlm_path=f"{vcfg['record']['vlm_path']}/episode_"+str(test_demos)+""    
         if not os.path.exists(vlm_path):
             os.makedirs(vlm_path)
         task.mode = mode
         env.seed(seed)
         env.set_task(task)
         obs = env.reset()
+        if obs is None:
+            continue
+        logging.info(f'Test: {test_demos + 1}/{n_demos}')
         info = env.info
 
         initial_state = task.initial_state
@@ -204,13 +212,9 @@ def main(vcfg):
         print("Initial State:", initial_state)
         handling_type=np.random.choice(["None"])
         if anomaly_type !='None':
-            anomaly_time = 0#np.random.choice(np.arange(0, len(episode)-1), size=1, replace=False)  ## the step when the anomaly occurr
+            start=1 if anomaly_type=="displacement" else 0
+            anomaly_time = np.random.choice(np.arange(start, task.gt_step-1), size=1, replace=False)  ## the step when the anomaly occurr
             print("{type} anomaly will occur in step {time}".format(type=anomaly_type,time=anomaly_time))
-            if anomaly_type=="removal":
-                if handling_type=="None":
-                    alert_true.append(0)
-                else:
-                    alert_true.append(1)
         else:
             anomaly_time=-1
         episode_message=prompt+"### User:\n"+initial_state+"\n"
@@ -218,14 +222,18 @@ def main(vcfg):
         all_llm_scores = []
         all_affordance_scores = []
         all_combined_scores = []
-        options = get_skill_set(task=task_name)
+        if "stack" in task_name:
+            color_candidate=[i[1] for i in task.block_info]
+            options = get_skill_set(task_name,color_candidate)
+        else:
+            options = get_skill_set(task=task_name)
         affordance_scores = affordance_scoring(options, task)
         #print(affordance_scores)
         num_tasks = 0
         steps_text = []
-        while num_tasks<4:
+        while num_tasks<task.gt_step:
             num_tasks += 1
-            episode_message +="### User:\n"+"What is your plan for the next step?\n"+"### Assistant:\n"
+            episode_message +="### User:\n"+"What is your next plan?\n"+"### Assistant:\n"
             #llm_scores,__=llama_skill_scoring(episode_message, options, llm_args)
             llm_scores=llama_skill_generation_scoring(episode_message, options,generator)
             combined_scores = {option['name']: np.exp(llm_scores[option['name']]) * affordance_scores[option['name']] for option in options}
@@ -241,90 +249,72 @@ def main(vcfg):
             all_combined_scores.append(combined_scores)
         #del generator
         torch.set_default_tensor_type(torch.cuda.FloatTensor)
+        torch.backends.cudnn.enabled = False
         # Evaluation loop
 
         logging.info(f"Evaluating: {str(ckpts_to_eval)}")
-        for ckpt in ckpts_to_eval:
-            model_file = os.path.join(vcfg['model_path'], ckpt)
+        #for ckpt in ckpts_to_eval:
+        model_file = os.path.join(vcfg['model_path'], ckpts_to_eval[0])
 
-            if not os.path.exists(model_file) or not os.path.isfile(model_file):
-                print(f"Checkpoint not found: {model_file}")
-                continue
-            elif not vcfg['update_results'] and ckpt in existing_results:
-                print(f"Skipping because of existing results for {model_file}.")
-                continue
+        # Initialize agent.
+        utils.set_seed(42, torch=True)
+        agent = agents.names[vcfg['agent']](name, tcfg, None, ds,val=True)
 
-            # Initialize agent.
-            utils.set_seed(0, torch=True)
-            agent = agents.names[vcfg['agent']](name, tcfg, None, ds,val=True)
+        # Load checkpoint
+        agent.load(model_file)
+        #agent=agent.to(torch.bfloat16)
+        logging.info(f"Loaded: {model_file}")
 
-            # Load checkpoint
-            agent.load(model_file)
-            #agent=agent.to(torch.bfloat16)
-            logging.info(f"Loaded: {model_file}")
-
-            # Run testing and save total rewards with last transition info.
-            alert_true=[]
-            alert_pred=[]
+        # Run testing and save total rewards with last transition info.
     
-            #Start recording video (NOTE: super slow)
-            if record:
-                logging.info("Start recording video ......")
-                video_name = f'{task_name}-{i + 1:06d}'
-                if 'multi' in vcfg['model_task']:
-                    video_name = f"{vcfg['model_task']}-{video_name}"
-                env.start_rec(video_name)
-                
-            step=0
-            state=0 
-            occured=False
-            for step, lang_inst in enumerate(steps_text):
-                if lang_inst=="alert." and anomaly_type=="removal":
-                    alert_pred.append(1)
-                    if record:
-                        env.end_rec()  
-                        break
-                
-                if lang_inst=="done.":
-                    env.end_rec()  
-                    break
-                
-                
-                if state ==anomaly_time and not occured:
-                    anomaly= anomaly_type  
+        #Start recording video (NOTE: super slow)
+        if record:
+            logging.info("Start recording video ......")
+            video_name = f'{task_name}-{test_demos + 1:06d}'
+            if 'multi' in vcfg['model_task']:
+                video_name = f"{vcfg['model_task']}-{video_name}"
+            env.start_rec(video_name)
+            
+        step=0
+        state=0 
+        occured=False
+        np.random.seed(seed)
+        random.seed(seed)
+        for step, lang_inst in enumerate(steps_text):
+            
+            if step ==anomaly_time and not occured:
+                anomaly= anomaly_type  
+            else:
+                anomaly=None
+            results=one_step_execution(env,task,agent,obs,info,step,lang_inst,anomaly,handling_type,state=state)
+            if results is None: 
+                break
+            else:
+                if step ==anomaly_time:
                     occured=True
-                else:
-                    anomaly=None
-                results=one_step_execution(env,task,agent,obs,info,step,lang_inst,anomaly,handling_type,state=state)
-                if results is None: 
-                    break
-                reward=results
-                if reward>0:
-                    state+=1
-                total_reward+=reward
-                total_nbr_action+=1
-                                                
-                __, __, done, __=env.step()
-                if done:
-                    env.end_rec()  
-                    break
-                step+=1
-            if record:
-                env.end_rec()
+            reward=results
+            if reward>0:
+                state+=1
+            total_reward+=reward
+            total_nbr_action+=1
+                                            
+            obs, __, done, __=env.step()
+            if done:
+                env.end_rec()  
+                break
+            step+=1
+        if record:
+            env.end_rec()
+        if anomaly_type !='None' and occured:
             eval_results.append((total_reward,total_nbr_action))
-            mean_reward = np.mean([r for r, i in eval_results])
-            mean_action=np.mean([i for r, i in eval_results])
-            print(f'Mean_reward: {mean_reward} | Mean_action: {mean_action}')
+            test_demos+=1
+        elif anomaly_type =='None':
+            eval_results.append((total_reward,total_nbr_action))
+            test_demos+=1
+        mean_reward = np.mean([r for r, i in eval_results])
+        mean_action=np.mean([i for r, i in eval_results])
+        print(f'Mean_reward: {mean_reward} | Mean_action: {mean_action}')
     print(f'Mean_reward: {mean_reward} | Mean_action: {mean_action}')
-    #print(total_reward)
-    # all_results[ckpt] = {
-    #     'SR': total_reward,
-    #     'nbr_action':total_nbr_action
-    # }
-    # if anomaly_type=="removal":
-    #     tn, fp, fn, tp = confusion_matrix(alert_true, alert_pred).ravel()
-    #     all_results[ckpt]['tp']=tp
-    #     all_results[ckpt]['fp']=fp
              
             
 

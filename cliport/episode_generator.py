@@ -34,7 +34,10 @@ def episode_execution(info,obs,agent,env,task,episode):
     total_reward=0
     reward=0
     for i in range(task.max_steps):
-        print(f'| Goal: {info["lang_goal"]}')
+        # if "pack" in task.task_name:
+        #     print(f'| Goal: {info["lang_goal"].format(pick_color=task.block_info[i][1])}')
+        # else:
+        #     print(f'| Goal: {info["lang_goal"]}')
         act = agent.act(obs, info)
         episode.append((obs, act, reward, info))
         obs, reward, done, info = env.step(act)

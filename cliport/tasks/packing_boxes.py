@@ -30,13 +30,15 @@ class PackingBoxes(Task):
 
 
         # Add container box.
+        self.container_info=[]
         zone_size = self.get_random_size(0.05, 0.3, 0.05, 0.3, 0.05, 0.05)
         zone_pose = self.get_random_pose(env, zone_size)
         container_template = 'container/container-template.urdf'
         half = np.float32(zone_size) / 2
         replace = {'DIM': zone_size, 'HALF': half}
         container_urdf = self.fill_template(container_template, replace)
-        env.add_object(container_urdf, zone_pose, 'fixed')
+        container_id=env.add_object(container_urdf, zone_pose, 'fixed')
+        self.container_info.append(container_id)
         if os.path.exists(container_urdf):
             os.remove(container_urdf)
 
@@ -60,7 +62,7 @@ class PackingBoxes(Task):
             split = size > 2 * min_object_dim
             if np.sum(split) == 0:
                 bboxes.append(node.bbox)
-                return
+                return 
             split = np.float32(split) / np.sum(split)
             split_axis = np.random.choice(range(len(split)), 1, p=split)[0]
 
@@ -98,8 +100,6 @@ class PackingBoxes(Task):
         pack_colors = [utils.COLORS[c] for c in relevant_color_names]
         distractor_colors = [utils.COLORS[c] for c in distractor_color_names]
 
-
-
         # Add objects in container.
         self.obj_colors={}
         object_points = {}
@@ -129,6 +129,7 @@ class PackingBoxes(Task):
             object_points[box_id] = self.get_box_object_points(box_id)
             target_list.append(icolor)
         # Randomly select object in box and save ground truth pose.
+        self.target_color=list(dict.fromkeys(initial_objects))
         true_poses = []
         # self.goal = {'places': {}, 'steps': []}
         for i, (object_id, _) in enumerate(object_ids):
@@ -162,8 +163,7 @@ class PackingBoxes(Task):
                 p.changeVisualShape(box_id, -1, rgbaColor=distractor_colors[icolor] + [1])
             self.block_info.append((box_id,distractor_color_names[icolor]))
             initial_objects.append(distractor_color_names[icolor])
-        target_list=np.unique(sorted(target_list))
-        self.target_color=[relevant_color_names[i] for i in target_list]
+        
         #print(self.target_color)
         self.lang_goals.append(self.lang_template)
         self.question_list.append(self.question_template)
@@ -172,18 +172,20 @@ class PackingBoxes(Task):
             object_ids, np.eye(len(object_ids)), true_poses,
             False, True, 'zone',
             (object_points, [(zone_pose, zone_size)]), 1))
-        self.build_initial_scene_description(initial_objects,self.target_color)
-        
+        self.build_initial_scene_description(initial_objects)
+        #print(env.obj_ids['fixed'])
         return True
 
-    def build_initial_scene_description(self, initial_objects, target_color):
+    def build_initial_scene_description(self, initial_objects):
         info = "In the initial state, there are "
         for color in initial_objects[:-1]:
             info += color + ', '
         info += "and " + str(
             initial_objects[-1]) + " blocks; there is a brown box and a trash can.  The instruction is 'Please put all "
-        for color in target_color[:-1]:
+
+        for color in self.target_color[:-1]:
             info += color + ', '
-        info+="and "+str(target_color[-1])+" blocks in the brown box'."
+        info+="and "+str(self.target_color[-1])+" blocks in the brown box'."
+        #print("fuck")
         self.initial_state = info
 

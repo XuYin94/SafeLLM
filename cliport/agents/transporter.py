@@ -204,9 +204,7 @@ class TransporterAgent(LightningModule):
             ckpt_path = os.path.join(checkpoint_path, filename)
             self.trainer.save_checkpoint(ckpt_path)
 
-        if global_step % 1875 == 0:
-            # save lastest checkpoint
-            # print(f"Saving last.ckpt Epoch: {self.trainer.current_epoch} | Global Step: {self.trainer.global_step}")
+        if global_step % 500== 0:
             self.save_last_checkpoint()
 
     def save_last_checkpoint(self):

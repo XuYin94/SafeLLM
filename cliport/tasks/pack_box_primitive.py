@@ -343,7 +343,7 @@ class PackBoxwithRelativePickPosition(Task):
     def add_adv_object(self,obj_id, urdf,object_size,env):
         #print(self.get_object_points(obj_id))
         true_pose = p.getBasePositionAndOrientation(obj_id)
-        current_pos=utils.determine_region(true_pose,self)
+        current_pos=self.determine_region(true_pose[0])
         i=0
         rel_pos = ['top left', 'top right', 'bottom left', 'bottom right']
         rel_pos.remove(current_pos)
