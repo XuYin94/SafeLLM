@@ -75,7 +75,7 @@ def one_step_execution(env,task,agent,obs,info,step,lang_inst,anomaly,handling_t
     if "done." in lang_inst or "alert." in lang_inst:
         env.add_video_frame()
         return 0.0
-    action_error = False#random.choices([True, False], weights=[0.2, 0.8])[0]
+    action_error = random.choices([True, False], weights=[0.2, 0.8])[0]
     if action_error:
         action_result="The actionf failed, and "
     else:

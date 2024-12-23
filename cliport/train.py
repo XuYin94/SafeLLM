@@ -13,7 +13,6 @@ import hydra
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
-os.environ["WANDB_DIR"] = "/mnt/bear1/users/zhangkang/yinxu/Workfolder/exp/wandb"
 def collate_fn(batch):
     if isinstance(batch[0], dict):
         return {key: collate_fn([d[key] for d in batch]) for key in batch[0]}
@@ -36,7 +35,6 @@ def main(cfg):
     wandb_logger = WandbLogger(
         name=cfg['tag'],
         project=cfg['wandb']['logger']['project'],
-        save_dir="/mnt/bear1/users/zhangkang/yinxu/Workfolder/exp/wandb"
     ) if cfg['train']['log'] else None
 
     # Checkpoint saver

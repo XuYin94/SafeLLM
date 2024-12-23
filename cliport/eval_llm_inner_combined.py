@@ -16,7 +16,7 @@ from cliport import dataset
 from cliport import tasks
 from cliport.environments.environment import Environment
 from cliport.utils import utils
-from instructive_llm import load_llm,get_legal_LLM_feedback
+from instructive_llm import load_llm,get_legal_LLM_feedback,get_next_LLM_feedback
 from vlm import load_vlm, get_vlm_feedback
 from cliport.utils.utils import anomaly_generator
 import os
@@ -24,6 +24,7 @@ import threading, time,queue
 from time import sleep
 
 def execution(obs,info,event,agent,env,action_error,output_queue):
+
     act=agent.act(obs,info)
     __,reward, __, __=env.step(act,action_error=action_error)
     output_queue.put((1,reward))
@@ -34,23 +35,22 @@ def one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,
     header,lang_inst=get_legal_LLM_feedback(history_message=episode_message,return_prompt = True,llm_args= llm_args,feedback=None)
     episode_message+=header+'\n'+lang_inst+'\n'
     #print(lang_inst)
-    #print(handling_type)
+
     task.lang_goals=[lang_inst]
     info['lang_goal']=lang_inst
     #img_obs=[]
     print("Step {step}: {action}".format(step=step,action=lang_inst))
     if "done." in lang_inst or "alert." in lang_inst:
-        env.add_video_frame()
-        return episode_message,lang_inst,0.0,None,[None,None],step
-    
+        #env.add_video_frame()
+        return episode_message,lang_inst,0.0,None,None,step
     if anomaly is not None:
         action_error = True#random.choices([True, False], weights=[0.4, 0.6])[0]
     else:
         action_error=False
     if action_error:
-        action_result="The action failed, and "
+        action_result="failed"
     else:
-        action_result="The action succeed, and "
+        action_result="succeed"
     
     rgb_list=[]
     depth_list=[]
@@ -64,7 +64,6 @@ def one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,
     actor = threading.Thread(target=execution,args=(obs,info,event,agent,env,action_error,output_queue))
     recorder=threading.Thread(target=record_img_for_reporter,args=(env,rgb_list,depth_list,event))
     thread_list=[actor,recorder]
-
     if anomaly is not None:
         #env,output_queue,task=None,perturbation="pick",step=0,type="None",progress=None
         gt_anomaly=threading.Thread(target=anomaly_generator,args=(env,output_queue,task,anomaly,handling_type,state))
@@ -88,14 +87,14 @@ def one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,
         anomaly = results[1][1]
     else:
         reward= results[0][1]
-        anomaly="no anomaly happened."
-    env.add_video_frame(Text="VLM: "+action_result+anomaly)
-    print("Ground-truth feedback: "+action_result+anomaly)
+        anomaly="no perturbation happened."
+    #env.add_video_frame(Text="GT: The action "+action_result+", and "+anomaly)
+    print("The action "+action_result+", and "+anomaly)
     rgb, depth = env.multi_view_render()
     rgb_list.append(rgb)
     if not use_vlm: ## use the gt feedback from Pybullet
         #if reward>0:
-        feedback="### User:\n"+action_result+anomaly+'\n'
+        feedback=f"### User:\nThe action {action_result}, and {anomaly}\n"
     else:
         if vlm_inference_type=="single":
             #rgb_list=[rgb_list[0],rgb_list[-1]]  ## only use the start & end state obs for vlm inference
@@ -111,6 +110,7 @@ def one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,
         #print(len(input_list))
         feedback=get_vlm_feedback(vlm_args,input_list,lang_inst,device=vlm_device,configuration=vlm_inference_type)
         print("Feed back from VLM: "+feedback)
+
     episode_message+=feedback
     
     return episode_message,lang_inst,reward,rgb_list,[action_result,anomaly], step
@@ -226,6 +226,7 @@ def main(vcfg):
 
         # Load checkpoint
         agent.load(model_file)
+        agent=agent.to('cuda:0')
         logging.info(f"Loaded: {model_file}")
 
         record = vcfg['record']['save_video']
@@ -242,7 +243,7 @@ def main(vcfg):
             if os.path.exists(text_path):
                 os.remove(text_path)
             logging.info(f'Test: {test_demos + 1}/{n_demos}')
-            episode, seed = ds.load(i+6)
+            episode, seed = ds.load(i)
             total_reward = 0
             total_nbr_action=0
             np.random.seed(seed)
@@ -268,10 +269,10 @@ def main(vcfg):
             print(f'THE FINAL GOAL: {final_goal}')
             print("Initial State:", initial_state)
 
-            handling_type="distractor"#np.random.choice(["None"])
+            handling_type=np.random.choice(["distractor"])
             if anomaly_type !='None':
                 start=1 if anomaly_type=="displacement" else 0
-                anomaly_time =1# np.random.choice(np.arange(start, len(episode)-1), size=1, replace=False)  ## the step when the anomaly occurr
+                anomaly_time = 2#np.random.choice(np.arange(start, len(episode)-1), size=1, replace=False)  ## the step when the anomaly occurr
                 print("{type} anomaly will occur in step {time}".format(type=anomaly_type,time=anomaly_time))
                 if anomaly_type=="removal":
                     if handling_type=="None":
@@ -285,8 +286,12 @@ def main(vcfg):
 
             episode_message=prompt+episode_message
             #print(episode_message)
-            header,goal_state=get_legal_LLM_feedback(episode_message,None,llm_args,None)
-            episode_message+=header+'\n'+goal_state+'\n'
+            
+            tag,goal_state=get_next_LLM_feedback(episode_message,False,llm_args,None)
+            print(goal_state)
+            if not ":" in tag:
+                tag+=":"
+            episode_message+=tag+"\n"+goal_state
             
             
             #Start recording video (NOTE: super slow)
@@ -302,22 +307,24 @@ def main(vcfg):
                 for color in task.target_color[:-1]:
                     text+=color+", "
                 text+=task.target_color[-1]+"]"
-                env.add_video_frame(Text=text)
+                if record:
+                    env.add_video_frame(Text=text)
             step=0
             state=0 
             occured=False
-            #print(handling_type)
+            #print(task.max_steps)
             while step <task.max_steps:
                 if state ==anomaly_time and not occured:
                     anomaly= anomaly_type  
                     occured=True
                 else:
                     anomaly=None
-                #print(state)
+                #print(episode_message)
                 if use_vlm:
                     results=one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,step,anomaly,handling_type,state,vlm_args,vlm_device=device)
                 else:
                     results=one_step_execution(env,task,agent,obs,info,episode_message,llm_args,use_vlm,step,anomaly,handling_type,state=state)
+
                 if results is None:
                     break
                 episode_message,act_plan,reward,__,feedback,step=results
@@ -331,24 +338,23 @@ def main(vcfg):
                     if record:
                         env.end_rec()  
                         break
-                
-                
-                
                 if act_plan=="done.":
                     history=episode_message[len(prompt):]
+                    #print(history)
                     if "All goals are completed" in history:
                         if anomaly_type=="removal":
                             alert_pred.append(0)
                         if record:
                             env.end_rec()  
                         break
-                if feedback[1] is None:
+                #print(feedback)
+                if feedback is None:
                     if record:
                         env.end_rec()  
-                    break
+                    break             
                 
                 if "no anomaly" in feedback[1]: ## start the next iteration after summarizing the progress and the future steps
-                    episode_message+="### User:\nPlease describe the progress and the remaining goals.\n"
+                    episode_message+="### User: \nPlease describe the progress and the remaining goals.\n"
                     header,state_of_progree_future=get_legal_LLM_feedback(history_message=episode_message,return_prompt = True,llm_args= llm_args,feedback=None)
                     episode_message+=header+'\n'+state_of_progree_future+'\n'
                 else:## without comprehensive analysis
@@ -356,10 +362,12 @@ def main(vcfg):
                     header, reply=get_legal_LLM_feedback(history_message=episode_message,return_prompt = True,llm_args= llm_args,feedback=None)
                     #print(reply)
                     episode_message+=header+'\n'+reply+'\n'
-                
+                                
+
                 
                 obs, __, done, info=env.step()
-                if done:
+                if done: 
+                    #print("fuck")
                     if record:
                         env.end_rec()  
                     break
@@ -372,7 +380,7 @@ def main(vcfg):
                 
             execution_history=episode_message[len(prompt):]       
             if (anomaly_type != 'None' and occured) or anomaly_type == 'None':
-                eval_results.append((task.progress, total_nbr_action))
+                eval_results.append((total_reward, total_nbr_action))
                 test_demos += 1
         
                 with open(text_path, 'a') as f:
@@ -451,6 +459,5 @@ def get_prompt(task:str,anomaly_type:str):
     requirment,prompt, system_info=get_inner_prompt(task=task,anomaly_type=anomaly_type)
     prompt="### System: "+system_info+"\n"+prompt
     return prompt, requirment
-
 if __name__ == '__main__':
     main()

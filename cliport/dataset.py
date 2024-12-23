@@ -317,38 +317,65 @@ class RavensDataset(Dataset):
 class RavensMultiTaskDataset(RavensDataset):
     MULTI_TASKS = {
         # all tasks
-        'multi-all': {
+        'multi-stack': {
             'train': [
-                #'pick-and-place-primitive',
-                #'pick-and-place-primitive-relative-pick-position',
-                # 'pack-box-primitive-relative-pick-position',
-                # 'pack-box-primitive'
-                # 'stack-block-pyramid-seq-seen-colors-primitive',
-                # 'stack-block-pyramid-seq-seen-colors-relative-position'
+                'stack-block-pyramid-seq-seen-colors-primitive',
+                'stack-block-pyramid-seq-seen-colors-relative-position'
+            ],
+            'val': [
+                'stack-block-pyramid-seq-seen-colors-primitive',
+                'stack-block-pyramid-seq-seen-colors-relative-position'
+            ],
+            'test': [
+                'stack-block-pyramid-seq-seen-colors-primitive',
+                'stack-block-pyramid-seq-seen-colors-relative-position'
+            ],
+        },
+
+        'multi-matching': {
+            'train': [
+                'pick-and-place-primitive',
+                'pick-and-place-primitive-relative-pick-position',
+            ],
+            'val': [
+                'pick-and-place-primitive',
+                'pick-and-place-primitive-relative-pick-position',
+            ],
+            'test': [
+                'pick-and-place-primitive',
+                'pick-and-place-primitive-relative-pick-position',
+            ],
+        },
+
+        'multi-pack-B': {
+            'train': [
+                'pack-box-primitive-relative-pick-position',
+                'pack-box-primitive'
+            ],
+            'val': [
+                'pack-box-primitive-relative-pick-position',
+                'pack-box-primitive'
+            ],
+            'test': [
+                'pack-box-primitive-relative-pick-position',
+                'pack-box-primitive'
+            ],
+        },
+
+        'multi-pack-G': {
+            'train': [
                 'pack-google-object-primitive',
                 'pack-google-object-relative-primitive'
             ],
             'val': [
-                #'pick-and-place-primitive',
-                #'pick-and-place-primitive-relative-pick-position',
-                # 'pack-box-primitive-relative-pick-position',
-                # 'pack-box-primitive'
-                # 'stack-block-pyramid-seq-seen-colors-primitive',
-                # 'stack-block-pyramid-seq-seen-colors-relative-position'
                 'pack-google-object-primitive',
                 'pack-google-object-relative-primitive'
             ],
             'test': [
-                #'pick-and-place-primitive',
-                #'pick-and-place-primitive-relative-pick-position',
-                # 'pack-box-primitive-relative-pick-position',
-                # 'pack-box-primitive'
-                # 'stack-block-pyramid-seq-seen-colors-primitive',
-                # 'stack-block-pyramid-seq-seen-colors-relative-position'
                 'pack-google-object-primitive',
                 'pack-google-object-relative-primitive'
             ],
-        }
+        },
 
     }
 
@@ -415,24 +442,16 @@ class RavensMultiTaskDataset(RavensDataset):
     def __getitem__(self, idx):
         # Choose random task.
         self._task = np.random.choice(self.tasks)
-        #print(self._task)
         self._path = os.path.join(self.root_path, f'{self._task}')
         # Choose random episode.
-        #print(len(self.sample_set[self._task]))
         if len(self.sample_set[self._task]) > 0:
             episode_id = np.random.choice(self.sample_set[self._task])
         else:
             episode_id = np.random.choice(range(self.n_episodes[self._task]))
-        #print(episode_id)
-        #print(self._task )
         episode, _ = self.load(episode_id, self.images, self.cache)
 
         # Is the task sequential like stack-block-pyramid-seq?
         is_sequential_task = '-seq' in self._path.split("/")[-1]
-        #print(self._task)
-        #print(episode_id)
-        #print(len(episode))
-        # Return random observation action pair (and goal) from episode.
         i = np.random.choice(range(len(episode) - 1))
         g = i + 1 if is_sequential_task else -1
         sample, goal = episode[i], episode[g]

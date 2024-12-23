@@ -1,21 +1,30 @@
+#!/bin/bash
 
-#source /root/miniconda3/etc/profile.d/conda.sh
-#conda env list
-#source activate loravens
+#DATA_DIR=$1
+DISP=False
 
-# python setup.py develop
-#wandb login 64b0361e494a7e48cf9aab82f6ecd77888550de4
-#pick-and-place-primitive pack-box-primitive-relative-pick-position stack-block-pyramid-seq-seen-colors-relative-position
-for TASK_NAME in stack-block-pyramid-seq-seen-colors-relative-position
-do
+echo "Generating dataset... Folder: $DATA_DIR"
 
-    python cliport/primitive_generator.py  task=$TASK_NAME  n=3000 mode=train data_dir=/mnt/bear1/users/zhangkang/yinxu/Workfolder/data/primitive
+# You can parallelize these depending on how much resources you have
 
-    python cliport/primitive_generator.py  task=$TASK_NAME  n=300 mode=val data_dir=/mnt/bear1/users/zhangkang/yinxu/Workfolder/data/primitive
+#############################
+## Language-Conditioned Tasks
 
- done
+LANG_TASKS='pack-google-object-primitive pack-google-object-relative-primitive'
+for task in $LANG_TASKS
+    do
+        python cliport/primitive_generator.py task=$task mode=train  n=2000 data_dir=/mnt/bear1/users/zhangkang/yinxu/Workfolder/data/primitive disp=$DISP &
+        python cliport/primitive_generator.py task=$task mode=val   n=200 data_dir=/mnt/bear1/users/zhangkang/yinxu/Workfolder/data/primitive disp=$DISP &
+    done
+echo "Finished Language Tasks."
+
+
+
+
+
+
 
 # python cliport/episode_generator.py n=5000 data_dir=/mnt/lynx4/users/zhang/yinxu/Workfolder/data/
 
 
-#torchrun --nnodes=1 --master-port 3637 --nproc_per_node=1 open_flamingo/train/fine_tune_test.py --batch_size_robot 8  --num_epochs 10   --warmup_steps  1875  --resume_from_checkpoint /mnt/lynx1/users/zhang/Workfolder/exp/vlm_exp/openflamingo3B/checkpoint_6.pt
+#torchrun --nnodes=1 --master-port 3637 --nproc_per_node=1 train/fine_tune_test.py --batch_size_robot 12  --num_epochs 10 --warmup_steps 2500 --resume /mnt/bear1/users/zhangkang/yinxu/LLM_models/OpenFlamingo-3B-vitl-mpt1b/base_weight.pt --workers=4

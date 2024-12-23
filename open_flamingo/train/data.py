@@ -27,7 +27,7 @@ _SHARD_SHUFFLE_INITIAL = 500
 _SAMPLE_SHUFFLE_SIZE = 5000
 _SAMPLE_SHUFFLE_INITIAL = 1000
 
-nbr_samples=2
+nbr_samples=4
 
 try:
     import horovod.torch as hvd
@@ -72,11 +72,11 @@ def preprocess_robot_data(sample, tokenizer,max_tokens=256):
         #print(np.asarray(image).shape)
         valid_images.append(vis_processors(image))
         
-    if len(valid_images)<4:
-        valid_images=valid_images + [valid_images[1]] * (4 - len(valid_images))
-    else:
-        middle = valid_images[1:-1]
-        valid_images=[valid_images[0]] + random.sample(middle, 2) + [valid_images[-1]]
+    # if len(valid_images)<4:
+    #     valid_images=valid_images + [valid_images[1]] * (4 - len(valid_images))
+    # else:
+    #     middle = valid_images[1:-1]
+    #     valid_images=[valid_images[0]] + random.sample(middle, 2) + [valid_images[-1]]
     #print(len(valid_images))
     image_tensors=torch.stack(valid_images,dim=0).unsqueeze(1)
     #print(image_tensors.shape)

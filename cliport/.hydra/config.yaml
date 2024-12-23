@@ -1,0 +1,61 @@
+root_dir: ${env:CLIPORT_ROOT}
+tag: default
+debug: false
+mode: test
+agent: cliport
+n_demos: 100
+train_demos: 200
+n_repeats: 1
+gpu:
+- 0
+save_results: true
+update_results: false
+checkpoint_type: steps=26251
+anomaly_type: None
+use_vlm: false
+vlm_device: cuda:1
+prompt_type: cot
+actor:
+  task: lohoravens-pick-and-place-primitive
+  agent: two_stream_full_clip_lingunet_lat_transporter
+  n_rotations: 36
+  n_rotations_pick: 1
+  val_repeats: 1
+  load_from_last_ckpt: false
+  batchnorm: true
+  gpu:
+  - 0
+  accum_grad: 1
+  batch_size: 1
+  attn_stream_fusion_type: add
+  trans_stream_fusion_type: conv
+  lang_fusion_type: mult
+reporter:
+  name: openflamingo3B
+  vision_encoder: null
+  language_encoder: null
+  ckt_path: null
+planner:
+  name: Llama-3.1-8B-instruct
+disp: false
+shared_memory: false
+eval_task: put-block-in-matching-bowl
+model_task: ${eval_task}
+type: single
+model_dir: /mnt/bear1/users/zhangkang/yinxu/Workfolder/exp/
+exp_folder: eval_llm
+data_dir: /mnt/bear1/users/zhangkang/yinxu/Workfolder/data/episodes
+assets_root: ./cliport/environments/assets/
+model_path: /mnt/bear1/users/zhangkang/yinxu/Workfolder/exp/checkpoints_matching/
+train_config: ./cliport/cfg/train.yaml
+save_path: ${model_dir}/${exp_folder}/${eval_task}-n${train_demos}-${mode}/checkpoints/
+results_path: ${model_dir}/${exp_folder}/${eval_task}-n${train_demos}-${mode}/checkpoints/
+record:
+  save_video: false
+  save_video_path: ${model_dir}/${exp_folder}/${eval_task}-n${train_demos}-${mode}/videos/
+  vlm_path: ${model_dir}/${exp_folder}/${eval_task}-n${train_demos}-${mode}/vlm/
+  txt_path: ${model_dir}/${exp_folder}/${eval_task}-n${train_demos}-${mode}/txt/
+  add_text: true
+  fps: 20
+  video_height: 640
+  video_width: 720

@@ -434,39 +434,89 @@ class Environment(gym.Env):
 
     def add_video_frame(self,Text=None):
         # Render frame.
-        config = self.agent_cams[0]
+        config = {
+        'image_size': (480, 640),
+        'intrinsics': (450., 0, 320., 0, 450., 240., 0, 0, 1),
+        'position': (0.5, 0, 0.68),
+        'rotation': p.getQuaternionFromEuler((0, np.pi, -np.pi/2)),
+        'zrange': (0.01, 10.),
+        'noise': False
+    }
         image_size = (self.record_cfg['video_height'], self.record_cfg['video_width'])
-        color, __, _ = self.render_camera(config, image_size, shadow=0)
+        color_, __, _ = self.render_camera(config, image_size, shadow=0)
+        color_ = cv2.resize(
+        color_.astype(np.float32),
+        (image_size[1] // 3, image_size[0] // 3),
+        interpolation = cv2.INTER_AREA)
+        color_ = np.array(color_)
+        
+        
+
+        color, _, _ = self.render_camera(self.agent_cams[0], (640, 720), shadow=0)
+        color = color
+        color = cv2.resize(
+            color.astype(np.float32),
+            (image_size[1], image_size[0]),
+            interpolation = cv2.INTER_AREA)
         color = np.array(color)
+
+        color[:image_size[0] // 3, (-image_size[1] // 3 ):] = color_
+        
+        color = np.array(color[..., :3]).astype(np.float32)
+        
+        
 
         # Add language instruction to video.
         if self.record_cfg['add_text']:
             if Text is None:
-                lang_goal = self.get_lang_goal()
+                lang_goal = "LLM: "+self.get_lang_goal()
             else:
                 lang_goal=Text
 
             font = cv2.FONT_HERSHEY_DUPLEX
             font_scale = 0.65
             font_thickness = 1
-
+            #lang_goal+="fuck fuck fuck fuck fuck fuck fuck fuck fuck fuck fuck"
             # Write language goal.
-            lang_textsize = cv2.getTextSize(lang_goal, font, font_scale, font_thickness)[0]
-            lang_textX = (image_size[1] - lang_textsize[0]) // 2
+            words=lang_goal.split(' ')
+            lang_textsize = cv2.getTextSize(lang_goal, font, font_scale, font_thickness)[0][0]
+            line = ''
+            if lang_textsize>image_size[1]:
+                x=50
+            else:
+                x=(image_size[1] - lang_textsize)//2
+            y=570
+            space_width=cv2.getTextSize(' ', font, font_scale, font_thickness)[0][0]
+            for word in words:
+                # 计算当前行和新单词的宽度
+                line_width = cv2.getTextSize(line + word, font, font_scale, font_thickness)[0][0]
+                if line_width + space_width > 670:
+                    cv2.putText(color, line, (x, y), font, font_scale, color=(0, 0, 0), thickness=font_thickness,lineType=cv2.LINE_AA)
+                    line = word + ' '  # 重新开始新的一行
+                    y += int(font_scale * 30)  # 调整y坐标到下一行，30是行高
+                else:
+                    line += word + ' '
+            
+            if line:
+                cv2.putText(color, line, (x, y), font, font_scale, color=(0, 0, 0),  thickness=font_thickness,lineType=cv2.LINE_AA)
+            
+            #lang_textX = (image_size[1] - lang_textsize[0]) // 2
 
-            color = cv2.putText(color, lang_goal, org=(lang_textX, 600),
-                                fontScale=font_scale,
-                                fontFace=font,
-                                color=(0, 0, 0),
-                                thickness=font_thickness, lineType=cv2.LINE_AA)
+            # color = cv2.putText(color, lang_goal, org=(lang_textX, 600),
+            #                     fontScale=font_scale,
+            #                     fontFace=font,
+            #                     color=(0, 0, 0),
+            #                     thickness=font_thickness, lineType=cv2.LINE_AA)
 
 
-            color = np.array(color)
-
-        self.video_writer.append_data(color)
+        color = np.array(color)
+        color = np.uint8(np.round(color))
+        #cv2.imwrite('/home/zhang/workspace/yinxu/LoHo-Ravens/cliport/0.png',color)
         if Text is not None:
-            for _ in range(50): 
+            for _ in range(20): 
                 self.video_writer.append_data(color)
+        else:
+            self.video_writer.append_data(color)
                 
                 
     def movep(self, pose, speed=0.01):

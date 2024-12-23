@@ -36,40 +36,101 @@ def get_normal_execution(task):
     
     if "match" in task:
         example_1 = ("### User:\n"+
-                    "In the initial state, there are green, red, purple, and yellow blocks; "+
-                    "there are green, red, purple, cyan, and blue bowls; and a trash can.\n"+
+                    "In the initial state, there are green, red, purple, and yellow blocks; there are green, red, purple, cyan, and blue bowls; and a trash can.\n"+
+                    "What is the final goal state?\n"+
+                    "### Assistant:\n"+
+                    "The initial state includes the following matched block and bowl pairs: Green block -> Green bowl, Red block -> Red bowl, Purple block -> Purple bowl. Goal state: ['Green, red, and purple blocks in their matching bowls'].\n"+          
                     "### User:\n"+
-                    "What is your next plan?\n"+         
+                    "What is your next plan?\n" +
                     "### Assistant:\n"+
                     "put the green block in the green bowl.\n" +
                     "### User:\n"+
-                    "What is your next plan?\n"+
+                    'The action succeeded, and no anomaly happened.\n'+
+                    "### User:\n"+
+                    'Please describe the progress and the remaining goals.\n'+
+                    "### Assistant:\n"+
+                    "Progress: ['green block in green bowl']. Remaining goal: ['put the red and purple blocks in their matching bowls'].\n" +
+                    "### User:\n"+
+                    "What is your next plan?\n" +
                     "### Assistant:\n"+
                     "put the red block in the red bowl.\n" +
+                    "### User:\n"+
+                    "The action failed, and no anomaly happened.\n"+
+					"### User:\n"+
+                    'Please describe the progress and the remaining goals.\n'+
+                    "### Assistant:\n"+
+                    "Progress: ['green block in green bowl']. Remaining goal: ['put the red and purple blocks in their matching bowls'].\n" +
+					"### User:\n"+
+                    "What is your next plan?\n" +
+                    "### Assistant:\n"+
+                    "put the red block in the red bowl.\n" +
+                    "### User:\n"+
+                    "The action succeeded, and no anomaly happened.\n"+
+                    "### User:\n"+
+                    'Please describe the progress and the remaining goals.\n'+
+                    "### Assistant:\n"+
+                    "Progress: ['green and red blocks in their matching bowls']. Remaining goal: ['put the purple block in its matching bowl'].\n" +
                     "### User:\n"+
                     "What is your next plan?\n"+
                     "### Assistant:\n"+
                     "put the purple block in the purple bowl.\n" +
                     "### User:\n"+
-                    "What is your next plan?\n"+
+                    "The action succeeded, and no anomaly happened.\n"+
+                    "### User:\n"+
+                    'Please describe the progress and the remaining goals.\n'+
+                    "### Assistant:\n"+
+                    "The progress is ['green, red and purple blocks in their matching bowls']. All goals are completed.\n" +
+                    "### User:\n"+
+                    "What is your next plan?\n" +
                     "### Assistant:\n"+
                     "done.\n"
                     )
         
         example_2 = ("### User:\n"+
                     "In the initial state, there are yellow, blue, orange, green, cyan, and pink blocks; there are yellow, blue, and orange bowls; and a trash can.\n" +
+                    "What is the final goal state?\n"
+                    "### Assistant:\n"+
+                    "The initial state includes the following matched block and bowl pairs: Yellow block -> Yellow bowl, Blue block -> Blue bowl, Orange block -> Orange bowl. Goal state: ['Yellow, blue, and orange blocks in their matching bowls'].\n"+
                     "### User:\n"+
-                    "What is your next plan?\n"+
+                    "What is your next plan?\n" +
                     "### Assistant:\n"+
                     "put the yellow block in the yellow bowl.\n"+
+                    "### User:\n"+
+                    "The action failed, and no anomaly happened.\n"+
+                    "### User:\n"+
+                    "Please describe the progress and the remaining goals.\n"+
+					"### Assistant:\n"+
+					"Progress: ['none of the blocks in their matching bowls']. Remaining goal: ['put the yellow, blue, orange, and orange blocks in their matching bowls'].\n"+
+					"### User:\n"+
+					"What is your next plan?\n"+
+					"### Assistant:\n"+
+                    "put the yellow block in the yellow bowl.\n"+
+					"### User:\n"+
+                    "The action succeeded, and no anomaly happened.\n"+
+                    "### User:\n"+
+                    'Please describe the progress and the remaining goals.\n'+
+                    "### Assistant:\n"+
+                    "Progress: ['yellow block in yellow bowl']. Remaining goal: ['put the blue and orange blocks in their matching bowls'].\n" +
                     "### User:\n"+
                     "What is your next plan?\n"+
                     "### Assistant:\n"+
                     "put the blue block in the blue bowl.\n"+
                     "### User:\n"+
+                    "The action succeeded, and no anomaly happened.\n"+
+                    "### User:\n"+
+                    "Please describe the progress and the remaining goals.\n"+
+                    "### Assistant:\n"+
+                    "Progress: ['yellow and blue blocks in their matching bowls']. Remaining goal: ['put the orange block in its matching bowl'].\n"+
+                    "### User:\n"+
                     "What is your next plan?\n"+
                     "### Assistant:\n"+
                     "put the orange block in the orange bowl.\n"+
+                    "### User:\n"+
+                    "The action succeeded, and no anomaly happened.\n"+
+                    "### User:\n"+
+                    "Please describe the progress and the remaining goals.\n"+
+                    "### Assistant:\n"+
+                    "Progress: ['yellow, blue, and orange blocks in their matching bowls.']. All goals are completed.\n"+
                     "### User:\n"+
                     "What is your next plan?\n"+
                     "### Assistant:\n"+
@@ -77,37 +138,88 @@ def get_normal_execution(task):
         
         example_3 = ("### User:\n"+
                     "In the initial state, there are white, red, pink, and green blocks; there are white, red, pink, yellow, and cyan bowls; and a trash can.\n" +
+                    "What is the final goal state?\n"
+                    "### Assistant:\n"+
+                    "The initial state includes the following matched block and bowl pairs: White block -> White bowl, Red block -> Red bowl, Pink block -> Pink bowl. Goal state:['White, red, and pink blocks in their matching bowls'].\n"+
                     "### User:\n"+
                     "What is your next plan?\n"+
                     "### Assistant:\n"+
                     "put the white block in the white bowl.\n"+
                     "### User:\n"+
-                    "What is your next plan?\n"+
+                    "The action succeeded, and no anomaly happened.\n"+
+                    "### User:\n"+
+                    "Please describe the progress and the remaining goals.\n"+
+                    "### Assistant:\n"+
+                    "Progress: ['white block in white bowl']. Remaining goal: ['put the red and pink blocks in their matching bowls'].\n"+
+                    "### User:\n"+"What is your next plan?\n"+
                     "### Assistant:\n"+
                     "put the red block in the red bowl.\n"+
+                    "### User:\n"+
+                    "The action succeeded, and no anomaly happened.\n"+
+                    "### User:\n"+
+                    "Please describe the progress and the remaining goals.\n"+
+                    "### Assistant:\n"+
+                    "Progress: ['white and red blocks in their matching bowls']. Remaining goal: ['put the pink block in its matching bowl'.]\n"+
                     "### User:\n"+
                     "What is your next plan?\n"+
                     "### Assistant:\n"+
                     "put the pink block in the pink bowl.\n"+
                     "### User:\n"+
+                    "The action failed, and no anomaly happened.\n"+
+                    "### User:\n"+
+                    "Please describe the progress and the remaining goals.\n"+
+					"### Assistant:\n"+
+                    "Progress: ['white and red blocks in their matching bowls']. Remaining goal: ['put the pink block in its matching bowl'.]\n"+
+                    "### User:\n"+
                     "What is your next plan?\n"+
+					"### Assistant:\n"+
+                    "put the pink block in the pink bowl.\n"+
+                    "### User:\n"+
+                    "The action succeeded, and no anomaly happened.\n"+
+                    "### Assistant:\n"+
+                    "Progress: ['white, red, and pink blocks in their matching bowls']. All goals are completed.\n"+
+                    "### User:\n"+
+                    "What is your next plan? \n"+
                     "### Assistant:\n"+
                     "done.\n")
                     
+					
+					
         example_4 = ("### User:\n"+
                     "In the initial state, there are yellow, blue, orange, green, cyan, and pink blocks; there are yellow, blue, orange, red, and white bowls; and a trash can.\n"+ 
+                    "What is the final goal state?\n"+
+                    "### Assistant:\n"+
+                    "The initial state includes the following matched block and bowl pairs: Yellow block -> Yellow bowl, Blue block -> Blue bowl, Orange block -> Orange bowl. Goal state: ['Yellow, blue, and orange blocks in their matching bowls'].\n"+
                     "### User:\n"+
                     "What is your next plan?\n"+
                     "### Assistant:\n"+
                     "put the yellow block in the yellow bowl.\n"+
                     "### User:\n"+
+                    "The action succeeded, and no anomaly happened.\n"+
+                    "### User:\n"+
+                    "Please describe the progress and the remaining goals.\n"+
+                    "### Assistant:\n"+
+                    "Progress: ['yellow block in yellow bowl']. Remaining goal: ['put the blue and orange blocks in their matching bowls'].\n"+
+                    "### User:\n"+
                     "What is your next plan?\n"+
                     "### Assistant:\n"+
                     "put the blue block in the blue bowl.\n"+
                     "### User:\n"+
+                    "The action succeeded, and no anomaly happened.\n"+
+                    "### User:\n"+
+                    "Please describe the progress and the remaining goals.\n"+
+                    "### Assistant:\n"+
+                    "Progress: ['yellow and blue blocks in their matching bowls']. Remaining goal: ['put the orange block in its matching bowl'].\n"+
+                    "### User:\n"+
                     "What is your next plan?\n"+
                     "### Assistant:\n"+
                     "put the orange block in the orange bowl.\n"+
+                    "### User:\n"+
+                    "The action succeeded, and no anomaly happened.\n"+
+                    "### User:\n"+
+                    "Please describe the progress and the remaining goals.\n"+
+                    "### Assistant:\n"+
+                    "Progress: ['yellow, blue, and orange blocks in their matching bowls']. All goals are completed.\n"+
                     "### User:\n"+
                     "What is your next plan?\n"+
                     "### Assistant:\n"+
@@ -115,135 +227,53 @@ def get_normal_execution(task):
         
         example_5 = ("### User:\n"+
                     "In the initial state, there are white, green, yellow, orange, blue, and pink blocks; there are white, green, yellow, orange, and purple bowls; and a trash can.\n"+
+                    "What is the final goal state?\n"+
+                    "### Assistant:\n"+
+					"The initial state includes the following matched block and bowl pairs: White block -> White bowl, Green block -> Green bowl, Yellow block -> Yellow bowl, Orange block -> Orange bowl. Goal state: ['White, green, yellow, and orange blocks in their matching bowls'].\n"+                   
                     "### User:\n"+
                     "What is your next plan?\n"+
                     "### Assistant:\n"+
                     "put the white block in the white bowl.\n"+
                     "### User:\n"+
+                    "The action succeeded, and no anomaly happened.\n"+
+                    "### User:\n"+
+                    "Please describe the progress and the remaining goals.\n"+
+                    "### Assistant:\n"+
+                    "Progress: ['white block in white bowl']. Remaining goal: ['put the green, yellow, and orange blocks in their matching bowls'].\n"+
+                    "### User:\n"+
                     "What is your next plan?\n"+
                     "### Assistant:\n"+
                     "put the green block in the green bowl.\n"+
                     "### User:\n"+
-                    "What is your next plan?\n"+
+                    "The action succeeded, and no anomaly happened.\n"+
+                    "### User:\n"+
+                    "Please describe the progress and the remaining goals.\n"+
                     "### Assistant:\n"+
-                    "put the yellow block in the yellow bowl.\n"+
+                    "Progress: ['white and green blocks in their matching bowls']. Remaining goal: ['put the yellow and orange blocks in their matching bowls'].\n"+
+                    "### User:\n"+
+                    "What is your next plan?\n"+
+                    "### Assistant:\n"+"put the yellow block in the yellow bowl.\n"+
+                    "### User:\n"+
+                    "The action succeeded, and no anomaly happened.\n"+
+                    "### User:\n"+
+                    "Please describe the progress and the remaining goals.\n"+
+                    "### Assistant:\n"+
+                    "Progress: ['the white, green, and yellow blocks are in their matching bowls']. Remaining goal: ['put the orange block in its matching bowl'].\n"+
                     "### User:\n"+
                     "What is your next plan?\n"+
                     "### Assistant:\n"+
                     "put the orange block in the orange bowl.\n"+
                     "### User:\n"+
+                    "The action succeeded, and no anomaly happened.\n"+
+                    "### User:\n"+
+                    "Please describe the progress and the remaining goals.\n"+
+                    "### Assistant:\n"+
+                    "Progress: ['white, green, yellow, and orange blocks in their matching bowls']. All goals are completed.\n"+
+                    "### User:\n"+
                     "What is your next plan?\n"+
                     "### Assistant:\n"+
                     "done.\n")
-        
-        example_6=(
-            "### User:\n"+
-            "In the initial state, there are white, blue, yellow, green, pink, and red blocks; there are white, blue, yellow, orange, cyan, and purple bowls; and a trash can.\n"+
-            "### Assistant:\n"+
-            "put the white block in the white bowl.\n"+
-            "### User:\n"+
-            "What is your next plan?\n"+
-            "### Assistant:\n"+
-            "put the blue block in the blue bowl.\n"+
-            "### User:\n"+
-            "What is your next plan?\n"+
-            "### Assistant:\n"+
-            "put the yellow block in the yellow bowl.\n"+
-            "### User:\n"+
-            "What is your next plan?\n"+
-            "### Assistant:\n"+
-            "done.\n"
-        )
-        
-        example_7=(
-            "### User:\n"+ 
-            "In the initial state, there are red, green, blue, cyan, pink, and orange blocks; there are red, green, blue, cyan, yellow, and purple blocks; and a trash can.\n"+
-            "### Assistant:\n"+
-            "put the red block in the red bowl.\n"+
-            "### User:\n"+
-            "What is your next plan?\n"+
-            "### Assistant:\n"+
-            "put the green block in the green bowl.\n"+
-            "### User:\n"+
-            "What is your next plan?\n"+
-            "### Assistant:\n"+
-            "put the blue block in the blue bowl.\n"+
-            "### User:\n"+
-            "What is your next plan?\n"+
-            "### Assistant:\n"+
-            "put the cyan block in the cyan bowl.\n"+
-            "### User:\n"+
-            "What is your next plan?\n"+
-            "### Assistant:\n"+
-            "done.\n"
-        )
-        
-        example_8=(
-            "### User:\n"+
-            "In the initial state, there are purple, yellow, green, blue, white, and red blocks; there are purple, yellow, green, blue, orange, and pink bowls; and a trash can.\n"+
-            "### Assistant:\n"+
-            "put the purple block in the purple bowl.\n"+
-            "### User:\n"+
-            "What is your next plan?\n"+
-            "### Assistant:\n"+
-            "put the yellow block in the yellow bowl.\n"+
-            "### User:\n"+
-            "What is your next plan?\n"+
-            "### Assistant:\n"+
-            "put the green block in the green bowl.\n"+
-            "### User:\n"+
-            "What is your next plan?\n"+
-            "### Assistant:\n"+
-            "put the blue block in the blue bowl.\n"+
-            "### User:\n"+
-            "What is your next plan?\n"+
-            "### Assistant:\n"+
-            "done.\n"
-            
-        )
-        example_9=(
-            "### User:\n"+ 
-            "In the initial state, there are orange, red, green, blue, pink, and cyan blocks; there are orange, red, green, blue, purple, and yellow bowls; and a trash can.\n"+
-            "### Assistant:\n"+
-            "put the orange block in the orange bowl.\n"+
-            "### User:\n"+
-            "What is your next plan?\n"+
-            "### Assistant:\n"+
-            "put the red block in the red bowl.\n"+
-            "### User:\n"+
-            "What is your next plan?\n"+
-            "### Assistant:\n"+
-            "put the green block in the green bowl.\n"+
-            "### User:\n"+
-            "What is your next plan?\n"+
-            "### Assistant:\n"+
-            "put the blue block in the blue bowl.\n"+
-            "### User:\n"+
-            "What is your next plan?\n"+
-            "### Assistant:\n"+
-            "done.\n"
-        )
-        
-        example_10=(
-            "### User:\n"+ 
-            "In the initial state, there are yellow, green, red, blue, orange, and purple blocks; there are yellow, green, red, blue, pink, and cyan bowls; and a trash can.\n"+
-            "### Assistant:\n"+
-            "put the yellow block in the yellow bowl.\n"+
-            "### User:\n"+
-            "What is your next plan?\n"+
-            "### Assistant:\n"+
-            "put the green block in the green bowl.\n"+
-            "### User:\n"+
-            "What is your next plan?\n"+
-            "### Assistant:\n"+
-            "put the red block in the red bowl.\n"+
-            "### User:\n"+
-            "What is your next plan?\n"+
-            "### Assistant:\n"+
-            "done.\n"
-            
-        )
-        episode_list=[example_1,example_2,example_3,example_4,example_5,example_6,example_7,example_8,example_9,example_10]
+        episode_list=[example_1,example_2,example_3,example_4]
     
     elif task=="packing-boxes":
         episode_1=(
@@ -534,9 +564,9 @@ def get_primitive_set(task="match",color_list=None):
         place_info=[color for color in ALL_COLORS]
         position="in"
     elif "pack" in task:
-        place_target=["brown box"]
+        place_target=["the brown box"]
         position="in"
-        place_info=["brown box"]
+        place_info=["the brown box"]
     else:
         place_target=["the darkest brown block of the stand","the middle brown block of the stand","the lightest brown block of the stand"]
 

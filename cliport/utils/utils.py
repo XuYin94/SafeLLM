@@ -613,13 +613,13 @@ COLORS = {
     'red': [255.0 / 255.0, 087.0 / 255.0, 089.0 / 255.0],
     'green': [089.0 / 255.0, 169.0 / 255.0, 079.0 / 255.0],
     'orange': [242.0 / 255.0, 142.0 / 255.0, 043.0 / 255.0],
-    'yellow': [237.0 / 255.0, 201.0 / 255.0, 072.0 / 255.0],
     'purple': [176.0 / 255.0, 122.0 / 255.0, 161.0 / 255.0],
     'pink': [255.0 / 255.0, 157.0 / 255.0, 167.0 / 255.0],
-    'cyan': [118.0 / 255.0, 183.0 / 255.0, 178.0 / 255.0],
-    'brown': [156.0 / 255.0, 117.0 / 255.0, 095.0 / 255.0],
     'white': [255.0 / 255.0, 255.0 / 255.0, 255.0 / 255.0],
+    'yellow': [237.0 / 255.0, 201.0 / 255.0, 072.0 / 255.0],
+    'brown': [156.0 / 255.0, 117.0 / 255.0, 095.0 / 255.0],
     'gray': [186.0 / 255.0, 176.0 / 255.0, 172.0 / 255.0],
+    'cyan': [118.0 / 255.0, 183.0 / 255.0, 178.0 / 255.0],
 }
 rel_pos=['top left', 'top right', 'bottom left', 'bottom right']
 
@@ -751,10 +751,10 @@ def anomaly_generator(env,output_queue,task=None,perturbation="pick",type="None"
 def box_packing_anomaly_generator(env,output_queue,task=None,perturbation="pick",step=0,type="None"):
     assert perturbation in ["addition","removal","displacement"]
     if perturbation=="addition":
-        case=random.choice(["pick","place","container"])
+        case=random.choice(["pick"])
         #print(case)
         if case in ["pick", "place"]: ## add blocks
-            sample_idx=random.randint(step+1,task.gt_step-1)
+            sample_idx=step#random.randint(step+1,task.gt_step-1)
             obj_id,addition_obj_color,___=task.block_info[sample_idx] ## the obj_info of the addition
             addition_color_value=COLORS[addition_obj_color]
             object_template = 'box/box-template.urdf'
@@ -827,7 +827,7 @@ def box_packing_anomaly_generator(env,output_queue,task=None,perturbation="pick"
         env.remove_object(obj_id)
         anomaly = "the {obj_color} block on the table disappeared.".format(obj_info=obj_color)
     else: ## displacement pertubations, we assume that each action executes successfully
-        affected_progress = 1 if step == 1 else random.randint(1, step)
+        affected_progress = 2#1 if step == 1 else random.randint(1, step)
 
         zone_id=env.obj_ids['fixed'][1]
         zone_pose,zone_rot,zone_size=env.info[zone_id]
@@ -856,54 +856,40 @@ def box_packing_anomaly_generator(env,output_queue,task=None,perturbation="pick"
         else:
             con=" block in the box is moved to other position on the table."
         anomaly = "the "
-        
+        color_list=[]
         for i,(obj,color,__) in enumerate(affected_objs):
             __, __, size = env.info[obj]
             pose = task.get_random_pose(env, size)
             p.resetBasePositionAndOrientation(obj, pose[0],pose[1])
-            # if i == len(items) - 1 and len(items) > 1:  # 最后一个元素前加 'and'
-            #     result += f"and {items[i]}"
-            # elif i == len(items) - 1:  # 如果只有一个元素，直接输出
-            #     result += f"{items[i]}"
-            # else:
-            #     result += f"{items[i]}, "
-            if i ==affected_progress-1 and affected_progress>1:
-                anomaly += "and "+color+""
-            elif i==affected_progress-1:
-                anomaly+=color
-            else:
-                anomaly+=color+", "
-            # if i<affected_progress-1 and affected_progress>2:
-            #     anomaly+=", "
-
-            # if i<affected_progress-1 and affected_progress>2:
-            #     anomaly+=", "
+            color_list.append(color)
             
-            # if i ==affected_progress-1 and affected_progress>1:
-            #     anomaly += "and "
-
-            # anomaly+=color+" "
+        if len(color_list)==1:
+            anomaly+=color_list[0]
+        elif len(color_list) == 2:
+            anomaly+=f"{color_list[0]} and {color_list[1]}"
+        else:
+            anomaly+= ", ".join(color_list[:-1]) + f", and {color_list[-1]}"
         anomaly+= con
-        # rgb, __ = env.multi_view_render()
-        # Image.fromarray(np.uint8(rgb[-1])).convert('RGB').save("1.png") 
+        
     output_queue.put((2,anomaly))
 
 
 
 def matching_bowls_anomaly_generator(env,output_queue,task=None,perturbation="pick",step=0,type="None"): # to generate the anomaly data for VLM training
-    assert perturbation in ["addition","removal","displacement"]
+    #print(perturbation)
+    assert perturbation in ["addition","removal","displacement","combined"]
     if step==0:
         sleep(3)
     if perturbation=="addition":
         if type=="None":## randomly add a task-related object in the zone
             if step>=task.gt_step-1:
                 return None
-            sample_idx=random.randint(step+1,task.gt_step-1)
+            sample_idx=step#random.randint(step+1,task.gt_step-1)
             obj_id,addition_obj_color,target_obj_pose=task.bowl_info[sample_idx] ## the obj_info of the addition
             addition_color_value=COLORS[addition_obj_color]
             idx=0
             while idx<10:
-                addition_type=random.choice(["pick","place","container"])
+                addition_type=random.choice(["place"])
                 if addition_type=="container":
                     obj_urdf='bowl/bowl.urdf'
                     obj_size = (0.12, 0.12, 0)
@@ -957,7 +943,7 @@ def matching_bowls_anomaly_generator(env,output_queue,task=None,perturbation="pi
             if len(task.bowl_info[task.gt_step:])>0:
                 for __,color,__ in task.bowl_info[task.gt_step:]:
                     distractor_list.append(color + " bowl")
-            target_obj=random.choice(distractor_list)
+            target_obj=distractor_list[-1]#random.choice(distractor_list)
             color, obj_type=target_obj.split(" ")
             addition_color_value=COLORS[color]
             if obj_type=="bowl":
@@ -983,7 +969,7 @@ def matching_bowls_anomaly_generator(env,output_queue,task=None,perturbation="pi
                                                                                         position=position)
 
     elif perturbation=="removal":
-        obj_type=random.choice(["block","bowl"])
+        obj_type=random.choice(["bowl"])
         if obj_type=="block":
             obj_list=task.block_info
             category="rigid"
@@ -994,68 +980,251 @@ def matching_bowls_anomaly_generator(env,output_queue,task=None,perturbation="pi
             obj_list=obj_list[task.gt_step:]
         else:
             obj_list=obj_list[step:task.gt_step]
-        goal_id,color,__=random.choice(obj_list)
+        goal_id,color=random.choice(obj_list)[:2]
         obj_info=color+" "+obj_type
         env.remove_object(goal_id,category)
         anomaly = "the {obj_info} on the table disappeared.".format(obj_info=obj_info)
 
-    else:  ## displacement
-        if step==0:
-            return None
-        if step>1:
-            affected_progress = random.randint(1,step)
-        else:
-            affected_progress=1
+    elif perturbation=="displacement":  ## displacement
+        #print("fuck")
+        # if step==0:
+        #     return None
+        # if step>1:
+        #     affected_progress = random.randint(1,step)
+        # else:
+        #     affected_progress=1
+        affected_progress=2
         obj_info = [(info[1],info[0]) for info in task.block_info[:affected_progress]]
         if affected_progress>1:
             con=" blocks in their corresponding bowls are moved to other positions on the table."
         else:
             con=" block in its corresponding bowl is moved to another position on the table."
         anomaly = "the "
+        color_list=[]
         for i,info in enumerate(obj_info):
             color,obj=info[:2]
             __, __, size = env.info[obj]
             pose = task.get_random_pose(env, size)
 
             p.resetBasePositionAndOrientation(obj, pose[0],pose[1])
-
-            if i ==affected_progress-1 and affected_progress>1:
-                anomaly += "and "+color+""
-            elif i==affected_progress-1:
-                anomaly+=color
-            else:
-                anomaly+=color+", "
-
-
+            color_list.append(color)
+            
+        if len(color_list)==1:
+            anomaly+=color_list[0]
+        elif len(color_list) == 2:
+            anomaly+=f"{color_list[0]} and {color_list[1]}"
+        else:
+            anomaly+= ", ".join(color_list[:-1]) + f", and {color_list[-1]}"
         anomaly+= con
 
+    else:  ## unseen perturbations which combine ADD and DIS
+        if step>1:
+            affected_progress = random.randint(1,step)
+        else:
+            affected_progress=1
+        affected_progress=2
+        obj_info = [(info[1],info[0]) for info in task.block_info[:affected_progress]]
+        if affected_progress>1:
+            con=" blocks in their corresponding bowls are moved to other positions on the table."
+        else:
+            con=" block in its corresponding bowl is moved to another position on the table."
+        anomaly_2 = "the "
+        color_list=[]
+        for i,info in enumerate(obj_info):
+            color,obj=info[:2]
+            __, __, size = env.info[obj]
+            pose = task.get_random_pose(env, size)
+
+            p.resetBasePositionAndOrientation(obj, pose[0],pose[1])
+            color_list.append(color)
+            
+        if len(color_list)==1:
+            anomaly_2+=color_list[0]
+        elif len(color_list) == 2:
+            anomaly_2+=f"{color_list[0]} and {color_list[1]}"
+        else:
+            anomaly_2+= ", ".join(color_list[:-1]) + f", and {color_list[-1]}"
+        anomaly_2+= con
+        
+        
+        
+        ### add
+        sample_idx=step#random.randint(step+1,task.gt_step-1)
+        obj_id,addition_obj_color,target_obj_pose=task.bowl_info[sample_idx] ## the obj_info of the addition
+        addition_color_value=COLORS[addition_obj_color]
+        obj_urdf='stacking/block.urdf'
+        obj_size = (0.04, 0.04, 0.04)
+        obj_id,__,target_obj_pose=task.block_info[sample_idx]
+        __,__,obj_size=env.info[obj_id]
+        goal_region=task.determine_region(target_obj_pose[0])
+        i=0
+        while i<=30:
+            position=random.choice(list(set(rel_pos)-set(goal_region)))  ## make sure the added block is in different region
+            #print(position)
+            addition_pose = task.get_random_pose(env, obj_size,zone=position)
+            addition_id = env.add_object(obj_urdf, addition_pose)
+            #print(addition_id)
+            if addition_id is not None:
+                p.changeVisualShape(addition_id, -1, rgbaColor=addition_color_value + [1])
+                break
+            i+=1
+            if addition_id is not None:
+                break
+        if addition_id is None:
+            return None
+        
+        
+        anomaly_1="a never-seen {addition_color} block appears at the {position} zone,".format(addition_color=addition_obj_color,position=position)
+
+
+        
+        anomaly=anomaly_2+" while "+anomaly_1
+        
+        
+    
     output_queue.put((2,anomaly))
 
 
 def stack_block_pyramid_anomaly_generator(env,output_queue,task,perturbation,step,type):
-    assert perturbation in ["addition", "removal", "displacement"]
+    #assert perturbation in ["addition","removal","displacement"]
     if perturbation == "addition":
-        if step > task.gt_step - 1:
+        #print(type)
+        if type =="None":
+            if step > task.gt_step - 1:
+                return None
+            sample_idx = step#random.randint(step,task.gt_step - 1)
+            obj_id, addition_obj_color,target_place_pose,place_desciption= task.block_info[sample_idx]  ## the obj_info of the addition
+            addition_color_value = COLORS[addition_obj_color]
+            __, __, obj_size = env.info[obj_id]
+            while True:
+                addition_list=["container"]
+                # if step<4:
+                #     addition_list.append("place")
+                addition_type = random.choice(addition_list)
+                if addition_type == "container":
+                    obj_template = 'stacking/stand.urdf'
+                    anomaly = "a never-seen stand appears at the {position}."
+                    goal_region = task.determine_region(task.container_info[1][0])
+                else:
+                    obj_template = 'stacking/block.urdf'
+                    if addition_type == "pick":
+                        pose1,__, obj_size = env.info[obj_id]
+                        goal_region = task.determine_region(pose1)
+                        anomaly = "a never-seen {addition_color} block appears at the {position}."
+                    else:
+                        obj_id, addition_obj_color, target_place_pose, place_desciption = task.block_info[step+1]
+                        anomaly = "a never-seen {addition_color} block appears in the {position}."
+                        position=place_desciption
+                obj_urdf = task.fill_template(obj_template, {'DIM': obj_size})
+                if addition_type != "place":
+                    i = 0
+                    while i <= 20:
+                        position = random.choice(
+                            list(set(rel_pos) - set(goal_region)))  ## make sure the added block is in different region
+                        # print(position)
+                        addition_pose = task.get_random_pose(env, obj_size, zone=position)
+                        addition_id = env.add_object(obj_urdf, addition_pose)
+                        if addition_id is not None:
+                            if addition_type!="container":
+                                p.changeVisualShape(addition_id, -1, rgbaColor=addition_color_value + [1])
+                            break
+                        i += 1
+                    # print(addition_id)
+                    if addition_id == None:
+                        continue
+                else:
+                    color_info=[item[1] for item in task.block_info]
+                    block_color = random.choice(list(set(list(COLORS.keys()))-set(color_info)))
+                    block_color_value = COLORS[block_color]
+                    addition_id = env.add_object(obj_urdf, target_place_pose)
+                    p.changeVisualShape(addition_id, -1, rgbaColor=block_color_value + [1])
+                    addition_obj_color = block_color
+                anomaly = anomaly.format(addition_color=addition_obj_color,position=position)
+                break
+        else: ## add distructor blocks that would iccur additional operations
+            distractor_color=task.block_info[-1][1]
+            addition_color_value=COLORS[distractor_color]
+            addition_obj_urdf='stacking/block.urdf'
+            addition_obj_size=(0.04,0.04,0.04)
+            obj_info=distractor_color+" block"
+            i=0
+            while i<=20:
+                position=random.choice(rel_pos)  ## make sure the added block is in different region
+                addition_pose = task.get_random_pose(env, addition_obj_size,zone=position)
+                addition_id = env.add_object(addition_obj_urdf, addition_pose)
+                if addition_id is not None:
+                    p.changeVisualShape(addition_id, -1, rgbaColor=addition_color_value + [1])
+                    break
+                i+=1
+            if addition_id==None:
+                return None
+            anomaly = "a never-seen {obj_info} appears in the {position}.".format(obj_info=obj_info,
+                                                                                        position=position)
+    elif perturbation == "removal":
+        if type == "distractor":
+            obj_list = task.block_info[task.gt_step:]
+        else:
+            obj_list = task.block_info[step+1:task.gt_step]
+        if len (obj_list)==0:
             return None
-        sample_idx = random.randint(step,task.gt_step - 1)
+        goal_id, color= list(random.choice(obj_list))[:2]
+        env.remove_object(goal_id)
+        anomaly = "the {obj_info} block in the table disappeared.".format(obj_info=color)
+
+    elif perturbation=="displacement":  ## displacement
+        if step==2:
+            affected_progress = 2#random.randint(1, 2)
+            obj_info = [info for info in task.block_info[:affected_progress]]
+        else:
+            obj_info=[task.block_info[step-1]]
+            
+        if len(obj_info) > 1:
+            con = " blocks on the stand are moved to other positions on the table."
+        else:
+            con = " block on "+obj_info[-1][-1]+" is moved to another position on the table."
+        anomaly = "the "
+        color_list=[]
+        for i, (obj,color,__,__) in enumerate(obj_info):
+            __, __, size = env.info[obj]
+            pose = task.get_random_pose(env, size)
+
+            p.resetBasePositionAndOrientation(obj, pose[0], pose[1])
+            color_list.append(color)
+        anomaly="the "
+        if len(color_list)==1:
+            anomaly+=color_list[0]
+        elif len(color_list) == 2:
+            anomaly+=f"{color_list[0]} and {color_list[1]}"
+        else:
+            anomaly+= ", ".join(color_list[:-1]) + f", and {color_list[-1]} "
+        #     anomaly+=color+" "
+        #     if len(obj_info)  > 1 and i<len(obj_info)-1:
+        #         anomaly += "and "
+        anomaly += con
+        
+    else: ## combined cases which has ADD and DIS jointly occur
+        sample_idx = step#random.randint(step,task.gt_step - 1)
         obj_id, addition_obj_color,target_place_pose,place_desciption= task.block_info[sample_idx]  ## the obj_info of the addition
         addition_color_value = COLORS[addition_obj_color]
         __, __, obj_size = env.info[obj_id]
         while True:
-            addition_type = random.choice(["container"])
+            addition_list=["container"]
+            # if step<4:
+            #     addition_list.append("place")
+            addition_type = random.choice(addition_list)
             if addition_type == "container":
                 obj_template = 'stacking/stand.urdf'
-                anomaly = "a never-seen stand appears at the {position} zone."
+                anomaly = "a never-seen stand appears at the {position}."
                 goal_region = task.determine_region(task.container_info[1][0])
             else:
                 obj_template = 'stacking/block.urdf'
                 if addition_type == "pick":
                     pose1,__, obj_size = env.info[obj_id]
                     goal_region = task.determine_region(pose1)
-                    anomaly = "a never-seen {addition_color} block appears at the {position} zone."
+                    anomaly = "a never-seen {addition_color} block appears at the {position},"
                 else:
                     obj_id, addition_obj_color, target_place_pose, place_desciption = task.block_info[step+1]
-                    anomaly = "a never-seen {addition_color} block appears in the {position}."
+                    anomaly = "a never-seen {addition_color} block appears in the {position},"
                     position=place_desciption
             obj_urdf = task.fill_template(obj_template, {'DIM': obj_size})
             if addition_type != "place":
@@ -1081,40 +1250,32 @@ def stack_block_pyramid_anomaly_generator(env,output_queue,task,perturbation,ste
                 addition_id = env.add_object(obj_urdf, target_place_pose)
                 p.changeVisualShape(addition_id, -1, rgbaColor=block_color_value + [1])
                 addition_obj_color = block_color
-            anomaly = anomaly.format(addition_color=addition_obj_color,position=position)
+            anomaly_1 = anomaly.format(addition_color=addition_obj_color,position=position)
             break
-    elif perturbation == "removal":
-        if type == "distractor":
-            obj_list = task.block_info[task.gt_step:]
-        else:
-            obj_list = task.block_info[step+1:task.gt_step]
-        if len (obj_list)==0:
-            return None
-        goal_id, color= list(random.choice(obj_list))[:2]
-        env.remove_object(goal_id)
-        anomaly = "the {obj_info} block in the table disappeared.".format(obj_info=color)
-
-    else:  ## displacement
-        if step==2:
-            affected_progress = random.randint(1, 2)
-            obj_info = [info for info in task.block_info[:affected_progress]]
-        else:
-            obj_info=[task.block_info[step-1]]
+        
+        ## Dis simulation
+        affected_progress = 2#random.randint(1, 2)
+        obj_info = [info for info in task.block_info[:affected_progress]]
+            
         if len(obj_info) > 1:
-            con = "blocks on the stand are moved to other positions on the table."
+            con = " blocks on the stand are moved to other positions on the table."
         else:
-            con = "block on "+obj_info[-1][-1]+" is moved to another position on the table."
-        anomaly = "the "
+            con = " block on "+obj_info[-1][-1]+" is moved to another position on the table."
+        color_list=[]
         for i, (obj,color,__,__) in enumerate(obj_info):
             __, __, size = env.info[obj]
             pose = task.get_random_pose(env, size)
 
             p.resetBasePositionAndOrientation(obj, pose[0], pose[1])
-
-            anomaly+=color+" "
-            if len(obj_info)  > 1:
-                anomaly += "and "
-        anomaly += con
+            color_list.append(color)
+        anomaly_2="the "
+        if len(color_list)==1:
+            anomaly+=color_list[0]
+        elif len(color_list) == 2:
+            anomaly_2+=f"{color_list[0]} and {color_list[1]}"
+        else:
+            anomaly_2+= ", ".join(color_list[:-1]) + f", and {color_list[-1]} "
+        anomaly=anomaly_1+" while "+anomaly_2+con#+" while "+anomaly_1
 
     output_queue.put((2, anomaly))
 

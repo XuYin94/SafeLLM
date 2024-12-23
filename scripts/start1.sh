@@ -1,18 +1,21 @@
+#!/bin/bash
 
-#source /root/miniconda3/etc/profile.d/conda.sh
-#conda env list
-#source activate loravens
+#DATA_DIR=$1
+DISP=False
 
-# python setup.py develop
-#wandb login 64b0361e494a7e48cf9aab82f6ecd77888550de4
-#pick-and-place-primitive pack-box-primitive-relative-pick-position stack-block-pyramid-seq-seen-colors-relative-position
-for TASK_NAME in pack-box-primitive-relative-pick-position
-do
+echo "Generating dataset... Folder: $DATA_DIR"
 
-    python cliport/primitive_generator.py  task=$TASK_NAME  n=3000 mode=train data_dir=/mnt/bear1/users/zhangkang/yinxu/Workfolder/data/primitive
+# You can parallelize these depending on how much resources you have
 
-    python cliport/primitive_generator.py  task=$TASK_NAME  n=300 mode=val data_dir=/mnt/bear1/users/zhangkang/yinxu/Workfolder/data/primitive
+#############################
+## Language-Conditioned Tasks
 
- done
+LANG_TASKS='stack-block-pyramid-seq-seen-colors-primitive stack-block-pyramid-seq-seen-colors-relative-position'
+for task in $LANG_TASKS
+    do
+        python cliport/primitive_generator.py task=$task mode=train n=1000 data_dir=/mnt/nas4/yinxu/LLM_workspace/primitive/new disp=$DISP &
+        python cliport/primitive_generator.py task=$task mode=val   n=100 data_dir=/mnt/nas4/yinxu/LLM_workspace/primitive/new disp=$DISP &
+    done
+echo "Finished Language Tasks."
 
-# python cliport/episode_generator.py n=5000 data_dir=/mnt/lynx4/users/zhang/yinxu/Workfolder/data/
+

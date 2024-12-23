@@ -80,7 +80,7 @@ def main():
         "--resume_from_checkpoint",
         type=str,
         help="path to checkpoint to resume from, this should contain model, optimizer, and lr_scheduler states. if there exists a checkpoint in the dir named run_name, we will resume from that checkpoint by default",
-        default=None,
+        default="/mnt/bear1/users/zhangkang/yinxu/LLM_models/OpenFlamingo-3B-vitl-mpt1b/checkpoint.pt",
     )
     parser.add_argument(
         "--delete_previous_checkpoint",
@@ -130,7 +130,7 @@ def main():
     # data args
     parser.add_argument(
         "--robot_shards",
-        default="/mnt/bear1/users/zhangkang/yinxu/Workfolder/data/vlm/shards/one_view/shard-{000000..000010}.tar",
+        default="/mnt/bear1/users/zhangkang/yinxu/Workfolder/data/vlm/shards/one_view/shard-{000000..000031}.tar",
         type=str,
         help="path to c4 shards, this should be a glob pattern such as /path/to/shards/shard-{000..0999}.tar",
     )
@@ -273,9 +273,13 @@ def main():
         if args.rank == 0:
             print(f"Loading checkpoint from {args.resume_from_checkpoint}")
         checkpoint = torch.load(args.resume_from_checkpoint, map_location="cpu")
-        msd = checkpoint["model_state_dict"]
+        if "checkpoint" in args.resume_from_checkpoint:
+            msd = checkpoint["model_state_dict"]
+            resume_from_epoch = checkpoint["epoch"] + 1
+        else:
+            msd=checkpoint
         msd = {k.replace("module.", ""): v for k, v in msd.items()}
-        resume_from_epoch = checkpoint["epoch"] + 1
+
 
         # for fsdp, only one rank needs to load the state dict
         if not args.fsdp or args.rank == 0:
@@ -390,7 +394,7 @@ def main():
         )
 
     # load optimizer checkpoint
-    if args.resume_from_checkpoint is not None:
+    if "checkpoint" in args.resume_from_checkpoint:
         osd = checkpoint["optimizer_state_dict"]
         if args.fsdp:
             osd = FSDP.optim_state_dict_to_load(osd, ddp_model, optimizer)
@@ -423,7 +427,7 @@ def main():
         )
 
     # load lr scheduler checkpoint
-    if args.resume_from_checkpoint is not None:
+    if "checkpoint" in args.resume_from_checkpoint:
         lr_scheduler.load_state_dict(checkpoint["lr_scheduler_state_dict"])
 
     # Start training!
@@ -446,7 +450,7 @@ def main():
         )
         save_checkpoint(ddp_model, optimizer, lr_scheduler, epoch, args)
 
-    save_checkpoint(ddp_model, optimizer, lr_scheduler, 0, args)
+    #save_checkpoint(ddp_model, optimizer, lr_scheduler, 0, args)
 
 
 if __name__ == "__main__":

@@ -3,7 +3,7 @@ import re
 from time import sleep
 from typing import Union, List, Dict, Any
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer, TextStreamer
+from transformers import AutoModelForCausalLM, AutoTokenizer, TextStreamer,MllamaForConditionalGeneration, AutoProcessor,BitsAndBytesConfig
 from prompt import get_cot_prompt
 
 import os
@@ -21,23 +21,42 @@ OPEN_SOURCE_LLMs = {"Llama-2-7b":
                      "type": "instruction"},
                     "Llama-3.1-8B-instruct":
                      {"path":"/mnt/bear1/users/zhangkang/yinxu/LLM_models/Meta-Llama-3.1-8B-Instruct/",
+                     "type": "instruction"},
+                    "Llama-3.1-70B-Instruct":
+                     {"path":"/mnt/bear1/users/zhangkang/yinxu/LLM_models/Llama-3.1-70B-Instruct/",
+                     "type": "instruction"},
+                    "Llama-3.2-11B-Vision-Instruct":
+                     {"path":"/mnt/bear1/users/zhangkang/yinxu/LLM_models/Llama-3.2-11B-Vision-Instruct",
                      "type": "instruction"}}
 def text_parsing (generated_output: str):
     #print(generated_output)
-    before_gen=generated_output.split('\n')[:2]
-    #print(before_gen)
+    lines = [line for line in generated_output.split('\n') if line.strip()]
+    before_gen=lines[:2]
     return before_gen
 
 def load_llm(llm_name: str):
     logging.info("-" * 10 + f"Loading the LLM {llm_name}" + "-" * 10)
     assert llm_name in OPEN_SOURCE_LLMs.keys()
+    #if llm_name=="Llama-3.2-11B-Vision-Instruct":
+        
+    
+    
     path=OPEN_SOURCE_LLMs[llm_name]['path']
-    tokenizer = AutoTokenizer.from_pretrained(path,TOKENIZERS_PARALLELISM=True)
+    tokenizer = AutoTokenizer.from_pretrained(path)
+    quantization_config = BitsAndBytesConfig(
+        load_in_4bit=True,
+        bnb_4bit_use_double_quant=True,
+        bnb_4bit_quant_type="nf4",
+        bnb_4bit_compute_dtype=torch.bfloat16
+        )
+    
+    
     model = AutoModelForCausalLM.from_pretrained(
         path,
         device_map="auto",
-        torch_dtype=torch.float16,
-        rope_scaling={"type": "dynamic", "factor": 2}  # allows handling of longer inputs
+        quantization_config=quantization_config
+        #rope_scaling={"type": "dynamic", "factor": 2}  # allows handling of longer inputs
+        
     )
     streamer = TextStreamer(tokenizer, skip_prompt=True, skip_special_tokens=True)
     if tokenizer.pad_token is None:
@@ -130,18 +149,21 @@ def get_next_LLM_feedback(history_message: str,return_prompt: bool = False,llm_a
     decoded_output = tokenizer.decode(output[0], skip_special_tokens=True)
     #print(decoded_output)
     decoded_output=decoded_output[ori_len:]
+    #print(decoded_output)
     response = text_parsing(decoded_output)
-    #print(response)
     header_type,response=response[0],response[1]
     response=response.split('###')[0].strip()
     return header_type,response
 
 def get_legal_LLM_feedback(history_message: str,return_prompt: bool = False,llm_args: Dict = None,feedback: str=None):
-    while True:
+    i=0
+    while i<20:
         header_type,response=get_next_LLM_feedback(history_message,False,llm_args,feedback)
-        #print(header_type)
-        if "### Assistant:" == header_type:
+        if "### Assistant:" == header_type or "### Assistant"==header_type:
             break
+        i+=1
+    if i==20:
+        return None
     return header_type,response
 
 

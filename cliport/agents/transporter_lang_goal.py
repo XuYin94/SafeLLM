@@ -79,7 +79,6 @@ class TwoStreamClipLingUNetTransporterAgent(TransporterAgent):
         # TODO: batch (should be compatible with the modified interface)
         img = self.test_ds.get_image(obs)
         lang_goal = info['lang_goal']
-        #print(lang_goal)
         # Attention model forward pass.
         pick_inp = {
             'inp_img': torch.from_numpy(img).to(dtype=torch.float, device=self.device).unsqueeze(0), 

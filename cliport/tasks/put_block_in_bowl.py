@@ -250,7 +250,7 @@ class PutBlockInMatchingBowl(Task):
         self.goals.append((blocks, np.eye(len(blocks)), bowl_poses, False, True, 'pose', None, 1))
 
         # Only one mistake allowed.
-        self.max_steps = len(blocks) + 2
+        self.max_steps = len(blocks) + 10
 
         # Colors of distractor objects.
         # distractor_bowl_colors = [utils.COLORS[c] for c in utils.COLORS if c not in selected_color_names]
@@ -260,7 +260,7 @@ class PutBlockInMatchingBowl(Task):
 
         # Add distractors.
         n_distractors = 0
-        max_distractors = 6
+        max_distractors = 3
         distractor_block = []
         distractor_bowl = []
         while n_distractors < max_distractors and distractor_colors:

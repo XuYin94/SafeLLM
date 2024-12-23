@@ -142,7 +142,7 @@ class PackingBoxes(Task):
 
             self.block_info[i]+=(true_pose,)
         # Add distractor objects
-        num_distractor_objects = 4
+        num_distractor_objects = 3
         distractor_bbox_idxs = np.random.choice(len(bboxes), num_distractor_objects)
         for bbox_idx in distractor_bbox_idxs:
             bbox = bboxes[bbox_idx]

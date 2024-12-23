@@ -53,10 +53,12 @@ def main(
         max_gen_len=max_gen_len,
         temperature=temperature,
         top_p=top_p,
+        logprobs=True
     )
     for prompt, result in zip(prompts, results):
-        print(prompt)
-        print(f"> {result['generation']}")
+        #print(prompt)
+        #print(f"> {result['generation']}")
+        print(len(result['logprobs']))
         print("\n==================================\n")
 
 

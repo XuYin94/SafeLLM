@@ -12,6 +12,7 @@ from PIL import Image
 import base64
 import json
 import pickle
+import random
 
 pattern = r"'(.*?)'"
 # Setup parameters for shard writers.
@@ -57,8 +58,13 @@ def convert_pkl2shards_two_view(root_path,output_path):
                             base64_images = []
                             episode_path=sorted(os.listdir(os.path.join(sub_path,field,fname)))
                             #episode_path=[episode_path[0],episode_path[-1]]  ## only use the 1st/last render images to infer the robot action and the anomaly scene
+                            if len(episode_path)>4:
+                                episode_path=[episode_path[0]]+random.sample(episode_path[1:-1], 2)+[episode_path[-1]]
+                            elif len(episode_path)<4:
+                                episode_path=[episode_path[0]]+[episode_path[1],episode_path[1]]+[episode_path[-1]]
+                            assert len(episode_path)==4
+                            
                             for img_idx, img in enumerate(episode_path):
-                                
                                 #image = Image.open(os.path.join(sub_path,'font_img',fname,img)).convert("RGB")
                                 with open(os.path.join(sub_path,field,fname,img),'rb') as img_file:
                                     img_bytes = img_file.read()
@@ -105,8 +111,11 @@ def convert_pkl2shards(root_path,output_path):
                             sample_data={}
                             base64_images = []
                             episode_path=sorted(os.listdir(os.path.join(sub_path,field,fname)))
-                            #episode_path=[episode_path[0],episode_path[-1]]  ## only use the 1st/last render images to infer the robot action and the anomaly scene
-                            #print(len(episode_path))
+                            if len(episode_path)>4:
+                                episode_path=[episode_path[0]]+random.sample(episode_path[1:-1], 2)+[episode_path[-1]]
+                            elif len(episode_path)<4:
+                                episode_path=[episode_path[0]]+[episode_path[1],episode_path[1]]+[episode_path[-1]]
+                            assert len(episode_path)==4
                             for img_idx, img in enumerate(episode_path):
                                 
                                 #image = Image.open(os.path.join(sub_path,'font_img',fname,img)).convert("RGB")
@@ -123,6 +132,7 @@ def convert_pkl2shards(root_path,output_path):
 
                             language_x+=answer_text
                             language_x+="<|endofchunk|><|endoftext|>"
+                            #print(language_x)
                             sample_data["img"]=base64_images
                             sample_data["text"]=language_x
                             #sample=json.dumps({"image":base64_images,"text":language_x})
@@ -137,7 +147,8 @@ if __name__ == "__main__":
 
     #convert_pkl2shards("/mnt/bear1/users/zhangkang/yinxu/Workfolder/data/vlm/","/mnt/bear1/users/zhangkang/yinxu/Workfolder/data/vlm/shards/one_view")
     convert_pkl2shards_two_view("/mnt/bear1/users/zhangkang/yinxu/Workfolder/data/vlm/","/mnt/bear1/users/zhangkang/yinxu/Workfolder/data/vlm/shards/two_view/")
-    # data = pickle.load(open("/mnt/lynx1/users/zhang/Workfolder/data/primitive/pick-and-place-primitive-train/info/000012-26.pkl", 'rb'))
-    # print(data)
-    #data=load_field()
-    #print(data)
+    # path="/mnt/bear1/users/zhangkang/yinxu/Workfolder/data/vlm/stack-block-pyramid-seq-unseen-colors-train/success/info/"
+    # for file in os.listdir(path):
+    #     data = pickle.load(open(os.path.join(path,file), 'rb'))
+    #     answer=data['answer']
+    #     print(answer.split(',')[1])
